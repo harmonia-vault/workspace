@@ -68,7 +68,8 @@ func exerciseProtectedDaemonProcess(t *testing.T, directory, uid string, certifi
 		select {
 		case err := <-done:
 			if err != nil {
-				t.Errorf("正式 daemon 结束失败：%v", err)
+				data, _ := os.ReadFile(logFile.Name())
+				t.Errorf("正式 daemon 结束失败：%v；固定诊断 contextCanceled=%t", err, bytes.Contains(data, []byte("context canceled")))
 			}
 		case <-time.After(5 * time.Second):
 			_ = process.Process.Kill()
@@ -205,4 +206,104 @@ func exerciseProtectedDaemonProcess(t *testing.T, directory, uid string, certifi
 		t.Fatal("撤销后正式 fragment 留有合成托管值", err)
 	}
 	t.Log("通过：实际无 fixture CLI daemon 在没有登录 session 的情况下从已接受入网回执启动，经显式测试 CA 的 HTTPS boot/授权拉取和身份 IPC；独立 CLI 的 put/delete/选中导入、原ID丢回应/历史重试、本机override、暂停拒写通过；关单次 CLI 服务继续，暂停收到撤销仍清托管值。宿主 env 未修改。")
+}
+
+func exerciseV2DaemonProcess(t *testing.T, directory, uid string, certificate *x509.Certificate, bootPerformed func() bool) {
+	t.Helper()
+	private := filepath.Dir(directory)
+	caFile := filepath.Join(private, "test-ca.pem")
+	if err := os.WriteFile(caFile, pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: certificate.Raw}), 0600); err != nil {
+		t.Fatal(err)
+	}
+	binary := filepath.Join(private, "harmonia-acceptance")
+	build := exec.Command("go", "build", "-o", binary, "./cmd/harmonia")
+	build.Dir = "../core-go"
+	// 仅沿用构建工具路径与 Go 缓存位置；不传入宿主真实环境值。
+	goEnv := exec.Command("go", "env", "GOCACHE", "GOMODCACHE", "GOPATH")
+	goEnv.Env = []string{"PATH=" + os.Getenv("PATH")}
+	// go env 需要用户配置的默认目录；通过显式只读值提取，不枚举环境。
+	for _, key := range []string{"HOME", "USERPROFILE", "GOCACHE", "GOMODCACHE", "GOPATH"} {
+		if value := os.Getenv(key); value != "" {
+			goEnv.Env = append(goEnv.Env, key+"="+value)
+		}
+	}
+	cacheOutput, err := goEnv.Output()
+	if err != nil {
+		t.Fatal("读取 Go 工具缓存位置失败")
+	}
+	cachePaths := strings.Split(strings.TrimSpace(string(cacheOutput)), "\n")
+	if len(cachePaths) != 3 {
+		t.Fatal("Go 缓存位置结果不完整")
+	}
+	build.Env = []string{"PATH=" + os.Getenv("PATH"), "GOCACHE=" + cachePaths[0], "GOMODCACHE=" + cachePaths[1], "GOPATH=" + cachePaths[2], "CGO_ENABLED=0"}
+	if output, err := build.CombinedOutput(); err != nil {
+		t.Fatalf("实际 CLI 构建失败：%v\n%s", err, output)
+	}
+	logFile, err := os.OpenFile(filepath.Join(private, "daemon-test.log"), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer logFile.Close()
+	process := exec.Command(binary, "daemon", "--local-directory", directory, "--local-user", uid, "--ca-file", caFile, "--interval", "20ms", "--sync-interval", "1s")
+	process.Env = []string{"PATH=" + os.Getenv("PATH")}
+	process.Stdout, process.Stderr = io.Discard, logFile
+	if err = process.Start(); err != nil {
+		t.Fatal(err)
+	}
+	done := make(chan error, 1)
+	go func() { done <- process.Wait() }()
+	defer func() {
+		_ = process.Process.Signal(syscall.SIGTERM)
+		select {
+		case err := <-done:
+			if err != nil {
+				data, _ := os.ReadFile(logFile.Name())
+				t.Errorf("正式 daemon 结束失败：%v；固定诊断 contextCanceled=%t", err, bytes.Contains(data, []byte("context canceled")))
+			}
+		case <-time.After(5 * time.Second):
+			_ = process.Process.Kill()
+			<-done
+			t.Error("正式 daemon 未正常停止")
+		}
+	}()
+	callInput := func(command, input string, extra ...string) ([]byte, error) {
+		args := append([]string{command, "--local-directory", directory, "--local-user", uid}, extra...)
+		cli := exec.Command(binary, args...)
+		cli.Env = []string{"PATH=" + os.Getenv("PATH")}
+		cli.Stdin = strings.NewReader(input)
+		return cli.CombinedOutput()
+	}
+	call := func(command string, extra ...string) ([]byte, error) {
+		return callInput(command, "", extra...)
+	}
+	waitStatus := func(predicate func(localipc.Status) bool) localipc.Status {
+		t.Helper()
+		deadline := time.Now().Add(12 * time.Second)
+		for time.Now().Before(deadline) {
+			output, err := call("status")
+			var status localipc.Status
+			if err == nil && json.Unmarshal(output, &status) == nil && predicate(status) {
+				return status
+			}
+			time.Sleep(25 * time.Millisecond)
+		}
+		t.Fatal("正式 daemon/IPC 未在期限内收敛")
+		return localipc.Status{}
+	}
+	waitStatus(func(s localipc.Status) bool {
+		return bootPerformed() && s.Sequence == 5 && s.AccountGeneration == 1 && s.Environments == 1
+	})
+	exports, err := call("export")
+	if err != nil || !bytes.Contains(exports, []byte("historical-a-synthetic")) || !bytes.Contains(exports, []byte("historical-b-synthetic")) {
+		t.Fatal("真实 v2 daemon 未从受保护双签回执重建逐环境来源", err)
+	}
+	if _, err = callInput("put", "readonly-daemon-synthetic", "--environment", "dev", "--name", "RO_DAEMON_WRITE", "--value-stdin", "--request-id", "v2-daemon-readonly"); err == nil {
+		t.Fatal("v2只读daemon被允许写云")
+	}
+	waitStatus(func(s localipc.Status) bool { return s.Sequence == 5 })
+	fragment, err := os.ReadFile(filepath.Join(directory, "environment.sh"))
+	if err != nil || !bytes.Contains(fragment, []byte("historical-a-synthetic")) || !bytes.Contains(fragment, []byte("historical-b-synthetic")) {
+		t.Fatal("v2正式fragment缺少历史来源", err)
+	}
+	t.Log("通过：独立正式 v2 daemon 无登录session，重验加密双签证书与完整逐环境proof，新boot会话和普通pull验证A/B历史；RO共享写失败，停止后台保留配置。")
 }
