@@ -1,11 +1,11 @@
-# Execution plan
+# 执行计划
 
-1. **Inventory and baseline (M0)**: inspect relevant local rules/memory summaries only, verify GitHub identity/org admin, tools/VMs; save design, threat model and execution plan; initialize MIT public repositories immediately after a privacy/secret review.
-2. **First tested vertical slice (M1)**: deterministic protocol/types/vectors; mature-library AEAD/signatures/HPKE; local merge/override/restoration/expiry engine and CLI; server account-scoped persistence/sequence/idempotency/current authorization; synthetic end-to-end tests. No trusted pairing bypass in a production path.
-3. **Enrollment and account lifecycle (M2)**: audited mature SPAKE2 integration, phone trust confirmation/grants, HTTPS sign-in/Argon2id, email switches/verification/reset, multi-account isolation and replay checkpoints. All controls fail closed until available.
-4. **Recovery and rotation (M3)**: seed derivation/envelopes, restricted recovery, bound one-use challenges, full re-entry and atomic key/envelope rotation, reset-generation invalidation and uncertain-result queries.
-5. **Local system integration (M4)**: per-user boot services, atomic shell fragments/Windows user registry, explicit selected import, pause/revocation/logout, durable crash reconciliation. Verify in isolated VM accounts; do not modify host environment.
-6. **Mobile + runtime acceptance (M5)**: one bounded Claude Opus 5.5 medium UI call after subscription/model validation; Flutter + Go boundary, Android platform protection/CRUD/approval/recovery; emulator acceptance. Keep iOS compatibility and report unrun iOS checks. Verify Docker SQLite restart and Workers D1/DO/Argon2 runtime behavior locally; no deployment.
-7. **Review and handoff**: refresh submodule commits, repeat source privacy check, push tested code and evidence, report precise paths/links/results and all unfinished security gates. No production-ready claim.
+1. **M0 盘点与基线**：相关工作规范和 memory_summary（不读 sessions）、GitHub 身份/组织权限、工具/VM；保存完整设计；秘密/个人数据检查后立即初始化并公开 MIT 五仓库。
+2. **M1 首个可测试纵向切片**：确定性协议/向量；成熟 AEAD、签名、HPKE；本机合并、override、逐 key 恢复、到期清理和 CLI；服务端账号持久化、序号、幂等与当前授权；合成端到端测试。生产路径不得提供无证明的设备信任绕过。
+3. **M2 配对与账号生命周期**：成熟 SPAKE2、手机审批/管理签授权、HTTPS 登录/Argon2id、独立注册/验证开关、发信验证/重置、多账号隔离和检查点。尚未实现的控制默认拒绝。
+4. **M3 恢复与轮换**：种子分用途派生/恢复封套、受限恢复会话、绑定单次挑战、完整重输新码、原子钥匙/封套切换、账号 generation 重置、结果不明查询。
+5. **M4 本机系统集成**：按用户开机服务、原子 shell fragment、Windows 用户 registry、显式勾选导入、暂停/撤销/退出、崩溃幂等收敛；隔离 VM 账号验证，不污染宿主。
+6. **M5 移动与运行时验收**：验证订阅/真实参数后仅一次 Claude Opus 5.5 medium UI 调用；Flutter+Go、Android 钥匙保护/CRUD/审批/恢复和模拟器；保留 iOS 兼容并如实报告未跑检查。Node SQLite 重启与 Workers D1/DO/Argon2 运行时本地实测，不部署。
+7. **审查交付**：刷新 submodule 固定提交、秘密/个人数据复查，推送经过测试的源码和证据，报告路径、链接、通过/失败/未跑以及所有未完成安全门槛。
 
-Work is milestone-driven; implementation does not stop at scaffolding. These milestones may require several sustained task turns. Each accepted result is committed and documented with actual test evidence.
+持续按可测试里程碑推进，不在脚手架结束。目标涉及多轮持续实现；每个已验证结果保存提交，设计目标不能冒充实现结果。所有文档使用中文，MIT 法律原文保持英文。

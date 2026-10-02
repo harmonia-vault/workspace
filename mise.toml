@@ -2,3 +2,11 @@
 go = "1.26.4"
 node = "24.16.0"
 pnpm = "11.5.2"
+
+[tasks.test]
+description = "执行 Go 与 TypeScript 的安全/业务测试"
+run = ["cd core-go && mise run test", "cd server && mise run test"]
+
+[tasks.check-source]
+description = "公开前检查源码秘密和个人路径"
+run = "python3 scripts/check_source.py"

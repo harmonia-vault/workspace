@@ -1,49 +1,67 @@
-# Harmonia / 和弦 — design baseline
+# Harmonia / 和弦：完整设计基线
 
-Status: experimental implementation. This document specifies the target, not a claim that every control is implemented. See PLAN.md and STATUS.md for evidence.
+当前状态：实验性安全软件。本文记录目标设计，不代表所有安全控制已经实现。实际结果见 PLAN.md、STATUS.md 和各仓库测试说明。
 
-## Product boundary
+## 产品范围与五仓库
 
-One person's devices share encrypted credentials and environment variables. Public self-hosted installations may host many strictly isolated email accounts. CLI and mobile accept a user-selected HTTPS endpoint. Environments are independent; each device has its own activation order, with later/higher priority sources overriding duplicate names and distinct names merging. Android Flutter + Go is the first mobile target; preserve an iOS path. Go CLI targets macOS, Linux and Windows. TypeScript server business logic is shared by Workers and Docker.
+面向单个用户的多设备凭据与环境变量同步；公开自托管实例可容纳多个严格隔离的邮箱账号。CLI 与手机可填写自托管 HTTPS 地址。支持多环境，每台设备独立维护激活列表与优先级：高优先级环境同名覆盖，不同名合并。Go 提供核心和 macOS、Linux、Windows CLI；手机采用 Flutter + Go，Android 首版，保留 iOS 兼容；服务端 TypeScript。
 
-## Repository topology
+protocol 管协议、确定性签名编码、威胁模型和互操作测试向量；core-go 管密码学、本机状态协调、同步、CLI 和移动桥；mobile 管 Flutter UI 和平台钥匙保护；server 管账号隔离、授权、写入顺序、持久化、恢复和邮件适配；workspace 用公开 HTTPS submodule 组织统一开发。项目各种文档统一中文，协议字段、代码标识及工具原生配置保留必要英文；MIT LICENSE 保留标准英文法律原文。首轮不配置 CI/CD、不发布 Release 或安装包、不部署真实线上服务。
 
-`protocol` owns versioned wire schemas, deterministic signing encoding, threat model and interoperability vectors. `core-go` owns crypto, local reconciliation, sync, CLI and mobile bridge. `mobile` owns Flutter UI and platform local key protection. `server` owns account isolation, authorization, accepted write order, persistence, recovery and email adapters. `workspace` uses public HTTPS submodules and coordinates documentation and local tasks. No CI/CD or production deployment is part of initial implementation.
+## 登录与设备信任
 
-## Security and authority
+账号登录不等于设备可信。客户端密码处理严格为 SHA256(password)，不增加客户端 salt、domain 或 KDF，通过 HTTPS 发送固定派生登录凭据；它是可重放的密码等价凭据，不得进入日志、监控或缓存。服务端独立随机 salt + Argon2id 保存验证值；此凭据不能作为 vault 钥匙。不采用 OPAQUE、MD5 或 Passkey。
 
-Server authentication is not device trust. Password processing is exactly SHA256(password) at the client, transported over HTTPS; it is a replayable password-equivalent credential. Server uses its own random salt and Argon2id and must never log/cache that credential. It never derives vault encryption from the password. No MD5, OPAQUE or Passkey.
+新设备本地产生独立接收与签名密钥。采用成熟 SPAKE2 实现完成短时、单次短码配对，秘密短码不交服务器。挑战绑定账号、用途、会话与确切设备公钥。可信管理手机确认环境角色和期限后授权，可有多台管理手机。永久授权持续至撤销；限时授权由服务端逐次拒绝过期请求，客户端即使离线也按期限停止环境生效并清相关缓存、重算其他来源。已读取的明文不能追回。
 
-Each environment gets a fresh random 256-bit key. XChaCha20-Poly1305 encrypts data with versioned, domain-separated associated data. HPKE suite X25519/HKDF-SHA256/ChaCha20-Poly1305 wraps keys. Independent Ed25519 keys sign device mutations; deterministic versioned encoding binds account ID/generation, device, environment/key version, grant generation, operation and idempotency key. Mature libraries and cross-language vectors are required. Public-key trust comes from trusted management-device authorization, never an untrusted server-provided key alone. Clients keep the highest accepted checkpoint and generation to reject basic replay; external witness infrastructure is outside scope.
+手机钥匙要求系统设备密码或强生物认证，不强制人脸、不用 Passkey。平台保护的软件钥匙不得宣传为始终硬件内。开机服务凭据不能只依赖登录后解锁的 Keychain：采用按本机用户隔离、仅服务和目标用户可访问的状态与平台保护方案，并明确无人登录可用性与磁盘/root 访问的权衡；全盘加密在启动前需要解锁，不能绕过。受损 root 或已解锁磁盘不能得到虚假的安全承诺。
 
-RO can read all keys in an authorized environment and, by possessing the symmetric key, can manufacture ciphertext. Therefore server and clients must validate signed write/delete operations and current management-signed grants. RW may explicitly edit through the app/CLI only. Admin grants and revokes roles. Every request is checked against current roles, generation, revocation and expiry, including every message after a WebSocket handshake. Server acceptance order determines LWW; identical idempotent retries retain the original sequence, and a reused ID with changed content is rejected.
+## 端到端加密、签名和授权
 
-New devices generate separate receiving/signing keypairs locally. A short-lived one-use pairing ceremony uses a mature SPAKE2 implementation; the short secret code never goes to the server. Challenges bind account, purpose, session and exact public keys. A trusted phone approves environments, RO/RW/Admin and expiry. Several phones may manage an account. Permanent authorization lasts until revocation. Local expiry is enforced offline and clears affected cached material; received revocations execute even while paused. Previously disclosed plaintext cannot be recalled.
+每个环境独立随机 256 位钥匙；数据采用 XChaCha20Poly1305，并绑定版本化、域分离关联数据。钥匙封套采用 HPKE：X25519 / HKDF-SHA256 / ChaCha20Poly1305。设备独立 Ed25519 签名。签名编码必须确定、版本化、域分离，绑定账号 ID/generation、设备、环境/key version、grant generation、操作和幂等 ID。只使用成熟库并提供跨语言测试向量。
 
-Phone keys require the OS device passcode or strong biometric policy, without requiring a face or Passkey. Software keys protected by the platform must not be described as always hardware-backed. Desktop service secrets cannot require a login-unlocked Keychain: pre-login service availability trades off against disk/root access. Use per-user isolated, service-readable encrypted state with a machine protector and documented full-disk-encryption dependency; do not invent a claim of protection against a compromised root or unlocked disk.
+设备公钥信任来自可信管理设备签授权，不能直接信任服务器临时返回的公钥。客户端保存最高已见 generation/检查点，阻止基本回放；复杂外部见证不在范围内。每设备每环境可为 RO、RW、Admin；获准后能读整个环境所有 key。RO 拥有对称钥匙，因此也能制造密文，写删必须额外检查设备签名、管理签授权、当前权限与版本。RW 仅通过 App/本 CLI 显式写云端，不自动上传直接修改的系统 env。服务端每次请求和每条 WebSocket 后续操作都检查当前撤销、降权、期限和 generation，不能只检查握手。
 
-## Local reconciliation
+共享写入只允许在线，先提交云端；服务端原子接受成功后，经相同签名序号拉取流下发本机，不做乐观权威状态更新。LWW 按服务端接受顺序；同幂等 ID、同内容重试返回旧序号，不产生新写；同 ID 不同内容拒绝。
 
-Shared mutation requires connectivity. Submit to the server only; after accepted persistence, update local state through the same signed sequence-pull flow, without optimistic authority changes. Offline reads use locally cached authorized values until local expiry. Overrides are explicit CLI actions, scoped by environment/name, never uploaded and usable offline. Apply overrides within an environment before priority merge. Cloud deletion or lost authorization prevents overrides from applying.
+## 本机环境协调
 
-Capture the original value/existence at first takeover. Managed values overwrite same-name local values, add missing names and preserve unrelated names. External edits of managed values are corrected while active. Removal/deactivation recomputes other active sources; when none remain, restore the recorded original or remove the tool-created item. Never restore an entire shell file or registry snapshot. Closing CLI leaves service active. Pause keeps configuration and halts ordinary sync/correction; received revocations still reconcile. Normal shutdown/crash does not clear everything; restart converges idempotently. Logout/uninstall removes managed config by key with restoration.
+本机下发规则：同名覆盖、缺少新增、无关不动；运行中外部修改托管配置则纠正。override 只能 CLI 显式设置，按环境/变量在本机保存、离线可用、不上传；先替换该环境值，再参与环境优先级合并。云端删除变量或失去环境授权时 override 停止生效。
 
-POSIX support is sh/bash/zsh interactive local terminals and Linux SSH. Shell hooks consume an atomic managed fragment on prompt/session refresh; existing process environments cannot be changed externally. Windows applies current user's registry environment with notification for future processes. No first-release GUI/container/cron/other-service adaptation. Machine services: macOS LaunchDaemon, Linux systemd and Windows Service, least privilege and local-user isolation. Disk unlock before startup remains required. Installation and privilege/ACL tests must use VMs or isolated accounts, not the host user's real shell or registry.
+首次接管记录原值与原来是否存在。删除或停用环境后回退剩余激活来源；全部无来源时恢复原值或移除工具新增项。逐 key 恢复，不能恢复整个 shell 文件或 registry 快照抹掉其他修改。关闭 CLI 后服务继续；暂停保留配置并停止普通同步/纠正，但已收到撤销仍执行。正常关机或崩溃不清全部配置，恢复后幂等收敛；退出账号/卸载清托管配置并恢复原值。
 
-## Server persistence and notification
+导入只扫描可获取的本地 env，用户显式勾选后仅导入选中项；测试使用合成 fixture，不扫描宿主真实凭据或环境。既有进程的 env 不能被外部强制修改。
 
-Workers: D1 holds only email-to-account routing; each account's SQLite Durable Object owns authoritative credentials, devices/grants, ciphertext, recovery state, sessions and monotonic sequence in one atomic domain. Never duplicate security authority into D1. Docker: Node plus local SQLite on one persistent volume and a single instance, no Cloudflare dependency. Both call the same business mechanism through minimal runtime adapters. WebSocket broadcasts sequence hints only; durable incremental pull and reconnect catch-up are mandatory. Account generations invalidate stale sessions, devices and requests following destructive reset.
+## 三平台系统服务
 
-## Account and recovery flows
+目标是开机后台系统服务 + 当前用户 CLI，重启无人登录可验证设备授权，无需再次手机确认。macOS LaunchDaemon、Linux systemd、Windows Service，最小权限并按本机用户隔离。Mac/Linux 支持 sh/bash/zsh、本地终端及 Linux SSH 交互；Windows 支持当前用户环境变量。GUI、容器、cron、其他业务服务首版不做。
 
-Email is the account identifier. `allowRegistration` and `requireEmailVerification` are independent switches; no invitation mode. SMTP or Cloudflare Email Service may deliver mail, with no inbound-email verification. Email-confirmed reset requires explicit destructive confirmation, erases old account data and reinitializes a new generation; it cannot recover the old vault. Old devices/sessions must fail atomically.
+POSIX shell 使用原子写入的托管 fragment，在会话或 prompt 刷新时读取；sh 没有统一 prompt hook，必须如实说明会话/手动刷新范围。Windows 按目标用户 registry 更新并通知未来进程；无人登录 hive 加载和 ACL 必须 VM 实测后才宣称可用。系统服务安装与权限测试优先隔离 VM/测试账号/临时目录，不修改宿主真实 shell、registry 或全局 env。
 
-Recovery is a random offline seed, with purpose-separated derived encryption/signing keys. New/rotated environment keys always have recovery envelopes. Recovery proof opens a restricted session, not full management. Successful recovery must explicitly finish recovery-code rotation before authorizing devices. Rotation: generate a new seed/code, require complete re-entry, derive the new signing key from the re-entered seed, sign a server-generated single-use nonce bound to account, operation, session and recovery generation. Server atomically verifies and installs the new recovery key plus every required envelope; only then is the old code invalid. A trusted admin or restricted recovery session may initiate. Challenges are short-lived and single-use; do not rely on timestamps alone to prevent replay. On ambiguous network outcome, query status before retry/new rotation. Possession proof cannot prove that the user safely backed up the seed. Lost devices plus lost seed means old vault is unrecoverable. Recovery is not data backup; historical codes with historical ciphertext cannot be revoked retroactively.
+## 服务端一致性和运行时
 
-## Email and cryptographic resource constraints
+Workers 的 D1 仅保存邮箱到账号路由目录；每账号 SQLite Durable Object 单一权威保存登录验证、设备/授权、密文、会话、恢复状态和单调序号，全部安全状态处于一个原子域。不得在 D1/DO 重复安全权威引发重置/撤销竞态。
 
-Docker SMTP: Nodemailer over implicit TLS 465 or required TLS 587, no plaintext downgrade, no secret debug. Workers opportunistic STARTTLS implementations and AUTH debug logging are unacceptable; use a verified safe implementation or Cloudflare Email Service. Arbitrary destinations may require paid Email Service; free verified-destination limitations must be documented. Deployment SMTP credentials are secrets, never repository values. Argon2id must be measured on Workers with intended parameters; resource failure is a blocker, not permission to weaken parameters.
+Docker 使用 Node + 本地 SQLite，单实例持久卷，不依赖 Cloudflare。两种运行时调用同一业务机制，只保留必要适配。WebSocket 只提示序号；持久化增量拉取与重连补漏不可省略。破坏性重置增加账号 generation，旧会话、旧设备和旧请求原子失效。
 
-## Verification strategy
+## 邮箱账号和破坏性重置
 
-Use synthetic fixtures for crypto tampering/binding/version tests, permission/revocation/expiry, idempotency/order, account isolation/reset, replay/recovery atomicity, offline reconciliation/original-value restoration and crash recovery. Cross-compile CLI for three OSes; run actual service behavior in available VMs before claiming support. Run TypeScript business/persistence tests against local SQLite and Workers runtime separately. Flutter analyze/build and emulator acceptance require a working official SDK; UI unit tests are excluded. Publish passed, failed and not-run results distinctly. SPAKE2/library selection, native key protection, boot-service privilege behavior and production resource measurement remain explicit gates.
+邮箱是账号标识；allowRegistration 和 requireEmailVerification 是两个独立开关，不做邀请制。可用 SMTP 或 Cloudflare Email Service 发信，不做收信验证。账号重置必须经邮件证明所有权和明确破坏性确认，删除旧数据并初始化新 generation；它不能恢复旧 vault。旧设备与旧会话必须失效。
+
+## 恢复种子与强制轮换
+
+恢复种子随机生成、离线保存，派生分用途恢复加密/签名钥匙。环境新增/轮换必须产生恢复封套。恢复成功先进入受限会话，必须显式完成恢复码轮换才可管理授权，不偷偷自动换码。
+
+轮换流程：生成新码，用户重新输入完整新码；从重输种子派生签名钥匙，签服务器一次 nonce。服务器验证新公钥，绑定账号、操作、会话和 recovery generation 后，在同一事务切换新恢复公钥及全部必需封套；成功后旧码才失效。发起须旧可信管理设备或有效受限恢复会话。挑战短时单次，不能仅靠时间戳防回放。服务器只证明持钥，不能证明用户真实备份。断网结果不明先查询状态。全部设备和恢复码都丢失时旧 vault 无法找回；恢复码不是数据备份，历史旧码加历史旧密文无法撤回。
+
+## 邮件 TLS 与资源约束
+
+Docker Nodemailer 可用 465 隐式 TLS 或 587 requireTLS，禁止明文降级和 secret debug。Workers opportunistic STARTTLS/AUTH debug 风险实现不能原样用于不安全 587；需安全实现、修补并测试，或使用 Cloudflare Email Service。任意收件人可能需要付费，免费仅 verified destination 的限制须明确，不能承诺全免费。SMTP 凭据仅部署 secrets，仓库只脱敏示例。
+
+Workers Argon2id 必须按预期安全参数真实测资源；失败即门槛，不能为额度削弱参数。
+
+## 可验证里程碑与公开门槛
+
+密码学检查篡改、绑定、版本和跨语言向量；业务检查当前权限/撤销/到期、幂等顺序、账号隔离/重置、回放及恢复原子性；本机检查离线、override、原值逐 key 恢复、暂停/撤销和崩溃收敛。三 OS CLI 编译与实际启动服务分别报告。Node SQLite 重启持久性与 Workers 本地运行时分别实测。Flutter analyze/build、模拟器和真机验收必须区分；不编写 UI 单元测试。
+
+公开前检查秘密和个人数据，仅源码、脱敏示例、中文文档、合成测试数据可以公开。未完成 SPAKE2、平台钥匙保护、恢复全流程或真实启动/资源验证前，不得宣传生产可用。通过、失败、未跑分别写明。

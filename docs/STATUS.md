@@ -1,5 +1,5 @@
-# Implementation status
+# 实现状态
 
-M0: inventory verified; design and plan saved. Initial source publication pending.
+M0：目录、相关规范、工具链和 GitHub 组织 admin 权限已验证；完整设计与计划已保存；MIT 五仓库首次公开推送成功，workspace 采用 HTTPS submodule。
 
-M1–M5: pending. Security software is experimental. No test/build/runtime result is implied by a design requirement.
+M1 正在实现和测试；M2–M5 尚未验收。设计目标不等于实现结果。实验性安全软件，不能用于生产凭据。
