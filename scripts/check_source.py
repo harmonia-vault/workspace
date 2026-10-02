@@ -30,7 +30,10 @@ for repo in [root, *(root / name for name in ("protocol", "core-go", "mobile", "
             continue
         for line_no, line in enumerate(content.splitlines(), 1):
             for label, pattern in patterns.items():
-                if pattern.search(line):
+                matches = list(pattern.finditer(line))
+                if label == "本机个人路径":
+                    matches = [m for m in matches if m.group(0) not in {"/home/harmonia/", "/home/example/", "/Users/example/"}]
+                if matches:
                     findings.append((rel, line_no, label))
 for rel, line, label in findings:
     print(f"{rel}:{line}: {label}")

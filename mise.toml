@@ -10,3 +10,7 @@ run = ["cd core-go && mise run test", "cd server && mise run test"]
 [tasks.check-source]
 description = "公开前检查源码秘密和个人路径"
 run = "python3 scripts/check_source.py"
+
+[tasks.acceptance]
+description = "合成 Go→HTTPS→TypeScript→SQLite→Go 端到端验收"
+run = "go test -v ./acceptance"
