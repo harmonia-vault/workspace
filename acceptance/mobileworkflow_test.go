@@ -42,7 +42,7 @@ func TestMobileWorkflowRealInitializationCRUDSealedResumeAndUnknownResults(t *te
 				lose = loseInit.Swap(false)
 			} else if strings.HasSuffix(path, "/mutations") {
 				lose = loseMutation.Swap(false)
-			} else if strings.HasSuffix(path, "/environment-changes") {
+			} else if strings.HasSuffix(path, "/environment-changes") || strings.HasSuffix(path, "/environment-changes-v2") {
 				lose = loseEnvironment.Swap(false)
 			}
 		}

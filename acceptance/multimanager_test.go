@@ -407,7 +407,7 @@ func TestNativeSPAKE2TwoManagersAndHistoricalIssuerProof(t *testing.T) {
 	trustC.Accepted = true
 	must(storeC.Vault().SaveTrustContext(trustC))
 	// 从受保护双签收据重新建立逐环境来源，不能从server目录补pin。
-	restartedVerifierC, err := syncclient.NewPinnedVerifierV2(syncclient.IssuerPinnedTrust{AccountID: f.AccountID, AccountGeneration: 1, DeviceID: deviceC.DeviceID, DeviceSigningPublicKey: deviceC.SigningPublic, ReceivingPrivateKey: deviceC.ReceivingPrivate, Receipt: resumedReceiptC})
+	restartedVerifierC, err := syncclient.NewPinnedVerifierV2WithOrigins(syncclient.IssuerPinnedTrust{AccountID: f.AccountID, AccountGeneration: 1, DeviceID: deviceC.DeviceID, DeviceSigningPublicKey: deviceC.SigningPublic, ReceivingPrivateKey: deviceC.ReceivingPrivate, Receipt: resumedReceiptC})
 	must(err)
 	defer restartedVerifierC.Close()
 	cBoot, err := syncclient.NewForBoot(syncclient.Config{Endpoint: proxy.URL, HTTPClient: httpClient, AccountID: f.AccountID, AccountGeneration: 1, DeviceID: deviceC.DeviceID, Verifier: restartedVerifierC, Engine: engineC})
