@@ -14,3 +14,7 @@ run = "python3 scripts/check_source.py"
 [tasks.acceptance]
 description = "合成 Go→HTTPS→TypeScript→SQLite→Go 端到端验收"
 run = "go test -v ./acceptance"
+
+[tasks.acceptance-native]
+description = "固定原生 SPAKE2 首次初始化、配对、boot、加密同步与恢复验收"
+run = "go test -tags harmonia_boringssl -v ./acceptance"

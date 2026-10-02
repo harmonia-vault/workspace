@@ -70,4 +70,4 @@ mise run check-source
 | [mobile](https://github.com/harmonia-vault/mobile) | Flutter 手机界面与平台适配 |
 | [server](https://github.com/harmonia-vault/server) | 共用 TypeScript 业务与 Node/Workers 适配 |
 
-完整目标见 [设计基线](docs/DESIGN.md)，推进顺序见 [执行计划](docs/PLAN.md)。公开仓库只包含源码、脱敏示例、文档和合成测试数据；本轮不配置 CI/CD、不发布 Release 或安装包、不部署真实线上服务。
+完整目标见 [设计基线](docs/DESIGN.md)，推进顺序见 [执行计划](docs/PLAN.md)。公开仓库只包含源码、脱敏示例、文档和合成测试数据；当前先完成 M2，实现与验收后再按已授权计划加入自动更新及 CI/CD。正式 Tag、Release、安装包发布和真实线上部署仍须另行授权。

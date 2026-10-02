@@ -13,6 +13,7 @@ import (
 	"net/http/httptest"
 	"net/http/httputil"
 	"net/url"
+	"os"
 	"os/exec"
 	"path/filepath"
 	"reflect"
@@ -23,6 +24,8 @@ import (
 	"time"
 
 	"github.com/harmonia-vault/core-go/cryptox"
+	"github.com/harmonia-vault/core-go/localipc"
+	"github.com/harmonia-vault/core-go/localkeys"
 	"github.com/harmonia-vault/core-go/localstate"
 	"github.com/harmonia-vault/core-go/syncclient"
 )
@@ -40,19 +43,16 @@ type fixture struct {
 		SigningPublicKey   string `json:"signingPublicKey"`
 		ReceivingPublicKey string `json:"receivingPublicKey"`
 	} `json:"devices"`
-	Grants []syncclient.SignedGrant `json:"grants"`
+	Grants             []syncclient.SignedGrant `json:"grants"`
+	TrustRoot          cryptox.TrustRoot        `json:"trustRoot"`
+	RecoveryGeneration string                   `json:"recoveryGeneration"`
 }
 
-type testStore struct{ state localstate.State }
-
-func (s *testStore) Load() (localstate.State, error)   { return s.state, nil }
-func (s *testStore) Save(state localstate.State) error { s.state = state; return nil }
-
-func startFixture(t *testing.T) fixture {
+func startFixture(t *testing.T, arguments ...string) fixture {
 	t.Helper()
 	_, source, _, _ := runtime.Caller(0)
 	root := filepath.Dir(filepath.Dir(source))
-	cmd := exec.Command("node", "--import", "tsx", "tests/synthetic-server.ts")
+	cmd := exec.Command("node", append([]string{"--import", "tsx", "tests/synthetic-server.ts"}, arguments...)...)
 	cmd.Dir = filepath.Join(root, "server")
 	stdout, err := cmd.StdoutPipe()
 	if err != nil {
@@ -269,10 +269,76 @@ func TestGoHTTPSNodeSQLiteVerifiedFlow(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	store := &testStore{state: localstate.EmptyState()}
+	// 真实 encrypted Store 与原生本地 IPC，所有配置仍只写临时目录。
+	temporaryRoot, err := os.MkdirTemp("/tmp", "harmonia-e2e-")
+	if err != nil {
+		t.Fatal(err)
+	}
+	t.Cleanup(func() { _ = os.RemoveAll(temporaryRoot) })
+	privateRoot, err := filepath.EvalSymlinks(temporaryRoot)
+	if err != nil {
+		t.Fatal(err)
+	}
+	userID, err := localkeys.CurrentUserID()
+	if err != nil {
+		t.Fatal(err)
+	}
+	storeConfig := localkeys.Config{Directory: filepath.Join(privateRoot, "protected-state"), UserID: userID}
+	store, err := localkeys.OpenEncryptedStateStore(storeConfig)
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer store.Close()
+	if duplicate, err := localkeys.OpenEncryptedStateStore(storeConfig); err == nil {
+		duplicate.Close()
+		t.Fatal("第二个进程状态拥有者未被拒绝")
+	}
+	// 此旧流程明确使用测试夹具的固定设备和已知管理签名；它只测试下发，
+	// 不计为入网成功。enrollment_test.go 另验真实首次初始化与 SPAKE2 入网。
+	receivingPublic, err := cryptox.DecodeBase64(f.Devices["writer"].ReceivingPublicKey, 32, 32)
+	if err != nil {
+		t.Fatal(err)
+	}
+	fixtureKeys := localkeys.DeviceKeys{DeviceID: "writer", SigningSeed: keyFor(t, f, "writer").Seed(), SigningPublic: keyFor(t, f, "writer").Public().(ed25519.PublicKey), ReceivingPrivate: receivingPrivate, ReceivingPublic: receivingPublic}
+	if err = store.Vault().SaveDeviceKeys(fixtureKeys); err != nil {
+		t.Fatal(err)
+	}
+	fixtureProof, _ := json.Marshal(map[string]any{"syntheticFixture": true, "grant": wireGrant(t, writerGrant, keyFor(t, f, "admin"))})
+	if err = store.Vault().SaveTrustContext(localkeys.TrustContext{Endpoint: proxy.URL, AccountID: f.AccountID, AccountGeneration: 1, DeviceID: "writer", SigningPublic: fixtureKeys.SigningPublic, ReceivingPublic: receivingPublic, Managers: map[string][]byte{"admin": keyFor(t, f, "admin").Public().(ed25519.PublicKey)}, PairingProfile: localkeys.EnrollmentPairingProfile, EnrollmentCertificate: fixtureProof, EnrollmentKey: "synthetic-fixture-pins", Accepted: true}); err != nil {
+		t.Fatal(err)
+	}
 	engine, err := localstate.New(store)
 	if err != nil {
 		t.Fatal(err)
+	}
+	providerPath := filepath.Join(privateRoot, "synthetic-provider.json")
+	initialProvider, _ := json.Marshal(map[string]string{"SYNTHETIC_E2E": "original-synthetic", "UNRELATED": "keep-synthetic"})
+	if err = os.WriteFile(providerPath, initialProvider, 0600); err != nil {
+		t.Fatal(err)
+	}
+	provider := &localstate.FileProvider{Path: providerPath}
+	endpoint := localipc.Endpoint{Directory: filepath.Join(privateRoot, "ipc"), UserID: userID}
+	background, err := localipc.Listen(localipc.Config{Endpoint: endpoint, Engine: engine, Provider: provider})
+	if err != nil {
+		t.Fatal(err)
+	}
+	ipcContext, cancelIPC := context.WithCancel(context.Background())
+	ipcDone := make(chan error, 1)
+	go func() { ipcDone <- background.Serve(ipcContext) }()
+	defer func() {
+		cancelIPC()
+		background.Close()
+		if err := <-ipcDone; err != nil {
+			t.Error(err)
+		}
+	}()
+	callIPC := func(command string) localipc.Response {
+		t.Helper()
+		response, err := localipc.Call(context.Background(), endpoint, localipc.Request{Command: command})
+		if err != nil || !response.OK {
+			t.Fatalf("本地 IPC %s 失败: %v", command, err)
+		}
+		return response
 	}
 	loginClient, err := syncclient.New(syncclient.Config{Endpoint: proxy.URL, HTTPClient: client, AccountID: f.AccountID, AccountGeneration: 1, DeviceID: "writer", Token: login.Token, Verifier: verifier, Engine: engine})
 	if err != nil {
@@ -287,6 +353,14 @@ func TestGoHTTPSNodeSQLiteVerifiedFlow(t *testing.T) {
 	}
 	if _, err = synced.Pull(context.Background()); err != nil {
 		t.Fatal(err)
+	}
+	bootClient, err := syncclient.NewForBoot(syncclient.Config{Endpoint: proxy.URL, HTTPClient: client, AccountID: f.AccountID, AccountGeneration: 1, DeviceID: "writer", Verifier: verifier, Engine: engine})
+	if err != nil {
+		t.Fatal(err)
+	}
+	synced, err = bootClient.BootDevice(context.Background(), keyFor(t, f, "writer"))
+	if err != nil {
+		t.Fatal("无登录凭据的已授权设备 boot 证明失败", err)
 	}
 	if err = engine.Activate(f.EnvironmentID, 10, time.Now()); err != nil {
 		t.Fatal(err)
@@ -306,6 +380,16 @@ func TestGoHTTPSNodeSQLiteVerifiedFlow(t *testing.T) {
 	if err != nil || effective[mutation.Name] != "synthetic-env-value" {
 		t.Fatal("HPKE 解封 + AEAD 解密后未形成正确本机值")
 	}
+	if err = background.Reconcile(context.Background(), time.Now()); err != nil {
+		t.Fatal(err)
+	}
+	if callIPC("export").Values[mutation.Name] != "synthetic-env-value" {
+		t.Fatal("CLI IPC 未读到后台已验签下发值")
+	}
+	onDisk, err := os.ReadFile(filepath.Join(storeConfig.Directory, "state.v1.enc"))
+	if err != nil || bytes.Contains(onDisk, []byte("synthetic-env-value")) {
+		t.Fatal("服务状态中发现合成明文或无法读取密文")
+	}
 	retried, err := synced.Submit(context.Background(), signed)
 	if err != nil || !retried.Accepted.Replayed || retried.Accepted.Sequence != result.Accepted.Sequence {
 		t.Fatal("同幂等写重试未保留原序号")
@@ -321,6 +405,19 @@ func TestGoHTTPSNodeSQLiteVerifiedFlow(t *testing.T) {
 		t.Fatalf("RO 即使能签密文也不得写，实际 HTTP %d", got)
 	}
 
+	callIPC("pause")
+	externalProvider, _ := json.Marshal(map[string]string{"SYNTHETIC_E2E": "external-synthetic", "UNRELATED": "external-unrelated"})
+	if err = os.WriteFile(providerPath, externalProvider, 0600); err != nil {
+		t.Fatal(err)
+	}
+	if err = background.Reconcile(context.Background(), time.Now()); err != nil {
+		t.Fatal(err)
+	}
+	pausedValues, err := provider.Snapshot(context.Background(), []string{"SYNTHETIC_E2E", "UNRELATED"})
+	if err != nil || pausedValues[mutation.Name] != "external-synthetic" || pausedValues["UNRELATED"] != "external-unrelated" {
+		t.Fatal("暂停期间仍纠正外部修改")
+	}
+
 	writerGrant.GrantGeneration = "3"
 	writerGrant.Role = "none"
 	writerGrant.Envelope = ""
@@ -328,12 +425,22 @@ func TestGoHTTPSNodeSQLiteVerifiedFlow(t *testing.T) {
 	if got := callJSON(t, client, proxy.URL, base+"/grants", adminToken, "admin", f.AccountGeneration, wireGrant(t, writerGrant, keyFor(t, f, "admin")), nil); got != 200 {
 		t.Fatalf("管理签撤销 HTTP %d", got)
 	}
-	if _, err = synced.Pull(context.Background()); err != nil {
+	if _, err = synced.AcceptRevocationHint(context.Background()); err != nil {
 		t.Fatal(err)
 	}
 	effective, err = engine.Effective(time.Now())
 	if err != nil || len(effective) != 0 {
 		t.Fatal("收到撤销后旧值仍生效")
+	}
+	if err = background.Reconcile(context.Background(), time.Now()); err != nil {
+		t.Fatal(err)
+	}
+	restoredValues, err := provider.Snapshot(context.Background(), []string{"SYNTHETIC_E2E", "UNRELATED"})
+	if err != nil || restoredValues[mutation.Name] != "original-synthetic" || restoredValues["UNRELATED"] != "external-unrelated" {
+		t.Fatal("暂停时撤销未逐 key 恢复原值，或抹掉无关外部修改")
+	}
+	if len(callIPC("export").Values) != 0 {
+		t.Fatal("撤销后 IPC 仍暴露旧来源")
 	}
 	if _, err = synced.Submit(context.Background(), signed); err == nil {
 		t.Fatal("撤销后重试不得绕过当前权限")
@@ -351,6 +458,7 @@ func TestGoHTTPSNodeSQLiteVerifiedFlow(t *testing.T) {
 	if got := callJSON(t, client, proxy.URL, base+"/grants", adminToken, "admin", f.AccountGeneration, wireGrant(t, writerGrant, keyFor(t, f, "admin")), nil); got != 200 {
 		t.Fatalf("重新授权 HTTP %d", got)
 	}
+	callIPC("resume")
 	if _, err = synced.Pull(context.Background()); err != nil {
 		t.Fatal(err)
 	}
@@ -358,5 +466,5 @@ func TestGoHTTPSNodeSQLiteVerifiedFlow(t *testing.T) {
 	if err != nil || effective["SYNTHETIC_E2E"] != "synthetic-env-value" {
 		t.Fatal("重新授权未补拉旧序号中的环境值")
 	}
-	t.Log("通过：Go 管理签/HPKE/AEAD → HTTPS → TypeScript 当前权限 → SQLite 序号 → Go 验签解密；持钥挑战、防重放、RO、幂等与撤销。")
+	t.Log("通过：Go 管理签/HPKE/AEAD → HTTPS → TypeScript 当前权限 → SQLite 序号 → Go 验签解密 → 加密持久状态 → 原生 IPC/隔离 provider；持钥挑战、防重放、RO、幂等、暂停与撤销逐 key 恢复。")
 }
