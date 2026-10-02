@@ -1,6 +1,6 @@
 # 本地系统服务与环境下发
 
-当前为实验实现。已完成平台适配器、服务配置生成和合成数据测试；软件机器保护与加密 Store 基础已补充，设备信任、真实同步及开机权限验收仍有门槛，不能宣传生产可用。测试没有导入宿主真实环境、凭据或账号，未在宿主安装服务、修改 shell 启动文件或注册表。
+当前为实验实现。已完成平台适配器、服务配置生成和合成数据测试；软件机器保护与加密 Store 基础已补充，正式 POSIX 双签设备信任、持钥 boot 与真实验证同步已有合成端到端证据，物理开机和原生权限验收仍有门槛，不能宣传生产可用。测试没有导入宿主真实环境、凭据或账号，未在宿主安装服务、修改 shell 启动文件或注册表。
 
 ## 按本地用户隔离
 
@@ -9,10 +9,10 @@
 | 平台 | 服务配置 | 权限边界与尚需验证的项目 |
 | --- | --- | --- |
 | macOS | `LaunchDaemon`，标签包含 UID，`UserName` 为目标非 root 用户，`RunAtLoad`，`Umask=0077` | 管理员控制二进制和服务配置；目标用户只读写自己的状态目录。UID 与用户名对应关系必须校验。真实开机、无人登录、撤销和权限隔离尚未运行 |
-| Linux | systemd 系统单元，目标非 root `User=`，`NoNewPrivileges`，空 capability，`ProtectSystem=strict`，`ProtectHome=true`，单独 `ReadWritePaths` | 生成器要求二进制在 `/usr/local/`，状态严格为 `/var/lib/harmonia/<UID>`，避免受保护 home 中的路径不可访问。已验证新建普通 UID 的 systemd 非交互启动、当前用户 CLI 与回环 SSH。整机开机未跑；OrbStack LXC 全局覆盖关闭 systemd 沙盒，需完整 Linux VM 验证其生效 |
+| Linux | systemd 系统单元，目标非 root `User=`，`NoNewPrivileges`，空 capability，`ProtectSystem=strict`，`ProtectHome=true`，单独 `ReadWritePaths` | 生成器要求二进制在 `/usr/local/`，状态严格为 `/var/lib/harmonia/<UID>`，避免受保护 home 中的路径不可访问。已验证新建普通 UID 的 systemd 非交互启动、当前用户 CLI 与回环 SSH。另建隔离来宾真实入网后 init 重启、无目标用户登录的新 boot/pull 已通过；物理内核开机未跑。OrbStack LXC 全局覆盖关闭 systemd 沙盒，需完整 Linux VM 验证其生效 |
 | Windows | 绑定目标用户 SID 的 `NT SERVICE\Harmonia-<SID摘要>` 虚拟服务身份；SCM 运行适配器支持停止和关机取消 | 只打开 `HKEY_USERS\<SID>\Environment`，禁止把服务身份的 HKCU 当目标账号。需要精确目录/注册表 ACL。目标用户 hive 未加载时立即失败；开机无人登录的 hive/profile 生命周期尚未实现 |
 
-生成器只生成配置和清单，不安装服务、不授予 ACL。样例中的用户名、UID、SID 和目录均为虚构值。真实配置不含 `--fixture`；当前正常 daemon 因可信设备授权及真实同步未完成而拒绝启动。新增加密 Store 不会解除该门槛。隔离测试必须显式使用 fixture，测试标记不能去除或作为可信注册捷径。
+生成器只生成配置和清单，不安装服务、不授予 ACL。样例中的用户名、UID、SID 和目录均为虚构值。正式 POSIX daemon 已接受 `--local-directory` 的加密状态与经过原生入网验证的信任上下文，能用独立设备签名钥完成 boot challenge 后取得设备绑定 session，再执行经验证的同步；不依赖密码等价凭据。没有已完成可信 context 时只提供隔离 IPC/恢复，不联网，也不自动入网。Windows 正式 daemon 仍明确关闭，等待原生 DPAPI/SID/SCM/hive 验收。三平台真正开机验收范围见下表；既有 fixture 结果只证明合成本地行为，测试标记不能取消或作为可信注册捷径。
 
 ## 开机凭据存储的取舍
 
@@ -54,8 +54,9 @@ bash 使用 `PROMPT_COMMAND`，保留原来的字符串或数组内容；zsh 使
 | Ubuntu 系统服务非交互启动/重启与按用户隔离 | 通过 | 新普通测试 UID、空 capability、0700 状态/0600 IPC；第二 UID 拒绝；只重启本次服务，没有重启机器 |
 | Ubuntu 真实 SSH Bash 与 CLI | 通过 | 新合成密钥与回环专用 sshd；合并/优先级/override/纠正/暂停/服务重启/离线到期回退/逐 key 退出恢复；临时资源清理通过 |
 | systemd 沙盒实际生效 | 未验证 | OrbStack Ubuntu 报告 LXC，全局 `zzz-lxc-service.conf` 覆盖关闭 `NoNewPrivileges/ProtectHome/ProtectSystem` 等；未修改该配置 |
-| 三平台整机开机与无人登录真实授权 | 未跑 | 系统服务非交互启动不能代替整机重启；Windows hive 生命周期及完整安装器仍有门槛 |
-| UTM Windows/macOS 原生服务 | 阻塞，未跑 | 两台既有 VM 正常启动。Windows 官方 guest-agent 版本查询两次返回 OSStatus -10004，macOS 后端明确不支持 exec；CUA 通道两次 Transport closed，未取得来宾桌面执行能力。没有读取来宾密码/钥匙或改变登录/安全设置 |
+| 新隔离 Ubuntu 来宾 init 重启后无登录真实授权 | 通过 | 来宾内原生 SPAKE2 上游 6/6、firstroot 双签、新设备入网、签名共享写；删除登录 slot/引导输入及旧服务端 sessions 后，重启仅新机，init/两 unit InvocationID 改变，目标 UID 无登录 session，新 boot challenge/session/pull 200 且无密码登录；正式 IPC、真实 sh 和第二 UID 拒绝通过 |
+| 三平台物理内核开机、磁盘解锁与完整原生权限 | 未跑 | OrbStack 检测为 LXC，namespace boot ID 变化但共享内核 uptime 连续；不能把该 init 重启当物理 kernel boot。Windows hive 生命周期及完整安装器仍有门槛 |
+| UTM Windows/macOS 原生服务 | 阻塞，未跑 | 两台既有 VM 正常启动。Windows 官方 guest-agent 版本查询两次返回 OSStatus -10004，macOS 后端明确不支持 exec；CUA 通道两次 Transport closed，未取得来宾桌面执行能力。没有读取来宾密码/钥匙或改变登录/安全设置；本轮只读状态仍为 started |
 
 可复现命令：在 `core-go` 执行平台测试；在 Linux 执行 `sh service-templates/verify-linux.sh service-templates/examples/linux-harmonia-user-10001.service`。服务样例在 `core-go/service-templates/examples`。测试数据与输出没有真实凭据。新增 OrbStack 验收脚本与脱敏 JSON 位于 `core-go/service-templates`；官方 OpenSSH/acl 测试依赖保留，默认 SSH service/socket 都是 inactive，socket 为 disabled。临时测试账号、系统单元、目录、专用 sshd 与合成密钥已清理。
 
@@ -68,3 +69,9 @@ Unix 默认软件机器钥是权限保护的可读随机文件，服务在系统
 安全 constructor 已将 POSIX 修订/暂停/release 元数据和 Windows 原值类型接入 AEAD，并在重启、真实 sh 与隔离 Windows 假存储中验证。shell 要直接 source 的 `environment.sh` 仍为权限保护的本地明文，写入使用固定 Vault 目录句柄与所有权/ACL/原子检查。旧 fixture 元数据不会自动迁移，正式路径必须明确选择安全 constructor。账号退出/切换还须编排同步取消、在途结果 epoch 拒绝与 device/session/trust 删除。恢复用 Originals 保留到逐 key 恢复成功，不因钥匙清理整文件覆盖。
 
 `TrustContext` 不含私钥；保存/加载核对同 Vault 的设备双公钥及可选 session 的账号绑定。待完成入网回执 `Accepted=false` 可重启后查询服务器结果，再确认完成；入网 profile、manager 公钥结构与证书 JSON 大小在本地校验，证书/配对/授权验签仍由可信控制器负责，布尔完成标记本身不证明设备信任。带云数据的加密 StateStore 必须匹配同目录已完成 context 的账号 generation；发现不一致立即失败。
+
+## 新隔离来宾的正式 boot 证据
+
+`core-go/service-templates/boot-test` 保存本次可复核合成输入与流程，`orbstack-boot-result.json` 保存脱敏结果。只创建并重启新的 Ubuntu 24.04 ARM64 来宾，无宿主 home/SSH agent 共享。设备 UID 30001 与 server UID 30002 各有私密目录；本次普通 UID 服务 cap 为 0，0700/0600 和第二 UID 拒绝均通过。共享值来自服务端签名密文经正常 pull/HPKE/AEAD 下发，未用 fixture env 或测试 trust 布尔绕过替代入网。TLS 使用进程显式 CA 文件并保留主机名/链校验。
+
+整个实验没有重启既有 Ubuntu、UTM 或宿主，没有修改全局 LXC 沙盒、电源、代理或系统 CA。两台既有 UTM 仍运行，Windows/macOS 原生执行能力 gate 不变。新测试来宾在清理本次账号/units/keys/SQLite/缓存后正常停机；官方工具链与公开源码保留用于后续隔离验收。服务模板已改为正式 `--local-directory`/`--local-user`，fixture 脚本保持明确隔离路径；模板解析通过不等于原生服务安装或权限完成。

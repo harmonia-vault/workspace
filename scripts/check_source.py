@@ -21,7 +21,7 @@ for repo in [root, *(root / name for name in ("protocol", "core-go", "mobile", "
         if not path.is_file():
             continue
         rel = str(path.relative_to(root))
-        if path.name in {".env", "auth.json", "credentials.json"} or (path.suffix in {".pem", ".key", ".sqlite", ".apk", ".exe"}):
+        if path.name in {".env", "auth.json", "credentials.json"} or path.suffix.lower() in {".pem", ".key", ".sqlite", ".apk", ".exe", ".aar", ".jar", ".ipa", ".a", ".so", ".dylib", ".jks", ".keystore", ".p12", ".pfx"} or path.name.endswith((".sqlite-wal", ".sqlite-shm", ".sqlite3", ".db-wal", ".db-shm")):
             findings.append((rel, 0, "不应公开的文件类型"))
             continue
         try:

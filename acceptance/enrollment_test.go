@@ -40,8 +40,13 @@ func TestNativeSPAKE2FirstVaultEnrollmentBootAndSync(t *testing.T) {
 	backend, _ := url.Parse(f.Endpoint)
 	transport := httputil.NewSingleHostReverseProxy(backend)
 	var loseCompletion atomic.Bool
+	var loseMutation atomic.Bool
+	var completedBoots atomic.Int64
 	transport.ModifyResponse = func(response *http.Response) error {
-		if response.Request.URL.Path == "/v1/accounts/"+f.AccountID+"/pairings/enroll-native-e2e/complete" && loseCompletion.Swap(false) && response.StatusCode == 200 {
+		if response.Request.URL.Path == "/v1/accounts/"+f.AccountID+"/boot-sessions" && response.StatusCode == 200 {
+			completedBoots.Add(1)
+		}
+		if (response.Request.URL.Path == "/v1/accounts/"+f.AccountID+"/pairings/enroll-native-e2e/complete" && loseCompletion.Swap(false) || response.Request.URL.Path == "/v1/accounts/"+f.AccountID+"/mutations" && loseMutation.Swap(false)) && response.StatusCode == 200 {
 			_ = response.Body.Close()
 			response.StatusCode = 504
 			response.Body = io.NopCloser(bytes.NewBufferString(`{"error":"request_rejected"}`))
@@ -291,14 +296,15 @@ func TestNativeSPAKE2FirstVaultEnrollmentBootAndSync(t *testing.T) {
 	grant.ExpiresAt = "0"
 	grant.Envelope = ""
 	grant.IdempotencyKey = "native-enrolled-revoke"
-	if got := callJSON(t, httpClient, proxy.URL, base+"/grants", managerSession.Token, manager.DeviceID, "1", wireGrant(t, grant, managerPrivate), nil); got != 200 {
-		t.Fatalf("正式已入网设备撤销HTTP %d", got)
-	}
-	_, err = synced.AcceptRevocationHint(ctx)
-	must(err)
-	effective, err = engine.Effective(time.Now())
-	must(err)
-	if len(effective) != 0 {
-		t.Fatal("撤销后加密缓存仍生效")
-	}
+	// 后台启动只持已入网设备钥和双签回执；删除旧登录 session 后仍须真实 boot。
+	must(store.Vault().Delete("session-v1"))
+	must(store.Close())
+	bootBeforeDaemon := completedBoots.Load()
+	exerciseProtectedDaemonProcess(t, filepath.Join(temporary, "protected"), uid, proxy.Certificate(), func() bool {
+		return completedBoots.Load() > bootBeforeDaemon
+	}, func() { loseMutation.Store(true) }, func() {
+		if got := callJSON(t, httpClient, proxy.URL, base+"/grants", managerSession.Token, manager.DeviceID, "1", wireGrant(t, grant, managerPrivate), nil); got != 200 {
+			t.Fatalf("正式已入网设备撤销HTTP %d", got)
+		}
+	})
 }

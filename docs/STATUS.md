@@ -61,26 +61,29 @@ protocol：`2c410a83178d99b87c966dd5fe6fbf56ca39943f`；core-go：`de91acb9753e9
 
 ## M2 当前验收与公开源码
 
-本轮已公开的固定提交：protocol `c3c902cb55bbf555380814a5dc074d07e3162f6f`、core-go `877eac3`、server `8dfbb7fe39f8a11e488fefbb9d04a0b00a183c42`。workspace 验收源码和手机桥接仍在整合；原生库、APK、真实凭据、私有测试目录不进入源码提交。
+当前公开固定提交：protocol `c3c902cb55bbf555380814a5dc074d07e3162f6f`、core-go `44e38371f8e4b836ed2c184ee0f39081c3a7480e`、mobile `c661894`、server `b7fcffd8a23301aaef997483f51d60337f2524c5`。workspace 用 submodule 保存这些源码位置；原生库、APK、真实凭据、私有测试目录不进入源码提交。多管理设备 v2、手机高层原生桥与 CLI 通知尚在本机整合，不能当成这些固定提交已完成的内容。
 
 | 检查 | 实际结果与边界 |
 | --- | --- |
-| workspace `mise run acceptance-native` | 4/4 通过，3.506 秒；真实 Go 原生 SPAKE2 首次初始化/限时 RW 入网、故意丢已接受响应后从加密 pending receipt 查询恢复、无密码 boot；HTTPS/TS/SQLite → 加密状态 → 原生 IPC；环境创建/改名/完整轮换/暂停删除墓碑/全局设备撤销；完整恢复码重输、一次 nonce、恢复根及全部封套原子轮换、旧码/会话失效与幂等查询 |
-| server `mise run check` | 77/77 通过，类型检查和 Node 构建通过；覆盖邮箱注册/验证/重置、逐请求权限、设备 boot、入网、恢复、环境生命周期、最大数据包失败时原子回滚 |
+| workspace 原生联合验收 | 通知依赖加入前 `mise run acceptance-native` 5/5 通过，5.414 秒。真实原生 SPAKE2、firstroot 双签、限时 RW 入网、已接受回应丢失的原加密回执恢复、无密码 boot、真实 HTTPS/TS/SQLite → 验签 Go → AEAD 状态 → 身份 IPC；环境创建/改名/完整轮换/暂停墓碑/全局撤销、完整恢复码重输与 nonce/新根及全部封套原子切换；手机 Go 首机、CRUD、未知结果重查、保存失败拒上传及撤销关闭 |
+| 正式独立 CLI 与 daemon | 后续扩充的原生入网单项 3.911 秒通过（测试 3.48 秒）：删除本地登录 session，实际新 boot-session 200；正式编译 CLI 的 put/delete/仅选中 import、接受后 504 的原请求重查、历史重试不覆盖新值、本机 override 不上传、云删停止 override、暂停拒写及收到撤销清除；不使用 daemon fixture |
+| server `mise run check` | 90/90 通过，类型检查和构建通过，任务约 14.03 秒/测试 13.59 秒；邮箱、boot、入网、恢复、生命周期、单次 WS 票据与逐次当前权限、纯序号提示、本人幂等收据和真实前端大请求边界 |
 | SMTP TLS | 隔离证书的真实 TLS 握手 2/2 通过：强制 TLS、证书验证和拒绝降级；没有真实邮件投递 |
-| Workers / Docker | 本地 workerd D1 仅邮箱目录、账号 SQLite DO 与 Argon2id 固定参数路径通过；Docker 本机构建、非 root 与临时持久卷重启 smoke 通过；Wrangler dry-run 通过，无真实部署 |
-| core-go | 八包 race 通过；原生标签 syncclient/cmd/pairing race 通过；darwin arm64、linux amd64/arm64、windows amd64 编译通过；不计 Windows 原生服务通过 |
-| 服务状态与本机权限 | 固定 AEAD slot、账号/代际/独立设备公钥/入网 receipt 绑定，Unix ACL/权限与唯一 owner；Mac localkeys 11 个和 platform 10 个主测试 race 通过；Linux ARM64 新临时普通用户通过（zsh 缺失跳过） |
-| OrbStack Ubuntu | 临时用户的实际 systemd 服务及 loopback SSH 通过：UID 隔离、shell 合并/优先级/override/纠正/暂停重启/到期回退/退出恢复。测试账号/服务/目录已清理；既有 LXC 全局关闭部分 systemd sandbox，不能算完整 sandbox 验收；整台 VM 无人登录重启尚未跑 |
-| UTM Windows/macOS | 正常启动，官方 guest exec 未能执行；CUA transport closed 无法读窗口。未改登录或 guest 设置；原生 boot/Session 0/hive 仍未跑 |
-| Android 官方 NDK | r28c 完整下载与官方 SHA1 `fc20a6bf15a30fb3428c9b60a7308793a362dc6d` 实际一致；安装 28.2.13676358 并核对 clang/source.properties |
-| Android Flutter UI | `mise run android-debug` 实际构建成功；隔离 API34 ARM64 AVD boot_completed=1，真实 APK 安装启动成功；7 张实际截图已交付。首轮 Maven TLS 握手短暂失败，Flutter 自动重试后通过；截图为显式合成预览，真实安全动作默认拒绝 |
-| Android Go 密码学编译 | 固定 BoringSSL SPAKE2 Android ARM64 静态库构建与 Go ELF 链接通过；gomobile AAR 已生成；Android 运行时桥接和认证测试仍在进行，不能用 Mac 测试替代 |
-| 手机控制层 | Flutter 静态分析通过，9/9 控制层测试通过；不含 UI 单元测试；iOS 未构建验收 |
-| 公开范围 | 本机源码基础秘密/个人路径检查与差异检查通过；合成账号、私有 httptest 证书和临时 provider，无宿主真实 env/凭据。这不是完整安全审计 |
+| Workers / Docker | 本地 workerd D1 仅邮箱目录、账号 SQLite DO 与 64 MiB/3 次/p1 Argon2 路径通过，首登录约 1387 ms；最新 Docker 构建与 Mac 恢复后隔离持久卷重启 smoke 通过，容器/卷已清理；Wrangler dry-run 247.41 KiB/gzip 61.05 KiB 通过，无真实部署 |
+| workerd 关闭边界 | 到期 alarm 的真实 4003 关闭帧通过；Miniflare 代理 TCP FIN 延迟，曾导致标准 close 事件五秒超时。没有宣称 TCP FIN 或线上休眠/容量通过 |
+| Go 回归 | 七包（cmd/harmonia、localipc、localkeys、localstate、platform、syncclient、mobileworkflow）最新 race 全通过。此前十包/原生标签回归及 darwin arm64、linux amd64/arm64、windows amd64 编译通过；不算 Windows 原生服务通过 |
+| 独立 Ubuntu init 重启 | 新隔离 Ubuntu24.04 ARM64 内原生 SPAKE2 6/6、firstroot/真实入网/签名共享写后，删除登录 slot/引导输入并清旧服务端 session；只重启新来宾后 UID30001 无登录，新 boot/pull 200、无密码登录，正式 IPC/sh/第二 UID 拒绝、cap0、0700/0600 通过；本次账号/units/keys/SQLite 已清理，新机正常停机保留 |
+| Linux 开机边界 | OrbStack 为 LXC，namespace boot ID 变化而内核 uptime 连续，因此只证明 init 重启。全局 LXC drop-in 关闭部分 systemd sandbox，未修改；物理内核开机、磁盘解锁和完整 VM sandbox 未跑 |
+| UTM Windows/macOS | 既有两机正常启动；Windows 官方 guestexec OSStatus -10004、macOS exec 不支持，CUA transport closed。未改安全/登录设置；原生 boot/Session0/hive 未跑，Windows 正式 daemon 仍关闭 |
+| Android 实际构建与 UI | 官方 NDK r28c SHA1 实际核对，Flutter APK 构建、隔离 API34 ARM64 AVD 安装启动通过；7 张真实合成预览截图已交付。首次 Maven TLS 短暂失败，自动重试通过；不使用宿主真实值 |
+| Android 窄原生桥 | 实际 AVD 6/6：4 个 Go 原语/域/取消门槛，系统设备认证后的 AES 保护/重启公钥保持和独立再次认证，取消返回 AUTH_CANCELLED 且不写资料。测试 PIN/alias/files/独立测试包已清理。只证明窄桥，不等于首机/CRUD/配对/恢复高层已接通 |
+| Flutter / iOS | 静态分析与 9/9 控制层测试通过，不含 UI 单元测试；已移除生成的 UI 测试目标。iOS project/scheme 解析通过，iOS 未构建验收 |
+| 多管理设备证明 | 独立 Go `issuer-proof-v1` 7 项/29 子测、协议 Node14/14 通过，包含真实 C/D HPKE、A 历史 AEAD/签链与 archived v2 节点。现有正式单 pin 尚未自动升级，服务端/client/真实 PAKE v2 链正在接入；未宣称多管理手机闭环通过 |
+| 当前整合检查 | 新 WS Go 依赖落盘后，workspace 全测曾在 setup 失败（顶层 go.sum 未同步），没有执行业务测试；等该切片冻结后补锁文件并重新验收。上述通过均保留实际执行范围 |
+| 公开范围 | 基础源码秘密/个人路径/编译产物扫描与人工范围检查通过；只使用合成账号、临时 TLS 和独立 provider，无宿主真实 env/凭据。这不是完整秘密或生产安全审计 |
 
-首次管理设备从本地独立 Ed25519/X25519 钥匙、恢复用途分离钥匙及环境 HPKE 封套开始；初始化挑战绑定账号/代际/登录会话，设备与恢复钥双签后一次事务接受。配对采用固定 BoringSSL 的 Edwards25519 SPAKE2 draft02 profile：短码只在端点使用，服务器中继签名公开消息；双方确认后管理设备签精确角色、期限和封套，新设备再签同一证书。未链接成熟原生库默认拒绝，不声称 RFC 9382 标准向量通过。
+首次管理设备从独立 Ed25519/X25519、用途分离恢复钥和独立环境 HPKE 封套开始；初始化挑战绑定账号/代际/登录会话，设备与恢复钥双签后一次事务接受。配对使用固定 BoringSSL Edwards25519 SPAKE2 draft02 profile；短码只在端点使用。未链接成熟原生库默认拒绝，不声称 RFC9382 标准向量通过。
 
-暂停期间独立拉取授权投影，处理撤销、到期和删除墓碑；恢复同步仍按原数据检查点补拉，避免漏掉暂停期间的共享写入。创建/轮换必须附齐当前授权设备及恢复封套，旧版本写入立即拒绝。删除最后一个环境暂时返回明确错误，须补足显式账号管理权限后开放；不会借用登录状态绕过权限。
+暂停独立拉取授权投影，执行撤销、到期和删除墓碑；恢复按原数据检查点补漏。创建/轮换须附齐当前设备和恢复封套，旧版本写入立即拒绝。最后环境删除须明确账号管理权限，当前关闭。退出先持久 AccountClosed/epoch 再清材料，崩溃重启不得复活旧设备；逐 key 恢复原值，保留无关修改。
 
-仍需完成：手机 Go 高层业务与系统强认证端到端链路、正式共享写入 CLI、恢复后可信设备重新入网、WebSocket 通知与断线补拉、三平台真实无人登录重启、iOS，以及 Worker 线上 Argon2 资源、容量/分页验收。当前不能宣传生产可用。先完成 M2，再按已授权计划实现自动更新及 CI/CD；正式 Tag/Release/安装包发布及真实线上部署仍未授权。
+仍需完成手机高层系统强认证、批准/恢复/轮换与多管理手机历史链、通知客户端重连补漏、三平台物理无人登录开机及 iOS。Worker 线上 Argon2 资源、容量/分页和完整安全审计未完成。先按可测试 M2 切片继续，再实现已授权自动更新与 CI；正式 Tag/Release/安装包、签名钥生成上传及真实线上部署仍未授权。当前不能宣传生产可用。
