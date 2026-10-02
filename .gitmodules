@@ -1,0 +1,12 @@
+[submodule "protocol"]
+	path = protocol
+	url = https://github.com/harmonia-vault/protocol.git
+[submodule "core-go"]
+	path = core-go
+	url = https://github.com/harmonia-vault/core-go.git
+[submodule "mobile"]
+	path = mobile
+	url = https://github.com/harmonia-vault/mobile.git
+[submodule "server"]
+	path = server
+	url = https://github.com/harmonia-vault/server.git
