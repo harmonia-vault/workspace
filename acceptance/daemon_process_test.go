@@ -187,13 +187,45 @@ func exerciseProtectedDaemonProcess(t *testing.T, directory, uid string, certifi
 	if err != nil || bytes.Contains(exports, []byte("SELECTED_A")) || bytes.Contains(exports, []byte("local-only-synthetic")) {
 		t.Fatal("云删变量仍让本机 override 生效")
 	}
+	// 默认进程扫描也只在完全合成 Env 的独立 CLI 中运行，绝不扫描宿主。
+	callScan := func(command string, extra ...string) ([]byte, error) {
+		args := append([]string{command, "--current-env"}, extra...)
+		cli := exec.Command(binary, args...)
+		cli.Env = []string{"SCAN_SELECTED=scan-selected-synthetic", "SCAN_UNSELECTED=scan-unselected-synthetic"}
+		return cli.CombinedOutput()
+	}
+	preview, err := callScan("import-preview")
+	var names []string
+	if err != nil || json.Unmarshal(preview, &names) != nil || len(names) != 2 || names[0] != "SCAN_SELECTED" || names[1] != "SCAN_UNSELECTED" || bytes.Contains(preview, []byte("scan-selected-synthetic")) || bytes.Contains(preview, []byte("scan-unselected-synthetic")) {
+		t.Fatal("实际 CLI 合成进程预览未限定为名称")
+	}
+	loseNextMutation()
+	scanLost, err := callScan("import", "--local-directory", directory, "--local-user", uid, "--environment", "dev", "--select", "SCAN_SELECTED", "--request-id", "actual-cli-scan")
+	if err == nil || !bytes.Contains(scanLost, []byte("actual-cli-scan")) || bytes.Contains(scanLost, []byte("scan-selected-synthetic")) || bytes.Contains(scanLost, []byte("scan-unselected-synthetic")) {
+		t.Fatal("扫描导入未知结果未保留原ID或泄漏值")
+	}
+	scanRetry, err := call("write-retry", "--request-id", "actual-cli-scan")
+	if err != nil || bytes.Contains(scanRetry, []byte("scan-selected-synthetic")) {
+		t.Fatal("实际扫描导入原回执重查失败或泄漏值")
+	}
+	if scan := writeResult(scanRetry); scan.Total != 1 || scan.Accepted != 1 || !scan.Applied || len(scan.Sequences) != 1 || scan.Sequences[0] != 9 {
+		t.Fatal("实际扫描导入原ID成为新写或选中集合错误", scan)
+	}
+	waitStatus(func(s localipc.Status) bool { return s.Sequence == 9 })
+	exports, err = call("export")
+	if err != nil || !bytes.Contains(exports, []byte("scan-selected-synthetic")) || bytes.Contains(exports, []byte("SCAN_UNSELECTED")) || bytes.Contains(exports, []byte("scan-unselected-synthetic")) {
+		t.Fatal("实际扫描未按原验签拉取流下发或导入了未选项")
+	}
 	if _, err = call("pause"); err != nil {
 		t.Fatal("正式 IPC 暂停失败", err)
 	}
 	if _, err = callInput("put", "paused-synthetic", "--environment", "dev", "--name", "PAUSED_WRITE", "--value-stdin", "--request-id", "actual-cli-paused"); err == nil {
 		t.Fatal("暂停期间共享写未拒绝")
 	}
-	waitStatus(func(s localipc.Status) bool { return s.Paused && s.Sequence == 8 })
+	if _, err = callScan("import", "--local-directory", directory, "--local-user", uid, "--environment", "dev", "--select", "SCAN_SELECTED", "--request-id", "actual-cli-paused-scan"); err == nil {
+		t.Fatal("暂停期间实际扫描导入未拒绝")
+	}
+	waitStatus(func(s localipc.Status) bool { return s.Paused && s.Sequence == 9 })
 	// 暂停保留配置，却仍处理已经收到的授权撤销。
 	revoke()
 	waitStatus(func(s localipc.Status) bool { return s.Paused && s.Environments == 0 })
@@ -205,7 +237,7 @@ func exerciseProtectedDaemonProcess(t *testing.T, directory, uid string, certifi
 	if err != nil || bytes.Contains(fragment, []byte("native-paired-value")) {
 		t.Fatal("撤销后正式 fragment 留有合成托管值", err)
 	}
-	t.Log("通过：实际无 fixture CLI daemon 在没有登录 session 的情况下从已接受入网回执启动，经显式测试 CA 的 HTTPS boot/授权拉取和身份 IPC；独立 CLI 的 put/delete/选中导入、原ID丢回应/历史重试、本机override、暂停拒写通过；关单次 CLI 服务继续，暂停收到撤销仍清托管值。宿主 env 未修改。")
+	t.Log("通过：实际无 fixture CLI daemon 在没有登录 session 的情况下从已接受入网回执启动，经显式测试 CA 的 HTTPS boot/授权拉取和身份 IPC；独立 CLI 的 put/delete/选中stdin及合成进程扫描导入、原ID丢回应/历史重试、本机override、暂停拒写通过；关单次 CLI 服务继续，暂停收到撤销仍清托管值。宿主 env 未修改。")
 }
 
 func exerciseV2DaemonProcess(t *testing.T, directory, uid string, certificate *x509.Certificate, bootPerformed func() bool) {
