@@ -30,3 +30,7 @@ run = "go test -race ./acceptance -run '^TestMobileDAGOwnerTwoWorkflowHTTPS$' -c
 [tasks.test-mobile-dag-transition-https]
 description = "三个隔离 B2 受限连续恢复事务的真实 HTTPS/SQLite 验收，不运行 SDK 或设备登记"
 run = "go test -race ./acceptance -run '^TestMobileDAGTransitionHTTPS$' -count=1 -timeout=150s -json"
+
+[tasks.test-mobile-dag-recovered-https]
+description = "三个隔离 B3a 明确登记原包的 HTTPS/SQLite 场景；无 Boot/Pull 或手机信任"
+run = "go test -race ./acceptance -run '^TestMobileDAGRecoveredHTTPS$' -count=1 -timeout=150s -json"

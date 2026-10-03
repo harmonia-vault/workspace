@@ -1,12 +1,12 @@
 # 当前实现状态与验证
 
-更新时间：2026-10-03 17:38 UTC。M2 尚未闭环，项目仍是实验性安全软件。组件通过、实际产品步骤通过、整轮测试结果分别记录，不合并宣称完整产品或生产安全验收。全部用户功能及下一步见 [TODO.md](TODO.md)，完成条件见 [PLAN.md](PLAN.md)。
+更新时间：2026-10-03 18:45 UTC。M2 尚未闭环，项目仍是实验性安全软件。组件通过、实际产品步骤通过、整轮测试结果分别记录，不合并宣称完整产品或生产安全验收。全部用户功能及下一步见 [TODO.md](TODO.md)，完成条件见 [PLAN.md](PLAN.md)。
 
 此前 STATUS（最近更新为 11:32 UTC）已[按原字节完整归档](history/STATUS-20261003-1132.md)，SHA-256 为 `2ab49f34deed0026d54a8efcf65a23442208eeb61207aaa665309d0591012079`。归档中的“当前”、路径与未跑结论只对应当时上下文；原始失败和精确历史快照没有删除。
 
 ## 当前范围
 
-本次整理依据已公开 protocol `1c0b241`、core-go `67db4a7`、server `2f15b94`、mobile `85f8c6c`。运行结论仍分别绑定下列证据中的实际源码与产物，不能追认为这些最新提交的完整重跑。并行候选仅在明确标为候选的项目中列出，不算已公开能力。
+本次整理依据已公开 protocol `1c0b241`、core-go `af702df`、server `2f15b94`、mobile `85f8c6c`。运行结论仍分别绑定下列证据中的实际源码与产物，不能追认为这些最新提交的完整重跑。并行候选仅在明确标为候选的项目中列出，不算已公开能力。
 
 | 用户流程 / 平台 | 已实际验证 | 仍缺什么 / 结果限制 |
 | --- | --- | --- |
@@ -17,7 +17,7 @@
 | iOS 产品 | 固定 mobile `8a0515c` Debug 实际登录未可信；显式新首机完整重输及提交 6.464 秒；变量新增/读取/更新/删除、正常退出和本地恢复拒绝通过；init 1、mutation 3/3、Boot 8、Pull 20；[证据](../mobile/docs/IOS_PRODUCT_INITIALIZATION_CRUD_SIMULATOR.md)公开于 `91e499c` | 第一次过期流程的完成/查询均 FAIL并保留；原查询 HTTP 次数未采集，不能称已接受未知结果不可查。仅 Simulator；真机因素、iOS PIN、审批/恢复和完整生命周期未验 |
 | App 锁与 PIN | Android MainActivity原生三阶段PASS；Flutter最小输入链PASS40.683秒：真实双录、独立PIN restore、错误PIN零写、正确PIN一次写且同Pull验值、UI忘记和新身份NOT_TRUSTED；[证据](../mobile/docs/PIN_FLUTTER_RUNTIME.md)随16项逐操作门控公开于 `1cb8398` | 前五FAIL保留，精确ErrPIN分类已修。账号注册/邮件/首机初始化采用同设备真实原生bootstrap，不算PIN逐屏账号/恢复码向导；CLI批准UI、恢复、迁移、V4/V5及iOS PIN未验。系统取消/临时锁定不得降级；整体realVaultReady=false |
 | 首次恢复及恢复后管理手机 | 固定 Android 原生三阶段 3/3、94.475 秒、30 次系统认证、两次 force-stop，通过受限恢复→完整新码→显式 cert4 登记→CLI4；[证据](../core-go/mobilebridge/RECOVERY_NATIVE.md) | Flutter 恢复向导与普通管理产品入口仍待接线和实际验收；不能借原生通过开放所有操作 |
-| 重复恢复 DAG → CLI5 | 已公开 major2/证书5/P4 客户端与服务；独立真实 A→B→C 恢复、原生 SPAKE2、正式 CLI5 RO/RW、CGO0 daemon、Boot/Pull/IPC/隔离 shell 通过。主 race 32.89 秒、Go 总计 34.356 秒；Node/workerd 8 项通过；[证据](evidence/RECOVERY-DAG-HTTP-VALIDATION.md) | B/C 是 Go API与测试加密存储适配器，不是手机 UI。手机 DAG S1 journal/CAS/owner合同已公开于 `08dcf01`，根独立442项race与vet通过；Android通用JNI Check/CAS已有限实测，仍无手机DAG跨认证ABI入口。S2a原ID冷查询已公开，根合并P4后426项race及3场景HTTPS/4事件通过；P4环境CRUD已公开，真实HPKE/PAKE及原包恢复通过；B1跨操作RAM owner/lease及P4每环境授权Go/TS已公开，根合并468项race、两项真实HTTPS主场景与Node/workerd3项通过；B2准备/完整码确认/同ID原子转换已公开，根576项race与3场景HTTPS通过；手机P4业务journal/UI、DAG跨认证ABI、manager-reanchor和新Windows SCM仍缺 |
+| 重复恢复 DAG → CLI5 | 已公开 major2/证书5/P4 客户端与服务；独立真实 A→B→C 恢复、原生 SPAKE2、正式 CLI5 RO/RW、CGO0 daemon、Boot/Pull/IPC/隔离 shell 通过。主 race 32.89 秒、Go 总计 34.356 秒；Node/workerd 8 项通过；[证据](evidence/RECOVERY-DAG-HTTP-VALIDATION.md) | B/C 是 Go API与测试加密存储适配器，不是手机 UI。手机 DAG S1 journal/CAS/owner合同已公开于 `08dcf01`，根独立442项race与vet通过；Android通用JNI Check/CAS已有限实测，仍无手机DAG跨认证ABI入口。S2a原ID冷查询已公开，根合并P4后426项race及3场景HTTPS/4事件通过；P4环境CRUD已公开，真实HPKE/PAKE及原包恢复通过；B1跨操作RAM owner/lease及P4每环境授权Go/TS已公开，根合并468项race、两项真实HTTPS主场景与Node/workerd3项通过；B2准备/完整码确认/同ID原子转换已公开，根576项race与3场景HTTPS通过；B3a 明确环境/角色/期限的原包登记已公开于 `af702df`，根最新版四包730项race及三个HTTPS场景通过；登记后仍未可信，B3b尚未接线；手机P4业务journal/UI、DAG跨认证ABI、manager-reanchor和新Windows SCM仍缺 |
 | 设备管理、前台授权提示 | Go/TS 管理与 Android 原生 42 次认证有固定证据；最小 pending 元数据已公开；CLI3 手动批准产品主链已实际通过 | Flutter 设备权限管理、真实前台请求去重/单提示/badge、取消/到期/撤销清理仍需闭环；不增加后台推送或伪造事件 |
 | Linux 无人登录后台 | 固定 core `b094a93`/server `bd86fec`：完整内核重启、新 boot/两 unit 身份、目标用户未登录时持钥 Boot/Pull；CLI 写入与交互 Bash 刷新片段纠正/暂停/签撤销/逐 key 回退通过；[证据](evidence/LINUX-KERNEL-REPRODUCTION.md) | 限本次隔离 Ubuntu；新版POSIX整目录消失恢复已独立通过48项shell/provider测试；共享离线退出和只读入网检查已公开；Linux安装器已公开：首次VM原生4PASS/5FAIL保留，umask077窄修后新10项原生全PASS及正式空安装/启动非零/卸载通过；外层组清理仍FAIL，最终账号/组实际均缺失、旧资源不变；最新公开基线根71项race及Linux构建/vet通过。真实入网后Start、有材料卸载与新版重启仍未跑，其它发行版和三OS整体未验。已有进程env只能经正式shell接入更新 |
 | macOS 无人登录后台 | 同固定 core/server 的正式配对、LaunchDaemon、清会话后内核重启未登录 Boot/Pull、重启后 CLI写入下发、暂停签撤销和精确清理通过；[证据](evidence/MACOS-LAUNCHDAEMON-VALIDATION.md) | 原观察器字面 `loginwindow` 检查 FAIL保留；独立页面/UID/boot/HTTP证据支持未登录结论。安装器v7已公开：固定label stderr absence和目录枚举上限已修，根258项race PASS及vet/构建/20包消费者零测试编译通过；正式安装器VM仍未跑；源权限类bug负例修前FAIL保留。[新版POSIX终端恢复](../core-go/platform/POSIX-CLEANUP.md)已公开，根在06db加该切片独立race48/48、vet通过；[正式离线退出](../core-go/docs/OFFLINE-LOCAL-LOGOUT.md)已公开，根独立三包race163/163与vet通过；共享[只读入网检查](../core-go/docs/LOCAL-ENROLLMENT-CHECK.md)已公开，根独立218项race与vet通过；已停服卸载、中断重试和真实安装器VM仍未完成 |
@@ -39,6 +39,8 @@ Android 全 writer 槽位协调器已公开于 `85f8c6c`：[分批实测](../mob
 iOS全writer候选已有六组Simulator组件及实际Go Check×2/普通Save×1通过；system-auth仍未完成。后续38.215秒与新增38.101秒诊断轮均FAIL、0次认证输入并精确清理。仅事件白名单诊断确认进入系统认证并等待到超时取消，自动化仍未确认可操作提示；不据此判定没有提示或线程根因。Go→Swift CAS仍未跑，iOS这部分仍是私有候选。
 
 [macOS安装协调器](../core-go/macosservice/README.md)与[Linux安装协调器](../core-go/linuxinstall/README.md)源码公开于 `1b370cb`，没有发布安装包或Release。Mac根最新基线258项race PASS10.511秒；Linux根71项race PASS5.524秒。Linux [实际VM记录](../core-go/linuxinstall/VM_VALIDATION.md)保留外层FAIL与原4PASS/5FAIL，不能将原生10项和空生命周期的局部通过拼成整轮成功。
+
+新增[B3a根复验](evidence/mobile-dag-b3a-root-result.json)：730项受影响race PASS（193.999秒）、vet通过、23包消费者仅编译（零测试），三个真实HTTPS/SQLite场景/四事件PASS（31.582秒）。明确选择Admin/RW/RO和期限、持久意图/challenge/原签包、响应丢失及CAS失败后的原ID查询均有限验证；独立审阅发现的嵌套字段别名缺口及修前两个FAIL保留。接受原包仍不赋予设备信任，不开放手机DAG能力。
 
 ## 最新验证如何使用
 
