@@ -4,7 +4,7 @@
 
 ## M2 用户流程总览
 
-2026-10-03 当前 workspace submodule 固定 protocol `de21d99`、core `b094a93`（原生账号、恢复、独立PIN包装及同锁来源投影）、mobile `9e0a00b`（C界面实际预览、Android独立PIN适配及iOS安全桥）、server `bd86fec`（注册策略、空实例测试入口和待批准元数据）。公开核心联合39项有两个精确固定快照，另列真实Android和平台产物范围；新Flutter产品接线及视觉迭代仍在进行，不将组件证据合并冒称完整产品通过。
+2026-10-03 当前 workspace submodule 固定 protocol `de21d99`、core `b094a93`（原生账号、恢复、独立PIN包装及同锁来源投影）、mobile `0caf1d0`（C界面、默认关闭的PIN产品接线及iOS安全桥）、server `bd86fec`（注册策略、空实例测试入口和待批准元数据）。公开核心联合39项有两个精确固定快照，另列真实Android和平台产物范围；新Flutter产品接线及视觉迭代仍在进行，不将组件证据合并冒称完整产品通过。
 
 | 用户流程 | 完成及实际证据 | 待验 / 阻塞 |
 | --- | --- | --- |
@@ -12,21 +12,21 @@
 | 手机批准CLI及本机环境同步 | 正式cert3 CLI/daemon、原生PAKE、HPKE/AEAD、RO/RW、selected-only导入、override、暂停和撤销已实际通过；Android cert3 focused19次CryptoObject通过 | Flutter授权入口已接，完整实际用户链未验；不把编译当三OS boot |
 | 恢复后手机入网并批准CLI | Go完整旧码→受限→新码重输/连续两签→明确env/role/expiry cert4登记→Boot/Pull→CLI4 PAKE/原receipt504恢复→CGO0 daemon及RO拒写/RW写删已通过；源码`b28c46a`，新两验收文件公开 | 真实Android恢复3/3、30次强认证及两次force-stop已通过，22文件公开；Flutter向导仍在接线，第二次恢复DAG仅密码学库已验、HTTP与产品未接 |
 | 手机设备权限管理 | Go已有设备RO/RW/Admin/none、全局撤销、原包未知查询及保存失败门槛通过；Android新focused1/1、42次CryptoObject、真实Go peer通过 | 当前已通过管理Android产物是固定core894等公开底座+9冻结候选，不等于最新HEAD；恢复E/F低层控制已公开及真实Go验收通过，高层环境日志已公开并经真实HTTPS候选测试；Android及手机界面接线继续 |
-| Linux后台无登录 | 原OrbStack隔离Boot/Pull/IPC/sh/SSH通过；新完整Ubuntu内核/systemd、cloud-init、离线固定主机公钥匹配SSH、独立数据卷和固定工具链通过；当前公开CLI/daemon及server在guest构建通过 | 正式systemd unit、最小权限隔离和整机重启无人登录Boot/Pull仍待验；不以构建或LXC结果替代 |
-| macOS后台无登录 | LaunchDaemon/目标UID/受保护状态/CLI及隔离shell组件通过；Computer Use权限及精确UTM窗口控制实际可用 | 旧VM已依明确授权停止并保留。新独立macOS VM使用已有官方镜像安装启动通过，许可已获授权接受，合成本地账号Setup继续中；正常桌面及真实LaunchDaemon boot尚未验证 |
-| Windows后台无登录 | SID/DPAPI/SCM组件及原生配对通过；上一轮严格未知结果处理、cleanup和独立absence通过；新轮实际同一注册会话的连接SID匹配目标普通用户、目标服务器匹配本机 | 原flags2注册仍80020009/SCODE80070005；同目录目标允许mask1201bf且无deny，根因仍未证实。没有重试/启动服务或扩大ACL；真实manifest只读回收中，正式CLI/SCM/provider/boot未验 |
+| Linux后台无登录 | 新完整Ubuntu内核/systemd、严格SSH、数据卷和固定工具链通过；公开CLI/daemon/server构建通过。两正式隔离unit安装通过，HTTPS服务正常；实际管理侧注册/双签初始化/写变量通过 | 首轮正式CLI登录失败，正在固定错误定位；设备unit尚未启动，真正配对、整机重启和无人登录Boot/Pull未验 |
+| macOS后台无登录 | LaunchDaemon/目标UID/受保护状态/CLI及隔离shell组件通过；新独立macOS VM已安装、创建合成本地账号并实际进入正常Finder桌面，root目视核验 | 实际27.0/26A428 arm64及Terminal命令入口已验证；正式LaunchDaemon和无登录重启待验。旧VM停止且保留，无真实Apple账号或宿主权限变更 |
+| Windows后台无登录 | 原生配对与平台组件通过；最新同会话连接SID及目标本机匹配、目录权限元数据已核；本轮严格结果确认、cleanup及完整独立absence通过 | flags2注册仍80020009/SCODE80070005。正准备仅credential userId从可信SID解析为canonical name并回验的有限候选；根因未证实，不改principal SID/ACL/COM/身份。正式CLI/SCM/provider/boot未验 |
 | SMTP / Workers | 隔离SMTP严格TLS实际2/2通过；本地workerd/SQLite DO及相同Argon2id64MiB/t3/p1通过，公开server183/183+type/build通过 | 真实投递、线上CF配额为外部验证待办；未授权线上部署，不为额度弱化参数，也不无限阻挡其余已授权开发 |
 
 最近独立完整公开 snapshot：workspace `2ba0c1a`、core `457858f`、server `b968223`、protocol `b770001`、mobile `d169d74`，原生 race 33/33 通过161.661秒；同一固定源码 Go 全包293项通过、1项默认构建专属反向检查跳过，12个含测试包全部通过。仅提取公开 commit，无 working-tree overlay。该结果已包含连续恢复及正式CLI4新6主项，不包含后续恢复E/F管理、Android恢复或产品UI候选。其后纯公开 workspace `f1d10b1`/core `202a83c`/server `02689b4`/protocol `2edad19`/mobile `d169d74` 的5项新增或受影响用户流程 race 通过69.442秒；无工作树覆盖、0失败/跳过。该固定快照共有37主项，本轮没有将5项定向复验说成完整37项通过。新增高层环境业务在公开9eb77df/core006450d独立target1/1通过13.497秒；随后严格挑战时钟验收公开后，root仅提取五仓公开固定源码完成39/39主项原生race（247.939秒、0FAIL/SKIP）；同一core全包307 PASS、0FAIL、1默认构建专属SKIP；精确范围见下表。M2仍未闭环；CI、Tag/Release、安装包、签名钥生成/上传和真实线上部署均未执行。
 
-## 最新实际进展（2026-10-03 09:43 UTC）
+## 最新实际进展（2026-10-03 10:03 UTC）
 
 - Android真实注册→邮箱证明→退出→普通登录未可信通过。完整新恢复码重输、原生初始化、restoreSession和businessPendingInfo已完成；旧驱动只回应此段前三次系统认证，环境标题提前显示，但最后Flutter Pull的第四次认证未回应，故初始化整体为PARTIAL，完整首页/CRUD/CLI未跑。累计服务端Boot/Pull成功响应不能归为最后Flutter Pull通过。13个不同CryptoObject窗口、原报告和尾部失败保留；每轮官方清除合成系统PIN及独立SDK noSecure通过。前一文档提交误将此段整体算通过，本项明确更正。
 - 已核实上述实际账号链使用旧界面快照，不是最终C界面。业务lib与当前公开底座逐文件相同，仅两UI文件不同。新独立候选只换入最终公开C两文件，analyze通过3.529秒、既有68项通过4.725秒；完整C用户链另验。当前公开core `b094a93`新AAR构建5.558秒通过，root独立对照公开archive的350源码文件零差异，APK产物和旧证据分开记。
-- PIN产品安全审查修复了服务器可能已接受后的原ID保留、状态故障关闭明文与业务能力、prepare后晚注册owner与dispose竞态，以及忘记PIN必须只清PIN所属材料。v2非视觉候选35项定向测试、确定性JVM交错及完整App编译通过；这是候选与合成故障端口证据，真实PIN完整用户链未跑。一次本机Claude Opus5.5 medium已完成两文件UI；机械清理修正后analyze和既有68项通过。所有PIN产品能力仍默认关闭，候选未公开为已可用。
-- 新独立macOS VM使用本机已有官方恢复镜像安装至100%并启动。已接受本次获授权的Apple许可，语言、地区、新机和隐私步骤通过，合成本地测试账号设置继续中，尚未确认进入正常桌面。旧VM按明确授权停止，磁盘及配置保留；无真实Apple ID或宿主权限变更。
-- Linux完整VM已证明正确NoCloud启动与全部cloud-init阶段无错误；离线白名单取得的公开主机指纹与实际SSH一致，严格SSH通过。任务独有16GiB空盘经核验后一次格式化、UUID挂载及0700工作目录通过。root空间门槛和npm配置的首次失败保留；将新VM公开apt索引迁至数据盘后固定Go/Node/pnpm和编译工具安装通过。公开固定core/server/workspace在guest低并发构建CLI、daemon及server通过169.045秒，正式服务和整机boot仍待验。
-- Windows上一轮严格cleanup及独立absence通过。新的单次真实注册同一会话诊断确认ConnectedUser解析SID与目标相同、TargetServer匹配本机，目录目标ACE允许1201bf、deny为0、无继承标志；flags2实际仍返回SCODE80070005。仅记录实际证据，VARIANT布局仍只是源码预测，未声称原生捕获。尚未找到根因，未启动服务、扩权限或继续盲试参数。
+- PIN产品14个精确源码/文档文件已公开为mobile `0caf1d0`，root逐文件核冻结摘要、公开底座、组合构建输入和有限秘密/个人路径扫描。修复晚持久故障保留原ID、状态故障关闭明文与能力、晚owner注册/销毁竞态及PIN所属清理范围；一次Claude两文件UI保留C样式。最终v2+UI+公开b094 AAR组合analyze通过2.3秒、全75项Flutter测试通过、完整App与定向testAPK编译通过22.034秒。默认PIN业务证据仍空、能力关闭；真实MainActivity插件三阶段正在验，不能把这些结果当作Flutter PIN点击或CLI批准通过。
+- 新独立macOS VM已使用本机官方镜像完成安装、接受获授权许可、创建合成本地账号并实际进入正常Finder桌面，root已核看无秘密截图。Terminal确认27.0/26A428 arm64，正常命令入口可用。正在准备固定公开CLI、明确局部CA与正式LaunchDaemon，再做正常重启/无人登录验证；未登录Apple账号、未启SSH/共享、未改宿主安全设置。旧VM停止且保留。
+- Linux完整VM、严格主机公钥SSH、独立数据卷及固定工具链通过；公开固定CLI/daemon/server在guest构建通过169.045秒。正式两unit安装通过2.571秒，只有本机HTTPS/SQLite服务启动；管理侧实际注册、登录、双签初始化与变量写入通过，随后正式CLI登录失败1.295秒，固定错误诊断中。保留第一轮合成状态和失败，未启动设备unit或整机重启，不把局部步骤算完整配对。
+- Windows最新单次注册仍SCODE80070005，实际同一会话ConnectedUser SID与目标相同、TargetServer匹配本机，COM目录和NTFS目录目标mask均1201bf、无deny、无继承标志。严格读回确认仅三字段变化，随后同源精确cleanup及独立完整absence通过；旧错误、原hresultRecorded=false和独立实测数字保留。仅准备可信SID反查canonical name并精确回验的credential参数候选，尚未新注册，不推论根因已证实。
 - iOS平台桥已公开为mobile `9e0a00b`：Simulator与未签名iPhoneOS arm64完整构建通过；独立实际安全15 PASS/0 FAIL/3 UNRUN，产品实际安装、启动和连接页查看通过。真机认证、实际NO_SYSTEM_AUTH完整PIN及可信产品链仍未验；后续官方Simulator认证验证排在macOS Setup之后。
 
 以下带时间段为历史；上述为当前结果。M2仍未闭环，不宣称生产可用，未配置CI、发布Release/安装包或部署真实线上服务。
