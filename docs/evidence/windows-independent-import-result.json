@@ -1,0 +1,48 @@
+{
+  "schema": "harmonia/windows-independent-import-validation/v1",
+  "selectedMainTests": 1,
+  "pass": 1,
+  "fail": 0,
+  "skip": 0,
+  "unrun": 0,
+  "selectedTest": "TestProcessImportDefaultSourceUsesOnlySyntheticChildEnvironment",
+  "fixedPE": "1a53dce9dc03c40561ec809fe7655864d05c3d497a8d4d8215669c79afb6ac89",
+  "guestExitCode": 0,
+  "observedTestSeconds": 0.02,
+  "rawSHA256": "ae2a79e2530a2205c1c99313eef61b8343f5597ab1faca70c80755bde53c6627",
+  "stdoutBytes": 161,
+  "stderrBytes": 0,
+  "noSyntheticValuesInOutput": true,
+  "cleanup": "PASS; unique staging removed, ownedProcesses0, entries2",
+  "originalNativeResult": "71PASS/1FAIL retained; not rerun",
+  "diagnosticNativeResult": "single FAIL retained; additional PROCESSOR_ARCHITECTURE",
+  "candidateScope": "test fixture provides PROCESSOR_ARCHITECTURE explicitly; strict exact five-name assertion",
+  "currentUserAcceptance": "UNRUN",
+  "serviceAcceptance": "UNRUN",
+  "guiInput": "NONE",
+  "stoppedSchedulerExperiment": "NOT EXECUTED",
+  "productSourceChangedByThisTask": false,
+  "publishedTestCommit": "eef671302e4f51f75581384385e01107633423d0",
+  "originalSelection": {
+    "main": {
+      "pass": 71,
+      "fail": 1,
+      "skip": 0
+    },
+    "includingSubtests": {
+      "pass": 85,
+      "fail": 1,
+      "skip": 0
+    },
+    "sourceFiles": 430,
+    "context": "SYSTEM 合成测试；内存环境适配器，不是普通用户或系统服务验收。",
+    "cleanup": "PASS"
+  },
+  "fixedSourceSHA256": "bc029af5a24c4fa5d3be6b30eb1103aeb3963e23839bdc7eec7787e1852f503e",
+  "privateEvidenceManifestSHA256": "982600690322c4f1db979afd7f315ebf1eec73e38e7919aca71ea379e496f5b5",
+  "limits": [
+    "原完整选择与诊断失败保留；修后只复跑原失败项。",
+    "未知的 Windows 内部变量注入路径未被本次测试证明。",
+    "被停止的令牌/计划任务实验未执行，普通用户存储、真实用户环境及无人登录服务仍未验。"
+  ]
+}

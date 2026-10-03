@@ -1,8 +1,8 @@
 # 功能待办总览
 
-更新时间：2026-10-03 15:45 UTC。此页按用户可操作功能分类；组件实现或局部通过不算整个功能完成。当前范围见 [STATUS.md](STATUS.md)，原始历史与失败见[完整归档](history/STATUS-20261003-1132.md)。
+更新时间：2026-10-03 16:53 UTC。此页按用户可操作功能分类；组件实现或局部通过不算整个功能完成。当前范围见 [STATUS.md](STATUS.md)，原始历史与失败见[完整归档](history/STATUS-20261003-1132.md)。
 
-当前公开来源：protocol `1c0b24180e7fabfcd9109dbabb2afbf6195f22d8`；server `2f15b94ce5023357320b415e5f3a4aebb29c2856`；core-go `d02f6a532dfe6c7c3534fe8194ef6946f4b14925`；mobile `ecbbc6212c14ca4335038a14abb66900d7217373`。每项实跑仍以证据所记固定源码/产物为界；并行候选不计作公开能力。
+当前公开来源：protocol `1c0b24180e7fabfcd9109dbabb2afbf6195f22d8`；server `2f15b94ce5023357320b415e5f3a4aebb29c2856`；core-go `eef671302e4f51f75581384385e01107633423d0`；mobile `ecbbc6212c14ca4335038a14abb66900d7217373`。每项实跑仍以证据所记固定源码/产物为界；并行候选不计作公开能力。
 
 | 用户功能 | 状态 | 已有证据 | 接下来需要完成 |
 | --- | --- | --- | --- |
@@ -21,11 +21,11 @@
 | 离线、暂停、期限、撤销和退出 | 核心及部分真实平台已验 | Go/CLI期限/回拨/撤销清缓存、暂停授权；公开Unix显式离线退出，根独立三包163/163 race及vet通过；Linux/macOS真实暂停签撤销；iOS正常退出后恢复拒绝；Android独立正式退出/材料清除/正常Activity重启PASS，[证据](../mobile/docs/ANDROID_PRODUCT_LOGOUT_20261003.md) | Android单笔原ID跨kill续办/取消已PASS83.527秒、仅一次POST；4465/4467 FAIL保留；旧整轮尾部失败根因未证，其它后台/失权与Windows实证仍缺；未收到撤销时离线有固有限制 |
 | 手机批准CLI和多管理手机 | Android产品CLI3主链已验，整轮仍FAIL | 34次系统认证轮完成正式CLI3 PAKE/Boot/Pull/RW写→App显示，批准1、mutation5、Pull74；[本轮证据](../mobile/docs/ANDROID_PRODUCT_USERFLOW_20261003.md)公开于b0778e3，原focused RO/RW独立 | 149.966秒整轮在最后logout窗口失败；多管理手机完整产品、Flutter PIN路径和iOS批准未验，不代表三OS无人登录 |
 | 全丢设备恢复→轮换→显式登记手机→CLI | Android原生已验，Flutter未闭环 | 固定原生3/3、94.475秒、30次认证、两次force-stop，cert4手机→正式CLI4/daemon通过；22源码公开 | Flutter受限恢复/完整新码/显式角色期限向导和实际操作；重复恢复DAG高层另列 |
-| 重复恢复与恢复设备继续轮换 | HTTP/Go/正式CLI5联合通过，手机高层未接 | 公开DAG major2/证书5/P4；A→B→C及CLI5 RO/RW主race32.89秒、Go34.356秒，Node/workerd8项独立PASS | B/C是Go API与测试加密存储，不是手机UI；DAG S1 journal/CAS已公开，根独立442项race/vet通过；S2a原ID冷查询已公开，根合并P4后426项race与3场景HTTPS/4事件通过；P4环境CRUD真实加密主项通过，B1跨操作RAM owner/lease及P4授权Go/TS已公开，根联合468项race、两项HTTPS与server3项通过；手机业务journal/UI、真实平台CAS/ABI和manager-reanchor仍缺 |
+| 重复恢复与恢复设备继续轮换 | HTTP/Go/正式CLI5联合通过，手机高层未接 | 公开DAG major2/证书5/P4；A→B→C及CLI5 RO/RW主race32.89秒、Go34.356秒，Node/workerd8项独立PASS | B/C是Go API与测试加密存储，不是手机UI；DAG S1 journal/CAS已公开，根独立442项race/vet通过；S2a原ID冷查询已公开，根合并P4后426项race与3场景HTTPS/4事件通过；P4环境CRUD真实加密主项通过，B1跨操作RAM owner/lease及P4授权Go/TS已公开，根联合468项race、两项HTTPS与server3项通过；B2高层准备/完整码确认/同ID转换已公开，根576项race及3场景HTTPS通过；手机业务journal/UI、真实平台CAS/ABI和manager-reanchor仍缺 |
 | 邮箱证明账号重置 | 后端已验，App待接 | 新邮件证明、破坏性确认、generation、旧设备及会话失效测试通过 | App入口、最新永久首号不重开回归和真实邮件投递 |
-| macOS系统服务无人登录启动 | 真实内核纵链通过，安装器候选未实跑 | 固定b094/bd86正式配对、LaunchDaemon、清会话后完整重启未登录Boot/Pull、CLI写入、暂停签撤销和清理；独立页面/UID/boot/HTTP支持 | 原console Name字面检查FAIL保留；安装器v5候选181项race PASS；v6正在修复重启前Start授权及删除持久化重试缺口；公开POSIX切片根独立48/48 race与vet通过；源权限类负例修前FAIL保留；正式离线退出已公开且根独立163/163 race及vet通过；共享只读入网检查已公开且根独立218项race/vet通过；已停服卸载/中断重试待完成，安装器VM及多用户仍未验 |
-| Linux系统服务无人登录启动 | 完整内核纵链通过，范围有限 | 固定b094/bd86真实配对、清会话后重启、未登录Boot/Pull、CLI写入、SSH Bash刷新片段纠正/暂停/签撤销/逐key回退 | 新版POSIX整目录消失恢复48项独立通过；正式安装器总协调器候选host71项race/ARM64构建通过，观察/打开竞态窄修与真实VM待完成；共享只读入网检查已公开；其它发行版及三OS整体未验；保留旧失败，见docs/evidence |
-| Windows系统服务与用户环境 | Task Scheduler注册仍FAIL，根因未证 | 两SCM服务创建后从未启动，本轮精确清理及独立absence通过；普通Batch/同会话SID、profile加载/释放/权限恢复；80次AccessCheck API完成且自己任务目录create允许；合成typed VARIANT调用帧实际9/9通过 | password EMPTY一次实际新注册仍FAIL3.305秒、80020009/SCODE80070005；新资源精确清理及独立absence通过；Scheduler仅为当前令牌获取选择，C++强类型对照未编译/执行，平台内容安全检查中止该具体实验；继续独立CLI/存储/环境恢复产品验收，见[收敛记录](evidence/WINDOWS-PATH-REVIEW.md)；不扩大权限、不把AccessCheck当根因证明；正式provider/CLI/SCM启动/boot未验 |
+| macOS系统服务无人登录启动 | 真实内核纵链通过，安装器候选未实跑 | 固定b094/bd86正式配对、LaunchDaemon、清会话后完整重启未登录Boot/Pull、CLI写入、暂停签撤销和清理；独立页面/UID/boot/HTTP支持 | 原console Name字面检查FAIL保留；安装器v6候选243项race PASS；v7正修固定label stderr absent诊断与目录枚举上限，VM未跑；公开POSIX切片根独立48/48 race与vet通过；源权限类负例修前FAIL保留；正式离线退出已公开且根独立163/163 race及vet通过；共享只读入网检查已公开且根独立218项race/vet通过；已停服卸载/中断重试待完成，安装器VM及多用户仍未验 |
+| Linux系统服务无人登录启动 | 完整内核纵链通过，范围有限 | 固定b094/bd86真实配对、清会话后重启、未登录Boot/Pull、CLI写入、SSH Bash刷新片段纠正/暂停/签撤销/逐key回退 | 新版POSIX整目录消失恢复48项独立通过；安装器观察竞态已修；首次VM原生4PASS/5FAIL揭示umask077目录权限缺口，窄修host71项race/ARM64构建通过，新10项原生与正式生命周期未跑；共享只读入网检查已公开；其它发行版及三OS整体未验；保留旧失败，见docs/evidence |
+| Windows系统服务与用户环境 | Task Scheduler注册仍FAIL，根因未证 | 两SCM服务创建后从未启动，本轮精确清理及独立absence通过；普通Batch/同会话SID、profile加载/释放/权限恢复；80次AccessCheck API完成且自己任务目录create允许；合成typed VARIANT调用帧实际9/9通过 | password EMPTY一次实际新注册仍FAIL3.305秒、80020009/SCODE80070005；新资源精确清理及独立absence通过；Scheduler仅为当前令牌获取选择，C++强类型对照未编译/执行，平台内容安全检查中止该具体实验；独立原生72主项71PASS/1FAIL，显式合成架构变量夹具修后该项PASS0.02秒及精确清理PASS；原失败保留，普通用户3项仍未跑，见[收敛记录](evidence/WINDOWS-PATH-REVIEW.md)；不扩大权限、不把AccessCheck当根因证明；正式provider/CLI/SCM启动/boot未验 |
 | Docker自托管 | 本地固定范围已验 | 公开bd86 archive真实Docker11/11，首号/登录/同卷重启永久标记/后续403、非root/0700/明文拒绝与清理 | 新DAG Docker整链、真实TLS代理/手机组合未跑；不部署真实服务 |
 | Workers自托管 | 本地范围已验 | D1目录/账号DO同Argon2；首号registry/legacy迁移workerd回归；DAG新Node/workerd8项独立通过 | 最新完整产品链及线上CPU/内存/配额未测；不能为额度弱化参数 |
 | SMTP和Cloudflare发信 | 隔离SMTP部分通过 | 严格TLS两项通过，不降级、不secret debug | 真实SMTP投递未跑；CF Email Service可选接入未开始，不承诺全免费 |

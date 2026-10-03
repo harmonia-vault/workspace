@@ -26,3 +26,7 @@ run = "go test -race ./acceptance -run '^TestMobileDAGOriginalQueryHTTPS$' -coun
 [tasks.test-mobile-dag-owner-https]
 description = "一个隔离 B1 owner 跨两个 Workflow 的真实 HTTPS 只读场景"
 run = "go test -race ./acceptance -run '^TestMobileDAGOwnerTwoWorkflowHTTPS$' -count=1 -timeout=90s -json"
+
+[tasks.test-mobile-dag-transition-https]
+description = "三个隔离 B2 受限连续恢复事务的真实 HTTPS/SQLite 验收，不运行 SDK 或设备登记"
+run = "go test -race ./acceptance -run '^TestMobileDAGTransitionHTTPS$' -count=1 -timeout=150s -json"
