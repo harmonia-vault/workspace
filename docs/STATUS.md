@@ -1,12 +1,12 @@
 # 当前实现状态与验证
 
-更新时间：2026-10-03 18:45 UTC。M2 尚未闭环，项目仍是实验性安全软件。组件通过、实际产品步骤通过、整轮测试结果分别记录，不合并宣称完整产品或生产安全验收。全部用户功能及下一步见 [TODO.md](TODO.md)，完成条件见 [PLAN.md](PLAN.md)。
+更新时间：2026-10-03 19:04 UTC。M2 尚未闭环，项目仍是实验性安全软件。组件通过、实际产品步骤通过、整轮测试结果分别记录，不合并宣称完整产品或生产安全验收。全部用户功能及下一步见 [TODO.md](TODO.md)，完成条件见 [PLAN.md](PLAN.md)。
 
 此前 STATUS（最近更新为 11:32 UTC）已[按原字节完整归档](history/STATUS-20261003-1132.md)，SHA-256 为 `2ab49f34deed0026d54a8efcf65a23442208eeb61207aaa665309d0591012079`。归档中的“当前”、路径与未跑结论只对应当时上下文；原始失败和精确历史快照没有删除。
 
 ## 当前范围
 
-本次整理依据已公开 protocol `1c0b241`、core-go `af702df`、server `2f15b94`、mobile `85f8c6c`。运行结论仍分别绑定下列证据中的实际源码与产物，不能追认为这些最新提交的完整重跑。并行候选仅在明确标为候选的项目中列出，不算已公开能力。
+本次整理依据已公开 protocol `1c0b241`、core-go `acf369c`、server `2f15b94`、mobile `9f49125`。运行结论仍分别绑定下列证据中的实际源码与产物，不能追认为这些最新提交的完整重跑。并行候选仅在明确标为候选的项目中列出，不算已公开能力。
 
 | 用户流程 / 平台 | 已实际验证 | 仍缺什么 / 结果限制 |
 | --- | --- | --- |
@@ -41,6 +41,8 @@ iOS全writer候选已有六组Simulator组件及实际Go Check×2/普通Save×1�
 [macOS安装协调器](../core-go/macosservice/README.md)与[Linux安装协调器](../core-go/linuxinstall/README.md)源码公开于 `1b370cb`，没有发布安装包或Release。Mac根最新基线258项race PASS10.511秒；Linux根71项race PASS5.524秒。Linux [实际VM记录](../core-go/linuxinstall/VM_VALIDATION.md)保留外层FAIL与原4PASS/5FAIL，不能将原生10项和空生命周期的局部通过拼成整轮成功。
 
 新增[B3a根复验](evidence/mobile-dag-b3a-root-result.json)：730项受影响race PASS（193.999秒）、vet通过、23包消费者仅编译（零测试），三个真实HTTPS/SQLite场景/四事件PASS（31.582秒）。明确选择Admin/RW/RO和期限、持久意图/challenge/原签包、响应丢失及CAS失败后的原ID查询均有限验证；独立审阅发现的嵌套字段别名缺口及修前两个FAIL保留。接受原包仍不赋予设备信任，不开放手机DAG能力。
+
+[Android DAG A 分片根复验](evidence/android-native-dag-a-root-result.json)：稳定 PlatformEpoch、有限认证等待和 opaque registry 源码已公开；根在最新 B3a 上合并后 54 项 race PASS（23.680 秒）、vet PASS（3.664 秒）。独立并发审阅 Go 8 项、Kotlin 12 项通过。原候选 arm64 AAR 与 Kotlin 编译通过，真实 JNI/系统设备密码/业务接线未跑；尚未接生产认证或 Flutter，不开放 DAG 能力。
 
 ## 最新验证如何使用
 

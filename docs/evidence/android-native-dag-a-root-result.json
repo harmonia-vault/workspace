@@ -1,0 +1,177 @@
+{
+  "schema": "harmonia/android-native-dag-a-root-validation/v1",
+  "status": "PASS-component-scope-only",
+  "publicBases": {
+    "core-go": {
+      "commit": "af702df5aca99913ec47aa23bbdb8c4b1f681bb8",
+      "archiveSHA256": "0b3ae9eade3eff8e06b5e93d6ee242f5f27f306f419b503344ef8f11a6f0b563"
+    },
+    "mobile": {
+      "commit": "85f8c6c116d7a0efcf7d8321c8c6caf63fabafcf",
+      "archiveSHA256": "42c4fbc9647e3cc765a97ae9a0fbcc9b6496c1a88f4f93f352fbacf3a08c5591"
+    }
+  },
+  "publishedSources": {
+    "core-go": "acf369c192deac6d29e0254e6009c9693a0c8e31",
+    "mobile": "9f491258162244f9a9acec194794454c795d04a5"
+  },
+  "candidateManifestSHA256": "163749dfc31941056b4ee30cd8203f47220ea119bec1c184a90f2b2af27f9362",
+  "sources": [
+    {
+      "path": "core-go/mise.toml",
+      "baseSHA256": "434b769f76b863df52e34297c7852705d8550ee501a614322002a11803e27fc1",
+      "candidateSHA256": "af4cc829431e730e2a6cd3f9e85b345f52dedcb332b2c0e4a410aba16dfd07fc",
+      "integratedSHA256": "b17ab2ad8687241ff36428e29604dc0b36500b4dd6bb0bbc92c24f58d7c308cd"
+    },
+    {
+      "path": "core-go/mobilebridge/NATIVE_DAG_REGISTRY.md",
+      "baseSHA256": null,
+      "candidateSHA256": "00e1f307d3d596ae5445a79d919c0e550a7617fd563fe03a89e007bd8809d1b1",
+      "integratedSHA256": "00e1f307d3d596ae5445a79d919c0e550a7617fd563fe03a89e007bd8809d1b1"
+    },
+    {
+      "path": "core-go/mobilebridge/recovery_registry.go",
+      "baseSHA256": "5ff7794f1be6280517308aeaae9d4c260f414cf7976fd2cd7f0710af2708ef6e",
+      "candidateSHA256": "514ddc5a4c6f252b8f2e972c9aff6d84d680d87c173e95e2f4e7c1ac620f6991",
+      "integratedSHA256": "514ddc5a4c6f252b8f2e972c9aff6d84d680d87c173e95e2f4e7c1ac620f6991"
+    },
+    {
+      "path": "core-go/mobilebridge/workflow.go",
+      "baseSHA256": "12d0097aca2b2ba861dcc4b9820cf1c63b03fcd2efcf31f9eecc4317e3d5e8b3",
+      "candidateSHA256": "c89f2be1e445b7d417af73ef0a1e59e0aa370dcdd78e85abdd38af23c71df6a8",
+      "integratedSHA256": "c89f2be1e445b7d417af73ef0a1e59e0aa370dcdd78e85abdd38af23c71df6a8"
+    },
+    {
+      "path": "core-go/mobilebridge/workflow_dag_native.go",
+      "baseSHA256": null,
+      "candidateSHA256": "c03cea3023a2dc248bf786a208771a7d19cfa80ed58dcf9c1ee02fa26d656b07",
+      "integratedSHA256": "c03cea3023a2dc248bf786a208771a7d19cfa80ed58dcf9c1ee02fa26d656b07"
+    },
+    {
+      "path": "core-go/mobilebridge/workflow_dag_native_test.go",
+      "baseSHA256": null,
+      "candidateSHA256": "3afa940c318b14209d8e62e015778f8076f6d2a1c72ea2446ff4f4e2d3bb0993",
+      "integratedSHA256": "3afa940c318b14209d8e62e015778f8076f6d2a1c72ea2446ff4f4e2d3bb0993"
+    },
+    {
+      "path": "mobile/android/app/src/main/kotlin/org/harmoniavault/harmonia_mobile/MainActivity.kt",
+      "baseSHA256": "d4803da01c00f91133b5ab83dafa94c74ca3c185b9ecb12ca941c2f4ecaf857a",
+      "candidateSHA256": "cb853d4b170f09017c4b1e2a5655b9e0fcac686d3cd26e83a942e43a3121f4f1",
+      "integratedSHA256": "cb853d4b170f09017c4b1e2a5655b9e0fcac686d3cd26e83a942e43a3121f4f1"
+    },
+    {
+      "path": "mobile/android/app/src/main/kotlin/org/harmoniavault/harmonia_mobile/nativebridge/NativeSlotLifecycle.kt",
+      "baseSHA256": null,
+      "candidateSHA256": "9ad5375e54900c41c934ec517f8edaf78261ed46347d3de469abad5cad660af2",
+      "integratedSHA256": "9ad5375e54900c41c934ec517f8edaf78261ed46347d3de469abad5cad660af2"
+    },
+    {
+      "path": "mobile/android/app/src/test/kotlin/org/harmoniavault/harmonia_mobile/nativebridge/NativeDAGABISignatureProbe.kt",
+      "baseSHA256": null,
+      "candidateSHA256": "4d91132c28bcef3d575dc13b5411087829e7543180e36db6d80e2c2ca6582dac",
+      "integratedSHA256": "4d91132c28bcef3d575dc13b5411087829e7543180e36db6d80e2c2ca6582dac"
+    },
+    {
+      "path": "mobile/android/app/src/test/kotlin/org/harmoniavault/harmonia_mobile/nativebridge/NativeSlotLifecycleHostTest.kt",
+      "baseSHA256": null,
+      "candidateSHA256": "78c99fa012fe33f7d935187fd70859420c296b9cf34304745d1a943b79ec2ad9",
+      "integratedSHA256": "78c99fa012fe33f7d935187fd70859420c296b9cf34304745d1a943b79ec2ad9"
+    },
+    {
+      "path": "mobile/docs/ANDROID_NATIVE_DAG_LIFECYCLE.md",
+      "baseSHA256": null,
+      "candidateSHA256": "c14d09b6ea5920fcf55488ee6a8a5c795643cbeaa46b9d79f1a5610792ca4d6b",
+      "integratedSHA256": "c14d09b6ea5920fcf55488ee6a8a5c795643cbeaa46b9d79f1a5610792ca4d6b"
+    },
+    {
+      "path": "mobile/mise.toml",
+      "baseSHA256": "f3b50f99eb24f50a23b4dbe3bc0596a14792ccab6f12cb21fc885eb58526c53e",
+      "candidateSHA256": "96a90de709bd9ab75ab9f109421154af402df033732500af11f84e370759d9ed",
+      "integratedSHA256": "96a90de709bd9ab75ab9f109421154af402df033732500af11f84e370759d9ed"
+    },
+    {
+      "path": "mobile/tool/native-dag-lifecycle-test.py",
+      "baseSHA256": null,
+      "candidateSHA256": "73f8f5a7494211e509e7d95771cfbac699be6f79184f6c6e97f03cd2cb0cfb17",
+      "integratedSHA256": "73f8f5a7494211e509e7d95771cfbac699be6f79184f6c6e97f03cd2cb0cfb17"
+    }
+  ],
+  "rootResults": [
+    {
+      "name": "affected-race",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 23.68,
+      "tests": {
+        "pass": 54,
+        "fail": 0,
+        "skip": 0
+      },
+      "packages": [
+        {
+          "package": "github.com/harmonia-vault/core-go/mobilebridge/internal/recoverysessions",
+          "status": "pass",
+          "seconds": 1.49
+        },
+        {
+          "package": "github.com/harmonia-vault/core-go/mobilebridge",
+          "status": "pass",
+          "seconds": 16.065
+        }
+      ],
+      "stdout": {
+        "bytes": 51844,
+        "sha256": "63544d426cad68e46b69663c38522ce867eb07a71c36a9a2e3f202f74e796fd6"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "affected-vet",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 3.664,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "independentReview": {
+    "manifestSHA256": "3cdec8d54e0dc67918d2473442f095a8e41e44e3ed4a258e6a3ef252836087b9",
+    "goRacePass": 8,
+    "goRaceSeconds": 1.548,
+    "kotlinOriginalCases": 10,
+    "kotlinAdditionalCases": 2,
+    "blockingFinding": false
+  },
+  "candidateValidation": {
+    "goRacePassEvents": 54,
+    "goRaceSeconds": 16.675,
+    "vetSeconds": 0.88,
+    "arm64AARBindSeconds": 3.774,
+    "kotlinCompileSeconds": 5.101,
+    "hostLifecyclePass": 10,
+    "hostLifecycleSeconds": 0.054,
+    "aarSHA256": "9da03400e799c533ba811a2d0aba50b26ea76241826e07298147ad03959958db"
+  },
+  "retainedFailures": [
+    "新增 Go 测试夹具类型名编译错误。",
+    "首次 Kotlin runner 缺少官方 LifecycleOwner classpath。",
+    "独立审阅初次默认 GOCACHE 的沙箱写入失败；另用授权临时缓存复验。"
+  ],
+  "limits": [
+    "根复验为已公开 B3a 加 A 分片的最新合并。原 AAR/SDK 编译使用候选原 core 67db4a7 加 A overlay，不能追认为最新合并 AAR 实测。",
+    "A 只接收 SDK 生命周期并提供 opaque registry；未接生产 BiometricPrompt、typed DAG dispatch、MethodChannel 或 Flutter。",
+    "真实 JNI、系统设备密码、SDK 生命周期、App 安装和 DAG 业务 HTTP 均未跑。30 秒认证后台等待不发 permit。",
+    "正常 Workflow 关闭仅解除当次绑定，失效立即取消，排空后才关闭跨操作 registry；后续 B 必须验证完整接线。"
+  ],
+  "capabilityEnabled": false,
+  "notProductionReady": true
+}

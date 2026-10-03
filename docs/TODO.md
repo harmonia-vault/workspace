@@ -1,8 +1,8 @@
 # 功能待办总览
 
-更新时间：2026-10-03 18:45 UTC。此页按用户可操作功能分类；组件实现或局部通过不算整个功能完成。当前范围见 [STATUS.md](STATUS.md)，原始历史与失败见[完整归档](history/STATUS-20261003-1132.md)。
+更新时间：2026-10-03 19:04 UTC。此页按用户可操作功能分类；组件实现或局部通过不算整个功能完成。当前范围见 [STATUS.md](STATUS.md)，原始历史与失败见[完整归档](history/STATUS-20261003-1132.md)。
 
-当前公开来源：protocol `1c0b24180e7fabfcd9109dbabb2afbf6195f22d8`；server `2f15b94ce5023357320b415e5f3a4aebb29c2856`；core-go `af702df5aca99913ec47aa23bbdb8c4b1f681bb8`；mobile `85f8c6c116d7a0efcf7d8321c8c6caf63fabafcf`。每项实跑仍以证据所记固定源码/产物为界；并行候选不计作公开能力。
+当前公开来源：protocol `1c0b24180e7fabfcd9109dbabb2afbf6195f22d8`；server `2f15b94ce5023357320b415e5f3a4aebb29c2856`；core-go `acf369c192deac6d29e0254e6009c9693a0c8e31`；mobile `9f491258162244f9a9acec194794454c795d04a5`。每项实跑仍以证据所记固定源码/产物为界；并行候选不计作公开能力。
 
 | 用户功能 | 状态 | 已有证据 | 接下来需要完成 |
 | --- | --- | --- | --- |
@@ -21,7 +21,7 @@
 | 离线、暂停、期限、撤销和退出 | 核心及部分真实平台已验 | Go/CLI期限/回拨/撤销清缓存、暂停授权；公开Unix显式离线退出，根独立三包163/163 race及vet通过；Linux/macOS真实暂停签撤销；iOS正常退出后恢复拒绝；Android独立正式退出/材料清除/正常Activity重启PASS，[证据](../mobile/docs/ANDROID_PRODUCT_LOGOUT_20261003.md) | Android单笔原ID跨kill续办/取消已PASS83.527秒、仅一次POST；4465/4467 FAIL保留；旧整轮尾部失败根因未证，其它后台/失权与Windows实证仍缺；未收到撤销时离线有固有限制 |
 | 手机批准CLI和多管理手机 | Android产品CLI3主链已验，整轮仍FAIL | 34次系统认证轮完成正式CLI3 PAKE/Boot/Pull/RW写→App显示，批准1、mutation5、Pull74；[本轮证据](../mobile/docs/ANDROID_PRODUCT_USERFLOW_20261003.md)公开于b0778e3，原focused RO/RW独立 | 149.966秒整轮在最后logout窗口失败；多管理手机完整产品、Flutter PIN路径和iOS批准未验，不代表三OS无人登录 |
 | 全丢设备恢复→轮换→显式登记手机→CLI | Android原生已验，Flutter未闭环 | 固定原生3/3、94.475秒、30次认证、两次force-stop，cert4手机→正式CLI4/daemon通过；22源码公开 | Flutter受限恢复/完整新码/显式角色期限向导和实际操作；重复恢复DAG高层另列 |
-| 重复恢复与恢复设备继续轮换 | HTTP/Go/正式CLI5联合通过，手机高层未接 | 公开DAG major2/证书5/P4；A→B→C及CLI5 RO/RW主race32.89秒、Go34.356秒，Node/workerd8项独立PASS | B/C是Go API与测试加密存储，不是手机UI；DAG S1 journal/CAS已公开，根独立442项race/vet通过；S2a原ID冷查询已公开，根合并P4后426项race与3场景HTTPS/4事件通过；P4环境CRUD真实加密主项通过，B1跨操作RAM owner/lease及P4授权Go/TS已公开，根联合468项race、两项HTTPS与server3项通过；B2高层准备/完整码确认/同ID转换已公开，根576项race及3场景HTTPS通过；Android全writer owner和typed atomic opener已公开，两项真实JNI定向PASS；不同APK的4项旧PASS与2项新PASS分开记；B3a 明确环境/角色/期限的原包登记已公开于 `af702df`，根最新版四包730项race及三个HTTPS场景通过；登记后仍未可信，B3b尚未接线；稳定跨认证PlatformEpoch、手机业务journal/UI、DAG ABI和manager-reanchor仍缺，iOS系统认证仍未闭环；私有候选Go CAS已有限实测通过，尚未公开 |
+| 重复恢复与恢复设备继续轮换 | HTTP/Go/正式CLI5联合通过，手机高层未接 | 公开DAG major2/证书5/P4；A→B→C及CLI5 RO/RW主race32.89秒、Go34.356秒，Node/workerd8项独立PASS | B/C是Go API与测试加密存储，不是手机UI；DAG S1 journal/CAS已公开，根独立442项race/vet通过；S2a原ID冷查询已公开，根合并P4后426项race与3场景HTTPS/4事件通过；P4环境CRUD真实加密主项通过，B1跨操作RAM owner/lease及P4授权Go/TS已公开，根联合468项race、两项HTTPS与server3项通过；B2高层准备/完整码确认/同ID转换已公开，根576项race及3场景HTTPS通过；Android全writer owner和typed atomic opener已公开，两项真实JNI定向PASS；不同APK的4项旧PASS与2项新PASS分开记；B3a 明确环境/角色/期限的原包登记已公开于 `af702df`，根最新版四包730项race及三个HTTPS场景通过；登记后仍未可信，B3b尚未接线；PlatformEpoch/opaque registry A源码已公开但真实跨认证业务未验（根54项race/vet通过）；手机业务journal/UI、DAG dispatch和manager-reanchor仍缺，iOS系统认证仍未闭环；私有候选Go CAS已有限实测通过，尚未公开 |
 | 邮箱证明账号重置 | 后端已验，App待接 | 新邮件证明、破坏性确认、generation、旧设备及会话失效测试通过 | App入口、最新永久首号不重开回归和真实邮件投递 |
 | macOS系统服务无人登录启动 | 真实内核纵链通过，安装器候选未实跑 | 固定b094/bd86正式配对、LaunchDaemon、清会话后完整重启未登录Boot/Pull、CLI写入、暂停签撤销和清理；独立页面/UID/boot/HTTP支持 | 原console Name字面检查FAIL保留；安装器v7源码已公开，stderr与枚举边界已修；最新基线根258项race及vet/构建通过，正式安装器VM未跑；公开POSIX切片根独立48/48 race与vet通过；源权限类负例修前FAIL保留；正式离线退出已公开且根独立163/163 race及vet通过；共享只读入网检查已公开且根独立218项race/vet通过；已停服卸载/中断重试待完成，安装器VM及多用户仍未验 |
 | Linux系统服务无人登录启动 | 完整内核纵链通过，范围有限 | 固定b094/bd86真实配对、清会话后重启、未登录Boot/Pull、CLI写入、SSH Bash刷新片段纠正/暂停/签撤销/逐key回退 | 新版POSIX整目录消失恢复48项独立通过；安装器已公开，首次VM原生4PASS/5FAIL保留；umask窄修后新10项原生及正式空生命周期通过，外层组清理仍FAIL但实际账号/组已缺失且旧资源不变；最新基线根71项race/ARM64全包构建/vet通过；真实入网后Start/有材料卸载/新版重启未跑；共享只读入网检查已公开；其它发行版及三OS整体未验；保留旧失败，见docs/evidence |
