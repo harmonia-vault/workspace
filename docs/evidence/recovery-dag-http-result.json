@@ -3,11 +3,12 @@
   "status": "EXPERIMENTAL_SLICE_PASS",
   "dateUTC": "2026-10-03",
   "publicBases": {
-    "workspace": "fd8c3cc7f703369178abdc038e1493d820351407",
+    "workspace": "0ff2c172c6657153e708c8a50f6a36cee1950b3e",
     "core-go": "b094a933bf1922347b4a41ea8baaa5699ffbf5c1",
     "server": "bd86fec6215b6f7149234578e7bf5dc764a639c2",
     "protocol": "de21d9907dd7b73636afeabee4806655aaa0a82e"
   },
+  "publicationParentWorkspace": "fd8c3cc7f703369178abdc038e1493d820351407",
   "sourceReviewManifests": {
     "server-review-2": "673b23172b49726544b8bf616f8b3706e8df774e6da938be77b4920b485f9226",
     "core-review-1-source": "0df0bf3f6195005b9ed7eaffaceaa1d69d4a34c4ec681f09e800d4dd29d45f57",
