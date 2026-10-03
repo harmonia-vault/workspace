@@ -10,7 +10,7 @@
 | --- | --- | --- |
 | macOS | `LaunchDaemon`，标签包含 UID，`UserName` 为目标非 root 用户，`RunAtLoad`，`Umask=0077` | 管理员控制二进制和服务配置；目标用户只读写自己的状态目录。UID 与用户名对应关系必须校验。真实开机、无人登录、撤销和权限隔离尚未运行 |
 | Linux | systemd 系统单元，目标非 root `User=`，`NoNewPrivileges`，空 capability，`ProtectSystem=strict`，`ProtectHome=true`，单独 `ReadWritePaths` | 生成器要求二进制在 `/usr/local/`，状态严格为 `/var/lib/harmonia/<UID>`，避免受保护 home 中的路径不可访问。已验证新建普通 UID 的 systemd 非交互启动、当前用户 CLI 与回环 SSH。另建隔离来宾真实入网后 init 重启、无目标用户登录的新 boot/pull 已通过；物理内核开机未跑。OrbStack LXC 全局覆盖关闭 systemd 沙盒，需完整 Linux VM 验证其生效 |
-| Windows | 绑定目标用户 SID 的 `NT SERVICE\Harmonia-<SID摘要>` 虚拟服务身份；SCM 运行适配器支持停止和关机取消 | 只打开 `HKEY_USERS\<SID>\Environment`，禁止把服务身份的 HKCU 当目标账号。需要精确目录/注册表 ACL。目标用户 hive 未加载时立即失败；开机无人登录的 hive/profile 生命周期尚未实现 |
+| Windows | 绑定目标用户 SID 的 `NT SERVICE\Harmonia-<SID摘要>` 虚拟服务身份；SCM 运行适配器支持停止和关机取消 | 只打开 `HKEY_USERS\<SID>\Environment`，禁止把服务身份的 HKCU 当目标账号。需要精确目录/注册表 ACL。默认已加载 hive 适配器在目标 hive 缺失时失败；另有未接入正式 daemon 的受托 token profile lease 源码，无人登录 token/broker/native 验收仍未完成 |
 
 生成器只生成配置和清单，不安装服务、不授予 ACL。样例中的用户名、UID、SID 和目录均为虚构值。正式 POSIX daemon 已接受 `--local-directory` 的加密状态与经过原生入网验证的信任上下文，能用独立设备签名钥完成 boot challenge 后取得设备绑定 session，再执行经验证的同步；不依赖密码等价凭据。没有已完成可信 context 时只提供隔离 IPC/恢复，不联网，也不自动入网。Windows 正式 daemon 仍明确关闭，等待原生 DPAPI/SID/SCM/hive 验收。三平台真正开机验收范围见下表；既有 fixture 结果只证明合成本地行为，测试标记不能取消或作为可信注册捷径。
 
@@ -40,7 +40,7 @@ bash 使用 `PROMPT_COMMAND`，保留原来的字符串或数组内容；zsh 使
 
 `WindowsProvider` 仅读取点名 key。Windows 名称不区分大小写，同批 `PATH`/`path` 等冲突会拒绝。原值记录包含不存在/存在、字面值、`REG_SZ` 或 `REG_EXPAND_SZ` 类型；不展开 `%NAME%` 引用。正式接入必须使用 `NewSecureWindowsProvider` 将原值类型写入 AEAD；`NewPersistentWindowsProvider` 的明文文件只用于 fixture 验证，原值在接管前落盘并绑定 SID，release 后清除记录，下次接管重新采集。只有内存的 `NewWindowsProvider` 用于隔离单次测试。
 
-当前原生适配器只访问已加载的目标用户 hive，并发送 `WM_SETTINGCHANGE` 通知。Session 0 的广播不保证进入用户交互会话；新进程读取用户环境的完整生命周期仍需验收。已有进程的 env 不能被外部强制改写。不自动加载用户 profile，不偷偷要求备份/恢复特权，不写其他用户或系统环境。
+当前原生适配器只访问已加载的目标用户 hive，并发送 `WM_SETTINGCHANGE` 通知。Session 0 的广播不保证进入用户交互会话；新进程读取用户环境的完整生命周期仍需验收。已有进程的 env 不能被外部强制改写。默认适配器不自动加载用户 profile、不要求备份/恢复特权。新增 profile lease 的受托 token 原生适配器仍隔离在正式入口之外，权限与生命周期见下节；不写其他用户或系统环境。
 
 ## 本轮真实验证
 
@@ -86,3 +86,22 @@ Unix 默认软件机器钥是权限保护的可读随机文件，服务在系统
 重启在使用缓存前重新验证原始固定根、完整来源图、数据来源 fingerprint、连续路径与精确当前 target；来源与值同一 AEAD 状态事务落盘。没有新来源字段的旧缓存只能在 KV/GG/fingerprint/权限均与受保护旧证据精确一致时首次识别。撤销、失去自身环境 scope、删除和到期立即删除缓存来源与 override，并逐 key 回退剩余环境或恢复原值；暂停不屏蔽这些安全变化。恢复同步仍从零普通拉取，通过当前 HPKE 封套、所有内部签名及已见检查点后，才以当前授权重建新的数据来源。
 
 本轮 `localstate`、`syncclient` race 回归通过，覆盖两次连续轮换与漏收补链、11 类来源/账本篡改、保存失败的原子性、旧缓存严格首次识别及同序号调用方不变。真实 HTTPS/SQLite、空 vault 注册与邮件证明、首次双签初始化、固定 BoringSSL 双向 PAKE、加密 Store 重启的联合回归已通过：暂停纯轮换保留配置，以及后续签名撤销、非最后环境删除、离线截止与服务端真实到期、降权/期限缩短和升级/续期延后到完整恢复。该结果不增加三平台物理无人登录开机或完整安全审计的证据。
+
+
+## Windows profile lease 源码与下一门槛
+
+`core-go/platform/profile_lifecycle.go` 将加载、Environment 读写与停止串行化。stop 请求先阻止新操作，再等待正在执行的操作完成；只关闭自身子 key，随后释放本组件持有的 `LoadUserProfile` 引用。子 key 关闭、卸载或 token 关闭失败时保持停止态，下一次 `Close` 仅重试尚未完成的清理。加载已取得引用但后续路径核对失败时也保留清理能力。正常停止不删除已下发环境，不把交互登录/注销当作强制卸载全局 hive 的理由。
+
+`NewWindowsProfileEnvironment(targetSID, trustedToken)` 是后续 profile broker 可复用的原生适配器，当前未接入正式 daemon。调用进程必须是 SYSTEM，线程不得正在 impersonate 客户端，既有 Backup/Restore privilege 必须已经启用。代码只检查，不取得登录 token、不启用/授予 privilege、不安装服务、不授予 ACL。Microsoft 要求 `LoadUserProfile` 调用进程为管理员或 SYSTEM，用户 token 具有查询、复制和 impersonation 访问权；本实现进一步限制为专用 SYSTEM owner。[LoadUserProfileW](https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-loaduserprofilew)
+
+目标只支持已存在的本地 SAM 用户：精确比对 token SID、本机账号反查及重新解析，并拒绝已配置的漫游 profile。profile 路径来自该 token 的 `GetUserProfileDirectory`，与受管理员保护的固定 HKLM ProfileList 项交叉核对，不接收调用方 hive 路径。不用进程环境扩展路径；只允许从系统目录 API 得出的 `%SystemDrive%` 替换。拒绝 UNC、设备路径、ADS、路径歧义、目录 reparse point，以及其他用户可改写的权限描述符。加载期间还验证已有 `NTUSER.DAT` 的链接/权限元数据，不读取文件内容；目录句柄保持到清理结束，hive 文件元数据句柄在加载调用结束即关闭。[GetUserProfileDirectoryW](https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-getuserprofiledirectoryw)、[USER_INFO_3](https://learn.microsoft.com/en-us/windows/win32/api/lmaccess/ns-lmaccess-user_info_3)
+
+加载得到的全权限 `hProfile` 不暴露给同步进程；只打开固定 `Environment` 子 key 的查询、写值及安全描述符查询句柄。用 `REG_OPTION_OPEN_LINK` 打开并拒绝 `REG_LINK`，避免跟随注册表链接跨 hive；子 key 不存在时失败，不自动新建。卸载仅调用 `UnloadUserProfile` 释放自己的引用，不直接 `RegCloseKey(hProfile)` 或 `RegUnLoadKey(HKU\SID)`。操作失败向上返回，不将 Session 0 通知视为交互会话已更新。[RegOpenKeyExW](https://learn.microsoft.com/en-us/windows/win32/api/winreg/nf-winreg-regopenkeyexw)、[UnloadUserProfile](https://learn.microsoft.com/en-us/windows/win32/api/userenv/nf-userenv-unloaduserprofile)
+
+后续完整方案需要将同步/Vault 继续留在目标实例的虚拟服务 SID 下，另设不联网、不读取 Vault 的小型 SYSTEM broker。安装配置及二进制只能由管理员写入；broker 固定唯一 target SID，通过管道原生身份认证只接受对应虚拟服务 SID，不能接受任意目标 SID、路径、注册表根或用户 token。每个 target SID 只能有一个 broker owner，stop 必须等待在途操作并按上面的顺序释放句柄。当前没有该 broker、管道协议、安装器或无人登录 token provider，不能把此源码视为完整 Windows 支持。
+
+`WTSQueryUserToken` 只返回已登录会话的 token，不能解决重启后无人登录；Microsoft 的 `KERB_S4U_LOGON` 路径另有域账号与权限前提，不能据此承诺本地、Microsoft Account 或 Entra 用户都可无密码启动。当前不猜未证明的 S4U 变体，也不离线改写用户 `NTUSER.DAT` 来替代 User Profile Service。[WTSQueryUserToken](https://learn.microsoft.com/en-us/windows/win32/api/wtsapi32/nf-wtsapi32-wtsqueryusertoken)、[LsaLogonUser](https://learn.microsoft.com/en-us/windows/win32/api/ntsecapi/nf-ntsecapi-lsalogonuser)
+
+新增合成测试验证 stop 与读写并发、失败清理不复活、只释放自身引用、加载/子 key 打开失败、SID 错配和输入/路径拒绝；它们不调用 Windows API。Windows 交叉编译只检查 API 绑定，原生 ACL、profile 文件句柄与 User Profile Service 的兼容性、临时 profile 回退、登录/注销并发、SCM/Session 0 和重启无人登录均未跑。正式 Windows daemon gate 保持关闭。当前可见来宾执行工具仍阻塞；恢复正常 Windows 来宾执行能力后，先在隔离临时账号验证标准用户不能启动该适配器及原生身份/ACL，实际 SYSTEM profile 加载需一个可审查测试组件并通过工具审批。先完成受托 token 的加载/卸载验收，再独立验证无人登录 token 来源；不能把一次交互登录产生的 token 当作无人登录证据。
+
+本轮实际结果：`mise exec -- go test -race ./platform -count=1 -v` 通过，新增 profile 合成测试 9/9，整个平台包 19 项顶层测试通过（1.921s）。`GOOS=windows GOARCH=amd64 CGO_ENABLED=0` 的平台测试交叉编译通过；Windows API 未执行。workspace 源码基础检查和差异空白检查通过。未创建测试服务、broker、账号或 VM，没有原生资源需要清理。
