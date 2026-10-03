@@ -217,5 +217,22 @@
   "otherFailurePreserved": "First local harness attempt rejected group-writable public git archive data before SSH. New harness distinguishes authenticated public source-map data from executable/control inputs.",
   "actualSystemdExecStartup": "UNRUN",
   "bootPull": "UNPROVEN in prior enrolled installer attempt",
-  "productionReady": false
+  "productionReady": false,
+  "followupTestOnlyCommit": "78d7dd845307abb9566cf8a6d0711c4977841c11",
+  "nativeCorrectedRun": {
+    "status": "PASS",
+    "main": 5,
+    "sub": 4,
+    "fail": 0,
+    "skip": 0,
+    "nativeSeconds": 0.899,
+    "wholeSeconds": 1.759,
+    "rawStdoutSHA256": "ca86656dd9e0cbf069ce9ff5be02ae61c857c58804cdcff3cfb26125b9e8f42b",
+    "actualManifestSHA256": "90eb4d67f38e09a6fbcfee337914762c121a628ee524871adc56cfeb5f0f4c77",
+    "priorTempCleanupCompleted": true,
+    "newTempAbsent": true,
+    "existingInstalledScopeUnchanged": true,
+    "productionChanged": false,
+    "actualSystemdStartup": "UNRUN"
+  }
 }

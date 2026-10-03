@@ -1,8 +1,10 @@
 # 功能待办总览
 
+本轮按[固定剩余产品验收清单](PRODUCT-ACCEPTANCE.md)逐项完成；不以新增组件测试替代手机界面或安装器闭环。
+
 更新时间：2026-10-03 23:00 UTC。此页按用户可操作功能分类；组件实现或局部通过不算整个功能完成。当前范围见 [STATUS.md](STATUS.md)，原始历史与失败见[完整归档](history/STATUS-20261003-1132.md)。
 
-当前公开来源：protocol `038f2db696647eceb4b0a5716784f976a55a2646`；server `36ab16fbaadacd766548e201c05acd5e80ccb89b`；core-go `b06302c541ce36edf8828f651ae342c535428a77`；mobile `09d3ce4239fe514cf1bebd4c3efb6e743a2013b6`。每项实跑仍以证据所记固定源码/产物为界；并行候选不计作公开能力。
+当前公开来源：protocol `038f2db696647eceb4b0a5716784f976a55a2646`；server `36ab16fbaadacd766548e201c05acd5e80ccb89b`；core-go `78d7dd845307abb9566cf8a6d0711c4977841c11`；mobile `09d3ce4239fe514cf1bebd4c3efb6e743a2013b6`。每项实跑仍以证据所记固定源码/产物为界；并行候选不计作公开能力。
 
 | 用户功能 | 状态 | 已有证据 | 接下来需要完成 |
 | --- | --- | --- | --- |
@@ -24,7 +26,7 @@
 | 重复恢复与恢复设备继续轮换 | HTTP/Go/正式CLI5联合通过，手机高层未接 | 公开DAG major2/证书5/P4；A→B→C及CLI5 RO/RW主race32.89秒、Go34.356秒，Node/workerd8项独立PASS | B/C是Go API与测试加密存储，不是手机UI；DAG S1 journal/CAS已公开，根独立442项race/vet通过；S2a原ID冷查询已公开，根合并P4后426项race与3场景HTTPS/4事件通过；P4环境CRUD真实加密主项通过，B1跨操作RAM owner/lease及P4授权Go/TS已公开，根联合468项race、两项HTTPS与server3项通过；B2高层准备/完整码确认/同ID转换已公开，根576项race及3场景HTTPS通过；Android全writer owner和typed atomic opener已公开，两项真实JNI定向PASS；不同APK的4项旧PASS与2项新PASS分开记；B3a 明确环境/角色/期限的原包登记已公开于 `af702df`，根最新版四包730项race及三个HTTPS场景通过；原登记本身仍未可信；B3b已接通Go高层正式Boot/P4 Pull与最后CAS激活，根两个受影响包695项race、真实HTTPS主项及独立跨实例退出负例通过，尚未接手机SDK/ABI/UI；PlatformEpoch/opaque registry A源码已公开但真实跨认证业务未验（根54项race/vet通过）；恢复操作关闭服务端/协议已公开（根51项Node/workerd、4向量和现有B3a三个HTTPS场景通过），手机关闭Go journal/CAS已公开于2a149aa，根468项race、真实HTTPS4事件与vet通过；SDK/ABI/UI仍缺；未可信账号范围CAS入口已公开并定向race/vet通过；Android封闭B1/B2/S2a原生dispatch已公开，根51+14项race/vet及最新AAR/Kotlin/17项host通过，固定原产物真实SDK两组metadata合同已通过，4次认证输入/1次取消；非空B1/B2及业务HTTP未跑；手机业务journal/UI、B3接线和manager-reanchor仍缺，iOS系统认证仍未闭环；私有候选Go CAS已有限实测通过，尚未公开 |
 | 邮箱证明账号重置 | 后端已验，App待接 | 新邮件证明、破坏性确认、generation、旧设备及会话失效测试通过 | App入口、最新永久首号不重开回归和真实邮件投递 |
 | macOS系统服务无人登录启动 | 真实内核纵链通过，安装器候选未实跑 | 固定b094/bd86正式配对、LaunchDaemon、清会话后完整重启未登录Boot/Pull、CLI写入、暂停签撤销和清理；独立页面/UID/boot/HTTP支持 | 原console Name字面检查FAIL保留；安装器v7源码已公开，stderr与枚举边界已修；最新基线根258项race及vet/构建通过，正式安装器VM未跑；公开POSIX切片根独立48/48 race与vet通过；源权限类负例修前FAIL保留；正式离线退出已公开且根独立163/163 race及vet通过；共享只读入网检查已公开且根独立218项race/vet通过；已停服卸载/中断重试待完成，安装器VM及多用户仍未验 |
-| Linux系统服务无人登录启动 | 完整内核纵链通过，范围有限 | 固定b094/bd86真实配对、清会话后重启、未登录Boot/Pull、CLI写入、SSH Bash刷新片段纠正/暂停/签撤销/逐key回退 | 新版POSIX整目录消失恢复48项独立通过；安装器已公开，首次VM原生4PASS/5FAIL保留；umask窄修后新10项原生及正式空生命周期通过，外层组清理仍FAIL但实际账号/组已缺失且旧资源不变；最新基线根71项race/ARM64全包构建/vet通过；后续真实入网后Start整轮FAIL、Boot/Pull未证明，正常Stop已通过且材料保留；新exec/旧收据兼容源码已公开、根131项race/vet/ARM64编译PASS，新增native首轮4主PASS/1主FAIL，已确认新测试错误要求未启动服务stop，修正重跑待完成；新exec真实Start/有材料卸载/新版重启未通过；共享只读入网检查已公开；其它发行版及三OS整体未验；保留旧失败，见docs/evidence |
+| Linux系统服务无人登录启动 | 完整内核纵链通过，范围有限 | 固定b094/bd86真实配对、清会话后重启、未登录Boot/Pull、CLI写入、SSH Bash刷新片段纠正/暂停/签撤销/逐key回退 | 新版POSIX整目录消失恢复48项独立通过；安装器已公开，首次VM原生4PASS/5FAIL保留；umask窄修后新10项原生及正式空生命周期通过，外层组清理仍FAIL但实际账号/组已缺失且旧资源不变；最新基线根71项race/ARM64全包构建/vet通过；后续真实入网后Start整轮FAIL、Boot/Pull未证明，正常Stop已通过且材料保留；新exec/旧收据兼容源码已公开、根131项race/vet/ARM64编译PASS，新增native首轮4主PASS/1主FAIL，已修正新测试的stop次数预期并加入删除前Busy拒绝，5主/4子原生PASS，精确清理与正式旧状态不变；旧FAIL保留；新exec真实Start/有材料卸载/新版重启未通过；共享只读入网检查已公开；其它发行版及三OS整体未验；保留旧失败，见docs/evidence |
 | Windows系统服务与用户环境 | Task Scheduler注册仍FAIL，根因未证 | 两SCM服务创建后从未启动，本轮精确清理及独立absence通过；普通Batch/同会话SID、profile加载/释放/权限恢复；80次AccessCheck API完成且自己任务目录create允许；合成typed VARIANT调用帧实际9/9通过 | password EMPTY一次实际新注册仍FAIL3.305秒、80020009/SCODE80070005；新资源精确清理及独立absence通过；Scheduler仅为当前令牌获取选择，C++强类型对照未编译/执行，平台内容安全检查中止该具体实验；独立原生72主项71PASS/1FAIL，显式合成架构变量夹具修后该项PASS0.02秒及精确清理PASS；原失败保留，普通用户3项仍未跑；正常合成账号登录后首次数据跨境传输条款未接受，等待明确决定，不能认定有跳过本地使用路径。见[收敛记录](evidence/WINDOWS-PATH-REVIEW.md)；不扩大权限、不把AccessCheck当根因证明；正式provider/CLI/SCM启动/boot未验 |
 | Docker自托管 | 本地固定范围已验 | 公开bd86 archive真实Docker11/11，首号/登录/同卷重启永久标记/后续403、非root/0700/明文拒绝与清理 | 新DAG Docker整链、真实TLS代理/手机组合未跑；不部署真实服务 |
 | Workers自托管 | 本地范围已验 | D1目录/账号DO同Argon2；首号registry/legacy迁移workerd回归；DAG新Node/workerd8项独立通过 | 最新完整产品链及线上CPU/内存/配额未测；不能为额度弱化参数 |
