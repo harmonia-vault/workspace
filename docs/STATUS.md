@@ -1,12 +1,12 @@
 # 当前实现状态与验证
 
-更新时间：2026-10-03 13:15 UTC。M2 尚未闭环，项目仍是实验性安全软件。组件通过、实际产品步骤通过、整轮测试结果分别记录，不合并宣称完整产品或生产安全验收。全部用户功能及下一步见 [TODO.md](TODO.md)，完成条件见 [PLAN.md](PLAN.md)。
+更新时间：2026-10-03 13:34 UTC。M2 尚未闭环，项目仍是实验性安全软件。组件通过、实际产品步骤通过、整轮测试结果分别记录，不合并宣称完整产品或生产安全验收。全部用户功能及下一步见 [TODO.md](TODO.md)，完成条件见 [PLAN.md](PLAN.md)。
 
 此前 STATUS（最近更新为 11:32 UTC）已[按原字节完整归档](history/STATUS-20261003-1132.md)，SHA-256 为 `2ab49f34deed0026d54a8efcf65a23442208eeb61207aaa665309d0591012079`。归档中的“当前”、路径与未跑结论只对应当时上下文；原始失败和精确历史快照没有删除。
 
 ## 当前范围
 
-本次整理依据已公开 protocol `ccf8ec6`、core-go `9b3f5fa`、server `6c39ed1`、mobile `1cb8398`。运行结论仍分别绑定下列证据中的实际源码与产物，不能追认为这些最新提交的完整重跑。并行候选仅在明确标为候选的项目中列出，不算已公开能力。
+本次整理依据已公开 protocol `ccf8ec6`、core-go `18a72fa`、server `6c39ed1`、mobile `1cb8398`。运行结论仍分别绑定下列证据中的实际源码与产物，不能追认为这些最新提交的完整重跑。并行候选仅在明确标为候选的项目中列出，不算已公开能力。
 
 | 用户流程 / 平台 | 已实际验证 | 仍缺什么 / 结果限制 |
 | --- | --- | --- |
@@ -18,12 +18,12 @@
 | 首次恢复及恢复后管理手机 | 固定 Android 原生三阶段 3/3、94.475 秒、30 次系统认证、两次 force-stop，通过受限恢复→完整新码→显式 cert4 登记→CLI4；[证据](../core-go/mobilebridge/RECOVERY_NATIVE.md) | Flutter 恢复向导与普通管理产品入口仍待接线和实际验收；不能借原生通过开放所有操作 |
 | 重复恢复 DAG → CLI5 | 已公开 major2/证书5/P4 客户端与服务；独立真实 A→B→C 恢复、原生 SPAKE2、正式 CLI5 RO/RW、CGO0 daemon、Boot/Pull/IPC/隔离 shell 通过。主 race 32.89 秒、Go 总计 34.356 秒；Node/workerd 8 项通过；[证据](evidence/RECOVERY-DAG-HTTP-VALIDATION.md) | B/C 是 Go API与测试加密存储适配器，不是手机 UI。手机 DAG 高层、P4 环境/授权管理控制、manager-reanchor 和新流程 Windows SCM仍未完成 |
 | 设备管理、前台授权提示 | Go/TS 管理与 Android 原生 42 次认证有固定证据；最小 pending 元数据已公开；CLI3 手动批准产品主链已实际通过 | Flutter 设备权限管理、真实前台请求去重/单提示/badge、取消/到期/撤销清理仍需闭环；不增加后台推送或伪造事件 |
-| Linux 无人登录后台 | 固定 core `b094a93`/server `bd86fec`：完整内核重启、新 boot/两 unit 身份、目标用户未登录时持钥 Boot/Pull；CLI 写入与交互 Bash 刷新片段纠正/暂停/签撤销/逐 key 回退通过；[证据](evidence/LINUX-KERNEL-REPRODUCTION.md) | 限本次隔离 Ubuntu；新版POSIX整目录消失恢复已独立通过48项shell/provider测试；Linux正式安装器仍在实现，其它发行版和三OS整体未验。已有进程env只能经正式shell接入更新 |
-| macOS 无人登录后台 | 同固定 core/server 的正式配对、LaunchDaemon、清会话后内核重启未登录 Boot/Pull、重启后 CLI写入下发、暂停签撤销和精确清理通过；[证据](evidence/MACOS-LAUNCHDAEMON-VALIDATION.md) | 原观察器字面 `loginwindow` 检查 FAIL保留；独立页面/UID/boot/HTTP证据支持未登录结论。有限安装器v4候选71项race PASS含PID退出等待；源权限类bug负例修前FAIL保留。[新版POSIX终端恢复](../core-go/platform/POSIX-CLEANUP.md)已公开，根在06db加该切片独立race48/48、vet通过；正式离线退出、已停服卸载与中断重试仍在实现，真实安装器VM仍UNRUN |
+| Linux 无人登录后台 | 固定 core `b094a93`/server `bd86fec`：完整内核重启、新 boot/两 unit 身份、目标用户未登录时持钥 Boot/Pull；CLI 写入与交互 Bash 刷新片段纠正/暂停/签撤销/逐 key 回退通过；[证据](evidence/LINUX-KERNEL-REPRODUCTION.md) | 限本次隔离 Ubuntu；新版POSIX整目录消失恢复已独立通过48项shell/provider测试；共享离线退出已公开，Linux正式安装器仍在实现，其它发行版和三OS整体未验。已有进程env只能经正式shell接入更新 |
+| macOS 无人登录后台 | 同固定 core/server 的正式配对、LaunchDaemon、清会话后内核重启未登录 Boot/Pull、重启后 CLI写入下发、暂停签撤销和精确清理通过；[证据](evidence/MACOS-LAUNCHDAEMON-VALIDATION.md) | 原观察器字面 `loginwindow` 检查 FAIL保留；独立页面/UID/boot/HTTP证据支持未登录结论。有限安装器v4候选71项race PASS含PID退出等待；源权限类bug负例修前FAIL保留。[新版POSIX终端恢复](../core-go/platform/POSIX-CLEANUP.md)已公开，根在06db加该切片独立race48/48、vet通过；[正式离线退出](../core-go/docs/OFFLINE-LOCAL-LOGOUT.md)已公开，根独立三包race163/163与vet通过；已停服卸载、中断重试和真实安装器VM仍未完成 |
 | Windows 服务与用户环境 | 两 SCM服务可创建但从未启动，本轮精确资源清理及独立absence已通过；目标普通 Batch身份、同会话 SID、profile 加载/释放及权限恢复已有局部实证；最新 AccessCheck 80 次 API检查完成，目标自己的任务目录 create允许 | `ITaskFolder::RegisterTask` 仍 FAIL：HRESULT `80020009` / SCODE `80070005`。profile与AccessCheck通过均未证明根因；不扩大权限。正式 provider/CLI/SCM启动/无人登录 Boot尚未验 |
 | Docker、Workers、邮件 | Docker固定公开 `bd86fec` 独立 11/11；Node/workerd账号与同 Argon2id参数有本地实证；新增 DAG服务端8项另列；隔离 SMTP严格TLS 2/2 | Docker真实代理/手机完整链、Workers线上资源配额、真实SMTP投递未跑；CF Email Service可选接入未开始；不降低安全参数，不部署真实服务 |
 
-POSIX根独立验证的源码/日志摘要与边界见[记录](evidence/posix-cleanup-result.json)，未包含安装器VM。Android最新产品轮已有公开精确来源/产物及清理证据；Windows AccessCheck和macOS安装器仍按本轮协调复核的候选范围记录，不计作公开树整体通过。各平台测试只使用合成账号、独立资料与局部测试 CA；没有导入宿主真实 env或凭据。
+POSIX根独立验证的源码/日志摘要与边界见[记录](evidence/posix-cleanup-result.json)；离线退出16文件的根复验见[记录](evidence/offline-local-logout-root-result.json)。两者均未包含安装器VM。Android最新产品轮已有公开精确来源/产物及清理证据；Windows AccessCheck和macOS安装器仍按本轮协调复核的候选范围记录，不计作公开树整体通过。各平台测试只使用合成账号、独立资料与局部测试 CA；没有导入宿主真实 env或凭据。
 
 ## 最新验证如何使用
 
