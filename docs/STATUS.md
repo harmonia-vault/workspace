@@ -4,20 +4,20 @@
 
 ## M2 用户流程总览
 
-2026-10-03 当前源码固定在 workspace submodule：protocol `b770001`、core `457858f`（连续恢复/CLI4在`b28c46a`，原生管理在`a542ea5`）、mobile `d169d74`、server `b968223`。这不等于整个当前工作树、Android产物或所有用户流程通过；各实际快照如下。
+2026-10-03 当前源码固定在 workspace submodule：protocol `b770001`、core `457858f`（连续恢复/CLI4在`b28c46a`，原生管理在`a542ea5`）、mobile `d169d74`、server `02689b4`。这不等于整个当前工作树、Android产物或所有用户流程通过；各实际快照如下。
 
 | 用户流程 | 完成及实际证据 | 待验 / 阻塞 |
 | --- | --- | --- |
 | 注册、邮箱验证、首机新码完整重输、环境/变量CRUD | 合成邮箱捕获→真实HTTPS/SQLite→Go验证与密封保存已通过 | Flutter真实产品界面尚未接；真实外部邮件投递未跑 |
 | 手机批准CLI及本机环境同步 | 正式cert3 CLI/daemon、原生PAKE、HPKE/AEAD、RO/RW、selected-only导入、override、暂停和撤销已实际通过；Android cert3 focused19次CryptoObject通过 | Flutter用户操作入口尚未接；不把编译当三OS boot |
-| 恢复后手机入网并批准CLI | Go完整旧码→受限→新码重输/连续两签→明确env/role/expiry cert4登记→Boot/Pull→CLI4 PAKE/原receipt504恢复→CGO0 daemon及RO拒写/RW写删已通过；源码`b28c46a`，新两验收文件公开 | root新公开快照全套待执行；Android Recovery Registry/每op强认证、高层V4批准及Flutter接线在进行；第二次恢复的来源合同仍未接 |
+| 恢复后手机入网并批准CLI | Go完整旧码→受限→新码重输/连续两签→明确env/role/expiry cert4登记→Boot/Pull→CLI4 PAKE/原receipt504恢复→CGO0 daemon及RO拒写/RW写删已通过；源码`b28c46a`，新两验收文件公开 | root固定公开快照33/33已通过；Android Recovery Registry/每op强认证、高层V4批准及Flutter接线在进行；第二次恢复的来源合同仍未接 |
 | 手机设备权限管理 | Go已有设备RO/RW/Admin/none、全局撤销、原包未知查询及保存失败门槛通过；Android新focused1/1、42次CryptoObject、真实Go peer通过 | 当前Android产物是固定core894等公开底座+9冻结候选，不等于最新HEAD；恢复E/F环境/权限控制的Proof3接线在进行 |
 | Linux后台无登录 | OrbStack独立Ubuntu/UID30001 init重启后正式Boot/Pull/IPC/sh/SSH及隔离通过 | LXC共享kernel；物理虚拟kernel boot和完整systemd sandbox未验，正在只读盘点正常完整VM实验路径 |
-| macOS后台无登录 | LaunchDaemon/目标UID与受保护状态/CLI实现和隔离shell验证已完成 | UTM原生来宾/CUA执行阻塞；无人登录真实boot未跑，未修改宿主服务/env |
-| Windows后台无登录 | SID/DPAPI/SCM/用户env组件已实现，受托profile lease合成9/9及platform19项race通过；amd64交叉编译通过 | 无人登录target token provider、SYSTEM broker认证/安装未实现；原生profile/ACL/Session0/boot未跑，正式入口保持关闭 |
-| SMTP / Workers | 隔离SMTP严格TLS实际2/2通过；本地workerd/SQLite DO及相同Argon2id64MiB/t3/p1通过，公开server178/178+type/build通过 | 真实投递、线上CF配额未验；不部署，不为额度弱化参数 |
+| macOS后台无登录 | LaunchDaemon/目标UID与受保护状态/CLI实现和隔离shell验证已完成；UTM来宾运行中、普通osascript查询通过 | 本次guestexec返回-2700/后端不支持；当前执行器无CUA，正常GUI尚未尝试，不是已证实的登录拒绝。无人登录真实boot未跑，未修改宿主服务/env |
+| Windows后台无登录 | SID/DPAPI/SCM/用户env组件已实现，受托profile lease合成9/9及platform19项race通过；amd64交叉编译通过；UTM来宾运行中 | 正式token来源、SYSTEM broker/服务和IPC认证仍在实现。历史guestexec -10004；本次cmd ver退出0但stdout/stderr空，来宾执行成功未证实；无CUA，正常GUI尚未尝试。原生profile/ACL/Session0/boot未跑，正式入口关闭 |
+| SMTP / Workers | 隔离SMTP严格TLS实际2/2通过；本地workerd/SQLite DO及相同Argon2id64MiB/t3/p1通过，公开server183/183+type/build通过 | 真实投递、线上CF配额为外部验证待办；未授权线上部署，不为额度弱化参数，也不无限阻挡其余已授权开发 |
 
-最近独立完整公开snapshot：workspace `67a69af`、core `894f2ad`、server `b968223`、protocol `b770001`、mobile `3b72a29`，原生race27/27通过120.670秒，记录在workspace `24852c1`。新连续恢复/CLI4已发表的源码新增验收将另以固定公开commit验证，不冒称此历史27项包含新6主测试。M2仍未闭环；CI、Tag/Release、安装包、签名钥生成/上传和真实线上部署均未执行。
+最近独立完整公开 snapshot：workspace `2ba0c1a`、core `457858f`、server `b968223`、protocol `b770001`、mobile `d169d74`，原生 race 33/33 通过161.661秒；同一固定源码 Go 全包293项通过、1项默认构建专属反向检查跳过，12个含测试包全部通过。仅提取公开 commit，无 working-tree overlay。该结果已包含连续恢复及正式CLI4新6主项，不包含后续恢复E/F管理、Android恢复或产品UI候选。M2仍未闭环；CI、Tag/Release、安装包、签名钥生成/上传和真实线上部署均未执行。
 
 ## M0 已完成
 
@@ -78,7 +78,7 @@ protocol：`2c410a83178d99b87c966dd5fe6fbf56ca39943f`；core-go：`de91acb9753e9
 
 ## M2 当前验收与公开源码
 
-本轮增量公开提交：protocol `b770001`、core-go `457858f`、server `b968223`、mobile `d169d74`。Android v3 源码已核对实际产物范围并公开；其 AAR 验收仍以旧公开底座加10个冻结文件为界，不冒称最新 core 全树产物。恢复封套与设备管理已公开，连续恢复协议、服务及Go/CLI4链已公开，Android恢复与真实Flutter产品链仍在接线。workspace `b96c18b` 的第一次独立快照因暂停测试依赖尚未提交的管理接口而编译失败，测试未执行；本次补齐 core 固定依赖并保留失败，不放宽断言。
+本轮增量公开提交：protocol `b770001`、core-go `457858f`、server `02689b4`、mobile `d169d74`。Android v3 源码已核对实际产物范围并公开；其 AAR 验收仍以旧公开底座加10个冻结文件为界，不冒称最新 core 全树产物。恢复封套与设备管理已公开，连续恢复协议、服务及Go/CLI4链已公开，Android恢复与真实Flutter产品链仍在接线。workspace `b96c18b` 的第一次独立快照因暂停测试依赖尚未提交的管理接口而编译失败，测试未执行；本次补齐 core 固定依赖并保留失败，不放宽断言。
 
 前次完整来源交付的固定提交：protocol `fe67023bf917faa895fabcc439c40c82ad0a8e1a`、core-go `0787b9f663c4f11ab713e2e421554a23c421fac8`、mobile `01dadefb37e22d3a3ccebe4ac5ed26b53a3a4661`、server `e4b3cf5c278058b82382641152babb2af8783256`。workspace 用 submodule 保存这些源码位置；原生库、APK、真实凭据、私有测试目录不进入源码提交。这些提交包含首根手机业务、自撤销、审批桥、cert3 多管理入网、原初始化精确 genesis、完整环境来源和批量轮换确认。前次新固定源码 17 项整体验收实际失败保留，现本轮25项完整公开快照已通过，详见下表；该结果不扩大为后续连续恢复或手机UI已完成。此前完整 13/13 使用 core-go `1801392`、server `0d4d08e`、mobile `591d081`、protocol `bdf9e23` 独立快照，保留为原受限恢复基线；后续完整来源恢复和连续恢复授权仍在候选中。此前 8/8 使用 core-go `d89872a`、server `4fe2cb8` 与其余相同公开提交，保留为历史结果。
 | 检查 | 实际结果与边界 |
@@ -96,7 +96,10 @@ protocol：`2c410a83178d99b87c966dd5fe6fbf56ca39943f`；core-go：`de91acb9753e9
 | 既有设备管理切片 | 服务端 `f5adbed` 的管理投影、原 ID grant/revoke 状态收据已公开，153/153 通过。`e1572d6` 补齐 none/expired/旧 KV 的历史签发者证明，不开放当前权限或返回数据；候选 Go 真实 HTTPS 管理流程通过：选定角色/期限、原包受保护保存、丢回应/重启只查原 ID、None/到期/重新授权、全局撤销及旧 boot/session 失效。core `887f932` 已公开；late status/POST 撤销重置会先持久清信任和待处理。最终两包 race 5.882/2.806 秒、真实原生联合 10.05 秒通过，Android 管理页仍未接 |
 | 显式进程扫描导入 | 新公开 core-go `731984a` 与其余相同公开提交的隔离源码快照，定向正式 CLI 纵链通过 2.964 秒（主项 2.52 秒）：只在完全合成 Env 的子进程列名，用户 select 后只取选中值；接受回应丢失后原 ID 查询仍序号 9，未选项不上传、暂停拒绝；保留 stdin 导入。此前当前源码同项也通过 2.787 秒。CLI 整包 race 7.702 秒、扫描定向 race 2.428 秒、vet、三平台默认构建和 Windows 测试编译通过；Windows 原生扫描未跑 |
 | 正式独立 CLI 与 daemon | 删除本地登录 session 后实际新 boot-session 200；正式编译 CLI 的 put/delete/仅选中 import、接受后 504 的原请求重查、历史重试不覆盖新值、本机 override 不上传、云删停止 override、暂停拒写及收到撤销清除通过；v2 独立 daemon 从加密双签证书重建逐环境历史来源，RO 写拒绝，不使用 daemon fixture。v2 新验收曾两次因 SIGTERM 返回 context canceled 失败；修正取消退出后定向及 7/7 全测通过，持久化错误仍返回失败 |
+| 连续恢复及CLI4完整公开快照 | root独立提取公开 workspace `2ba0c1a7dc8754165be8c365714d2fce2d164bd9`、core `457858f879a264675c0e8598e06529bd87d6344b`、server `b968223d85872cb70536ba4ffaf0b415f65971cd`、protocol `b7700013c378fb59afc7d401fc1a0de05e45e458`、mobile `d169d74d5c7bf080d02e950e6a8147d21175cc5b`，完整 `go test -race -tags harmonia_boringssl -count=1 -v ./acceptance` 33/33主项通过、0失败/跳过，161.661秒、exit0。包括原27项、新连续恢复五主项12场景、正式恢复E→CLI4真实SPAKE2/HPKE、原receipt丢回应恢复、CGO0 daemon及RO拒写/RW写删。只使用工具/缓存环境及合成账号、TLS和钥匙；无工作树覆盖，临时快照删除。此结果不包含尚未公开的高层V4审批、恢复E/F控制或Android恢复/UI |
+| 同一公开源码完整Go原生回归 | 上列同一五个固定公开提交独立快照中 `go test -race -tags harmonia_boringssl -count=1 -v ./...` exit0；293主项PASS、0FAIL、1SKIP，12个含测试包全部PASS。跳过项精确为 `TestDefaultPairCannotCreateProtectedFilesOrSendRequests`，仅适用于默认构建的反向检查；真实原生SPAKE2执行。cmd8.358秒、cryptox8.911秒、mobileworkflow4.880秒、platform1.967秒、syncclient9.217秒。Windowsprofile仍只含合成生命周期与编译证据，未冒称Windows原生API或无人登录通过；临时快照删除 |
 | 新服务公开快照兼容回归 | root独立提取公开 workspace `67a69af08823bf14c305dd6aefcd795e57cd0bb3`、core `894f2ad8c9d05fd44b7b97533921b15ee94c76d2`、server `b968223d85872cb70536ba4ffaf0b415f65971cd`、protocol `b7700013c378fb59afc7d401fc1a0de05e45e458`、mobile `3b72a29423527794c6969c6b0f9243a980ad1ddb`，无working-tree覆盖；`go test -race -tags harmonia_boringssl -count=1 -v ./acceptance` 完整27/27主项通过，120.670秒、exit0。实际原生PAKE/HPKE/AEAD、正式CLI/daemon、暂停四场景、管理五故障、纯时钟回退、原17恢复安全场景均回归；这证明新服务与既有公开客户端兼容，不把尚未公开的新连续恢复客户端算入结果。仅使用工具/缓存环境与合成数据，独立快照已删除 |
+| 恢复E/F环境与权限管理服务第1层 | server `02689b44e071cfdfe0aa3c65d7a5d250c3c69fe8` 已公开，183/183、0失败/跳过/取消，typecheck/build通过，总19.52秒、测试19.07秒。Node/workerd定向5/5通过8.719秒；显式Proof3控制及环境v3原两签提交、E新建Z、未获Z授权F的完整身份归档、RW/Admin、F新环境和轮换、rename/delete、none历史来源、原摘要/事务尾和SQL原子回滚。封套和值是合成结构输入，真实Go HPKE/PAKE及Android高层新链仍待独立验收；未把目录公钥当信任，不加独立恢复vault列表，旧接口/parser/domain保持；下一次恢复DAG仍独立待办 |
 | 连续恢复服务切片 | server `b968223d85872cb70536ba4ffaf0b415f65971cd` 已公开，178/178 通过、0 失败/跳过，typecheck/build 通过，总18.25秒、测试17.88秒。18项新增向量/Node TCP/workerd HTTP覆盖旧设备全部撤销后的25域双签过渡、仍受限、明确新设备18域双签登记、boot/proof3/v4委派、当前降权重查、SQL整笔回滚、原ID/hash查询和JSON/容量边界。HTTP封套是合成结构输入，此服务测试不等同真实PAKE/HPKE、手机强认证或新码回填验收。内嵌recovered actor proof3尚未接，后续复轮/部分新增环境再恢复失败关闭；未跑本批Docker/Wrangler，未部署/发布/加入CI |
 | server `mise run check` | 最新公开完整恢复来源图 `e4b3cf5` 144/144 通过、0 失败/跳过，类型检查和构建通过，任务 15.68 秒/测试 15.294 秒；独立 Node/workerd 恢复图 10/10 通过，7.536 秒，本地 Argon2id 相同参数约 1475 ms。此前原初始化锚 134/134、19.27/18.8906 秒保留；完整 before/after 授权与身份、历史写入者来源、精确原 genesis、缺原记录拒绝、跨环境数据隔离和 SQLite 原子回滚均回归。此前 v2 109/109 记录保留在服务端文档；本次未重跑 Docker/Wrangler，也未部署 |
 | SMTP TLS | 隔离证书的真实 TLS 握手 2/2 通过：强制 TLS、证书验证和拒绝降级；没有真实邮件投递 |
