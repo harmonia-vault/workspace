@@ -1,0 +1,262 @@
+{
+  "actualNativeSPAKE2": {
+    "status": "PASS",
+    "certificateVersion": "3",
+    "sequence": 4
+  },
+  "rootOwnedInstallation": {
+    "status": "PASS",
+    "bundleHash": "0219e075fd0a5d0f7c95cafe40bf27abd3b3312a47edc3396079a47ec290633f",
+    "members": 12
+  },
+  "beforeBootCLI": {
+    "status": "PASS",
+    "sharedPutAppliedByPull": true,
+    "sequence": 5
+  },
+  "fullRebootNoLogin": {
+    "status": "PASS",
+    "newKernelBootUUIDObserved": true,
+    "consoleUID": 0,
+    "jobUID": 501,
+    "newBootSession200": 1,
+    "newPull200": 15,
+    "login200Before": 2,
+    "login200After": 2,
+    "credentialsEnteredAfterReboot": false,
+    "uiScreenshotSHA256": "3e4ada4820fa33f5008284d14167bcbeaccc7b92360b8565ce6bbf6f0b3d17a9"
+  },
+  "strictObserverLiteralLoginwindow": {
+    "status": "FAIL",
+    "actual": false,
+    "reason": "scutil Name literal predicate did not match; raw metadata preserved; no silent relaxation"
+  },
+  "postBootCLI": {
+    "status": "PASS",
+    "sequence": 6,
+    "sharedPutAppliedByPull": true,
+    "newAccountLoginRequired": false
+  },
+  "pauseRevocation": {
+    "status": "PASS",
+    "sequence": 7,
+    "realSignedGrant200": true,
+    "paused": true,
+    "environmentCacheEmpty": true,
+    "exportEmpty": true
+  },
+  "cleanup": {
+    "status": "PASS",
+    "normalCurrentUserLogout": true,
+    "onlyOwnedJobsUnloaded": 2,
+    "programStateAndTwoPlistsAbsent": true,
+    "onlyOwnGuestPublicInputsRemoved": true,
+    "vmAndSyntheticAccountRetained": true,
+    "privateHostListenersClosed": 3
+  },
+  "priorFailures": [
+    {
+      "stage": "public Shift flagsChanged echo",
+      "status": "FAIL",
+      "laterNormalKeyDownUpPhysicalMask": "PASS"
+    },
+    {
+      "stage": "v1 install UUID guard",
+      "status": "FAIL",
+      "cause": "manual E/F transcription error; failed before side effects",
+      "v2": "PASS"
+    },
+    {
+      "stage": "start guard and pre-start convergence",
+      "status": "FAIL",
+      "cause": "BSD stat %a is atime; only own script %Lp narrow fix",
+      "laterStartAndCLI": "PASS"
+    }
+  ],
+  "consoleAfterLogin": {
+    "status": "PASS",
+    "observedName": "synthetic target user",
+    "UID": 501,
+    "inferOldBootName": false
+  },
+  "auditTotals": {
+    "httpRequests": 145,
+    "metadataObservations": 164,
+    "requestHeadersOrBodies": false,
+    "lastSignedGrant200": 1791026444420
+  },
+  "metadataRouteAudit": {
+    "status": "PASS",
+    "businessRows": 145,
+    "businessFields": [
+      "at",
+      "method",
+      "path",
+      "status"
+    ],
+    "observationRows": 164,
+    "observerBodyFields": [
+      "bootUUID",
+      "consoleLoginwindow",
+      "consoleUID",
+      "jobPID",
+      "jobUID",
+      "run",
+      "tick",
+      "version"
+    ],
+    "hostAddsReceiptTime": true,
+    "authorizationHeadersOrBodiesRecorded": false,
+    "receiverSourceSHA256": "962e80a7ff5c82421f09d0ea71c594926a5669d151f3752cb45f9785b7abe890",
+    "businessAuditSHA256": "562a3b1966dab2e5c87eec574edbacdd82e0683a939632796c2929df3e35c972",
+    "observerAuditSHA256": "c1a3f6674b316c626d91688856b5b575e2156d224e29f86624eb8c102401aabe",
+    "frozenPreLoginRawSHA256": "ac2d2e524e1e5f30322523de4b2c4440f839e95b1d081e00abd21f5d18ac98b5",
+    "sanitizedRoutes": [
+      {
+        "method": "GET",
+        "path": "/v1/accounts/:accountId/environment-changes/:operationId",
+        "status": 200,
+        "count": 1
+      },
+      {
+        "method": "GET",
+        "path": "/v1/accounts/:accountId/grant-management",
+        "status": 200,
+        "count": 3
+      },
+      {
+        "method": "GET",
+        "path": "/v1/accounts/:accountId/grant-status",
+        "status": 200,
+        "count": 3
+      },
+      {
+        "method": "GET",
+        "path": "/v1/accounts/:accountId/mutation-status",
+        "status": 200,
+        "count": 3
+      },
+      {
+        "method": "GET",
+        "path": "/v1/accounts/:accountId/pairings-v3/:pairingId",
+        "status": 200,
+        "count": 12
+      },
+      {
+        "method": "GET",
+        "path": "/v1/accounts/:accountId/pull",
+        "status": 200,
+        "count": 75
+      },
+      {
+        "method": "GET",
+        "path": "/v1/accounts/:accountId/vault-initializations/:operationId",
+        "status": 200,
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "path": "/v1/accounts/:accountId/boot-challenges",
+        "status": 200,
+        "count": 4
+      },
+      {
+        "method": "POST",
+        "path": "/v1/accounts/:accountId/boot-sessions",
+        "status": 200,
+        "count": 4
+      },
+      {
+        "method": "POST",
+        "path": "/v1/accounts/:accountId/environment-changes",
+        "status": 200,
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "path": "/v1/accounts/:accountId/grants",
+        "status": 200,
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "path": "/v1/accounts/:accountId/mutations",
+        "status": 200,
+        "count": 3
+      },
+      {
+        "method": "POST",
+        "path": "/v1/accounts/:accountId/notification-tickets",
+        "status": 200,
+        "count": 20
+      },
+      {
+        "method": "POST",
+        "path": "/v1/accounts/:accountId/notification-tickets",
+        "status": 403,
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "path": "/v1/accounts/:accountId/notification-tickets",
+        "status": 429,
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "path": "/v1/accounts/:accountId/pairings-v3",
+        "status": 200,
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "path": "/v1/accounts/:accountId/pairings-v3/:pairingId/approve",
+        "status": 200,
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "path": "/v1/accounts/:accountId/pairings-v3/:pairingId/complete",
+        "status": 200,
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "path": "/v1/accounts/:accountId/pairings-v3/:pairingId/relay",
+        "status": 200,
+        "count": 4
+      },
+      {
+        "method": "POST",
+        "path": "/v1/accounts/:accountId/vault-initializations",
+        "status": 200,
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "path": "/v1/accounts/:accountId/vault-initializations/:operationId/complete",
+        "status": 200,
+        "count": 1
+      },
+      {
+        "method": "POST",
+        "path": "/v1/login",
+        "status": 200,
+        "count": 2
+      },
+      {
+        "method": "POST",
+        "path": "/v1/register",
+        "status": 200,
+        "count": 1
+      }
+    ],
+    "webSocketForwarding": "UNRUN; fixture refused upgrade, sequence pull was used"
+  },
+  "unrun": [
+    "macOS sh/bash/zsh interactive correction and per-key restoration",
+    "real hardware key protection",
+    "FileVault locked-disk boot",
+    "GUI/container/cron environment adapters"
+  ]
+}
