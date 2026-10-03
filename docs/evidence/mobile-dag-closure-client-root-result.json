@@ -1,0 +1,349 @@
+{
+  "schema": "harmonia/mobile-dag-closure-client-root/v1",
+  "sourceBase": {
+    "workspace": "feb5f5a30e7850dce9d0fd632678ab8b59bcfa99",
+    "core-go": "e3541d193e88ee8fb0a252f547fbeac937d85e1c",
+    "server": "36ab16fbaadacd766548e201c05acd5e80ccb89b",
+    "protocol": "038f2db696647eceb4b0a5716784f976a55a2646"
+  },
+  "coreCommit": "2a149aa686f6eae14e5ae6145738c4520906cdca",
+  "candidateManifestSHA256": "3512611429f8cf1e5a266443b353407ccc4d8ddfdd89a187686ef21de58d1ce4",
+  "sourceFiles": [
+    {
+      "path": "core-go/cryptox/recovery_operation_resolution.go",
+      "baseSHA256": null,
+      "sha256": "f9b762c9e6b338d9eec6c20eaad2951cb231cc3e1deaefd7b93b9f7e141adf7e",
+      "bytes": 14202
+    },
+    {
+      "path": "core-go/cryptox/recovery_operation_resolution_test.go",
+      "baseSHA256": null,
+      "sha256": "d9ebcf029677d12b05a97558fca0f1ffdc60b8c4cc3f13d6aee27e0c6d9864d0",
+      "bytes": 7213
+    },
+    {
+      "path": "core-go/cryptox/testdata/recovery-operation-resolution-v1.json",
+      "baseSHA256": null,
+      "sha256": "92986cfc5e4747fbf5a0a5fbc9d71a2aa142d4cbd4b1083ad50853e2ab83d05e",
+      "bytes": 17862
+    },
+    {
+      "path": "core-go/syncclient/recovery_operation_resolution.go",
+      "baseSHA256": null,
+      "sha256": "a56bcaebd26b792f076888f95dacde30a6019b1a70119c2e16c14ac908ae521e",
+      "bytes": 7438
+    },
+    {
+      "path": "core-go/syncclient/recovery_operation_resolution_test.go",
+      "baseSHA256": null,
+      "sha256": "9e35b49b49f685f2965ada026af0922c081f15d9a46554e1f3515344d9333720",
+      "bytes": 5028
+    },
+    {
+      "path": "core-go/syncclient/recovery_operation_target.go",
+      "baseSHA256": null,
+      "sha256": "f01e001f9104193a6d6fed8b4db768dee074bc7659da66dbfa5a97492a4af23b",
+      "bytes": 4658
+    },
+    {
+      "path": "core-go/syncclient/RECOVERY-OPERATION-RESOLUTION.md",
+      "baseSHA256": null,
+      "sha256": "ad89d7b64825eddba1f58979b148d93603b2d17fcf16215d61adf8803777e032",
+      "bytes": 3661
+    },
+    {
+      "path": "core-go/syncclient/recovery_dag_client.go",
+      "baseSHA256": "fc9675b524df321d2d46e6db60ee43a79231d81fcb779a94c3b7e1c3121e2a69",
+      "sha256": "651908d079c1c5ab80401227c65ebff11d0cc8da8486f3a9c60869a426088096",
+      "bytes": 22546
+    },
+    {
+      "path": "core-go/syncclient/dag_protocol.go",
+      "baseSHA256": "729a1ede79d0106e48fb64fd8e1f16a654ad084b1ea69da856d4525e9eb49bb3",
+      "sha256": "77d7fa7c5fcf1e008b557cf2b55812479f63e7447c77825aa4cbaccd1ae197a0",
+      "bytes": 2452
+    },
+    {
+      "path": "core-go/syncclient/fault_codes.go",
+      "baseSHA256": "3cf7b74d8d20d09c3eb01aef25cab4f7bbb126663564a738cde50926e4cd3f44",
+      "sha256": "bfdf5e648d57e5bab6c230a30f5ae16f114034c450eca1a10555cd0315222f8f",
+      "bytes": 8862
+    },
+    {
+      "path": "core-go/mobileworkflow/recovery_dag_resolution.go",
+      "baseSHA256": null,
+      "sha256": "c564ef00e8e3d66dc300c0fd9df3bbfec1804fe0d184d8465def5a1d76ffe206",
+      "bytes": 15335
+    },
+    {
+      "path": "core-go/mobileworkflow/recovery_dag_resolution_state.go",
+      "baseSHA256": null,
+      "sha256": "a4b8162fb8cacc037979f9c2f5526bdf1b9e0768c2b5970980f7e4e8532dacac",
+      "bytes": 14306
+    },
+    {
+      "path": "core-go/mobileworkflow/recovery_dag_resolution_test.go",
+      "baseSHA256": null,
+      "sha256": "a5fd85b1c1b49f2067193b19a9f3c7394635f03e090f3a35b0dca329281a076a",
+      "bytes": 11958
+    },
+    {
+      "path": "core-go/mobileworkflow/RECOVERY_DAG_OPERATION_CLOSURE.md",
+      "baseSHA256": null,
+      "sha256": "5384f6b06c9ce3be1cd3f49943b5cd6fc5fcd9330d9106d0e6a46c8f72c185d7",
+      "bytes": 4612
+    },
+    {
+      "path": "core-go/mobileworkflow/vaultworkflow.go",
+      "baseSHA256": "65fb3faa09ca59894f0b48e2e7b0d52006d6cd2eb58461b9c0e539087005cca2",
+      "sha256": "ff604453020f80447e419a8407e51871b8f33ac17f74e5f8521201893ff4f3c9",
+      "bytes": 53907
+    },
+    {
+      "path": "core-go/mobileworkflow/recovery_dag_prepare_state.go",
+      "baseSHA256": "cc11c622dae059182d277d51b58814811fc028117a722552caf8b6d9f19b8ddf",
+      "sha256": "76e257dff208def38b36285df27dba0f275e1672f94d73910adfba7a1330d989",
+      "bytes": 7868
+    },
+    {
+      "path": "core-go/mobileworkflow/recovery_dag_lease.go",
+      "baseSHA256": "666b113fcc9f152eb5256b4adacfbc1680abbe3cf1245231a8ee8a9540f7d994",
+      "sha256": "4a7a31136112c6b3f2775bf22df9da37567f55001b2fdf933cba874998b68236",
+      "bytes": 5265
+    },
+    {
+      "path": "core-go/mobileworkflow/recovery_dag_query.go",
+      "baseSHA256": "6e74729d44133622a3c317b63e0defcd965f79189fd93c7d5fff905ba5159233",
+      "sha256": "482ae2e52b2f40198e29da983e9963772a61a706400c995e7ba02f3a673d8460",
+      "bytes": 6659
+    },
+    {
+      "path": "core-go/mobileworkflow/recovered_dag_device.go",
+      "baseSHA256": "b1594301c2da3ad9cc6060f45a6a929c4b5b5306306eb536c422390d3becd254",
+      "sha256": "55b5a1bf304d926b2b62ee0ea471c88aaef6bae1ce251361533f7ad982d12e62",
+      "bytes": 16054
+    },
+    {
+      "path": "core-go/mobileworkflow/recovery_dag_owner.go",
+      "baseSHA256": "d0ad21dec6847c5a18be60ff379c892b0e57a71389b398f9cfb0e0e3fb0069da",
+      "sha256": "369cb1090a78c46d2ecde7dbfc7504608ff844530af8d0d11498e6c771f930d0",
+      "bytes": 10542
+    },
+    {
+      "path": "core-go/mise.toml",
+      "baseSHA256": "fed0b8670c3712e048f5260d6ec7c79301abbe745b9ebd61e9a8833d62fc67a7",
+      "sha256": "60396a1e9ec282a62a5e2c44ecc2c85fc76a9194c552de9bfd383c49cc927cd0",
+      "bytes": 4286
+    },
+    {
+      "path": "acceptance/mobile_dag_resolution_test.go",
+      "baseSHA256": null,
+      "sha256": "3c53a9e5c46eeb24820745e228724a3b45828a2d5fadfa60eb006b3f90aaf9c2",
+      "bytes": 12161
+    },
+    {
+      "path": "mise.toml",
+      "baseSHA256": "479f823c4e4a2c33bc666c97dc77aeeb72813b5beb2d9d48ff481f46f4c4a342",
+      "sha256": "a02db8bbd6acf00e203c5650b2a72c5e1018d5c4151a2ca594b447e8e51f152a",
+      "bytes": 1892
+    },
+    {
+      "path": "core-go/syncclient/recovery_operation_history.go",
+      "baseSHA256": null,
+      "sha256": "cead9ab0c9cd222c2ff6d46b61bcfc91d92bc73f101da4963cf253e323044983",
+      "bytes": 2786
+    },
+    {
+      "path": "core-go/syncclient/recovery_operation_history_test.go",
+      "baseSHA256": null,
+      "sha256": "ef15a8cfc192bc934dde1ac36392c82a016fad1237fb6d6bace5a17716f26e96",
+      "bytes": 4518
+    },
+    {
+      "path": "core-go/mobileworkflow/recovery_dag_resolution_history.go",
+      "baseSHA256": null,
+      "sha256": "65af9a45db4f6cff639bc5b517b103da1d07ae4b1a819808c3da52c550585c3c",
+      "bytes": 1139
+    },
+    {
+      "path": "core-go/mobileworkflow/recovery_dag_resolution_history_test.go",
+      "baseSHA256": null,
+      "sha256": "fec1f8be0d1e48cc73e8cd0eef069899acf4a652c2ed76e04b0ae1e642ec4ad5",
+      "bytes": 13865
+    }
+  ],
+  "rootResults": [
+    {
+      "name": "components-and-dag-regression-extended-budget",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 302.886,
+      "stdout": {
+        "path": "logs/components-and-dag-regression-extended-budget.stdout",
+        "bytes": 454092,
+        "sha256": "be3b5652433e1bd2764c10bdad4357051f92b78bb99f3812ad466a5da1594aee"
+      },
+      "stderr": {
+        "path": "logs/components-and-dag-regression-extended-budget.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "tests": {
+        "pass": 468,
+        "fail": 0,
+        "skip": 0
+      },
+      "mainTestsPassed": 82,
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-p",
+        "2",
+        "./cryptox",
+        "./syncclient",
+        "./mobileworkflow",
+        "-run",
+        "^(Test(RecoveryOperation|DAG|MobileDAG|RecoveryDAG|B3b|NativeDAG|ConfirmedRecoveredDAG|CheckedDAG))",
+        "-count=1",
+        "-timeout=420s",
+        "-json"
+      ]
+    },
+    {
+      "name": "closure-real-https",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 21.645,
+      "stdout": {
+        "path": "logs/closure-real-https.stdout",
+        "bytes": 4689,
+        "sha256": "777983e61d7cd2a0deaabab16adbfe892357640a197849b2023c0ff94538a0b1"
+      },
+      "stderr": {
+        "path": "logs/closure-real-https.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "tests": {
+        "pass": 4,
+        "fail": 0,
+        "skip": 0
+      },
+      "mainTestsPassed": 1,
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-p",
+        "2",
+        "-tags",
+        "harmonia_boringssl",
+        "./acceptance",
+        "-run",
+        "^TestMobileDAGOperationResolutionHTTPS$",
+        "-count=1",
+        "-timeout=180s",
+        "-json"
+      ]
+    },
+    {
+      "name": "affected-vet",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 1.048,
+      "stdout": {
+        "path": "logs/affected-vet.stdout",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "path": "logs/affected-vet.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "command": [
+        "go",
+        "vet",
+        "-p",
+        "2",
+        "./cryptox",
+        "./syncclient",
+        "./mobileworkflow"
+      ]
+    }
+  ],
+  "initialRootFailure": [
+    {
+      "name": "components-and-dag-regression",
+      "status": "FAIL",
+      "exitCode": 1,
+      "seconds": 278.444,
+      "stdout": {
+        "path": "logs/components-and-dag-regression.stdout",
+        "bytes": 420607,
+        "sha256": "b8362459b66277ad71d7d7d0ad29bcbbfa40ae0d287159d09bf9a69ffe0761da"
+      },
+      "stderr": {
+        "path": "logs/components-and-dag-regression.stderr",
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "tests": {
+        "pass": 407,
+        "fail": 0,
+        "skip": 0
+      },
+      "mainTestsPassed": 75,
+      "command": [
+        "go",
+        "test",
+        "-race",
+        "-p",
+        "2",
+        "./cryptox",
+        "./syncclient",
+        "./mobileworkflow",
+        "-run",
+        "^(Test(RecoveryOperation|DAG|MobileDAG|RecoveryDAG|B3b|NativeDAG|ConfirmedRecoveredDAG|CheckedDAG))",
+        "-count=1",
+        "-timeout=240s",
+        "-json"
+      ]
+    }
+  ],
+  "initialFailureInterpretation": "240-second package suite timeout; 407 test pass events / 75 main tests before timeout, no assertion failure event. Same source and selection passed with 420-second suite budget. Initial overall status remains FAIL.",
+  "independentReview": {
+    "status": "ACCEPTED",
+    "candidateManifestSHA256": "3512611429f8cf1e5a266443b353407ccc4d8ddfdd89a187686ef21de58d1ce4",
+    "independentReviewSHA256": "71618b4a6cd128dc2e40356e277af90d072dba305ae860e4aca6150217385efd",
+    "independentTest": {
+      "sourceSHA256": "7d7e3d1d476150acb48545feb84334fa7900f92d09c0d633cfbf640e6e4cbe12",
+      "sourceUnchangedFromV1Failure": true,
+      "result": "PASS",
+      "exitCode": 0,
+      "race": true,
+      "mainPass": 1,
+      "subPass": 2,
+      "fail": 0,
+      "skip": 0,
+      "packageSeconds": 8.104
+    },
+    "oldFailurePreserved": "ac5d3932e0067a1c2da8e50d221b6c85adf7f61a4db79795ba5f05e297f44230",
+    "rootReview": "Full production v1-to-v2 delta read; protected pin/all records/minimum sequence/closed constraints preserved. No new confirmed blocker. Root tests tracked separately."
+  },
+  "scope": [
+    "Only transition-v2 and old-recovery sealed original operations. Query/close requires fresh current recovery proof and fixed original target.",
+    "Closed ledger and accepted history constraints apply to current/baseline/issuer graphs, preparation, original query and activation.",
+    "Whole-state CAS preserves original pending/unknown operations; explicit terminal handling does not itself grant trust.",
+    "Ordinary sessions still require complete verified vault history; legacy gaps only support the fixed terminal query."
+  ],
+  "notRun": [
+    "Mobile SDK/ABI/UI closure integration",
+    "Latest five-repository full suite",
+    "Workers complete client workflow",
+    "Production deployment"
+  ],
+  "capabilitiesOpened": false,
+  "secretsOrPersonalDataIncluded": false
+}

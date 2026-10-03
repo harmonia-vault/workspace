@@ -34,3 +34,7 @@ run = "go test -race ./acceptance -run '^TestMobileDAGTransitionHTTPS$' -count=1
 [tasks.test-mobile-dag-recovered-https]
 description = "三个隔离 B3a 明确登记原包的 HTTPS/SQLite 场景；无 Boot/Pull 或手机信任"
 run = "go test -race ./acceptance -run '^TestMobileDAGRecoveredHTTPS$' -count=1 -timeout=150s -json"
+
+[tasks.test-mobile-dag-closure-https]
+description = "原ID关闭/accepted确认/legacygap的有限真实HTTPS联合race"
+run = "go test -race -p 2 -tags harmonia_boringssl ./acceptance -run '^TestMobileDAGOperationResolutionHTTPS$' -count=1 -timeout=180s -json"
