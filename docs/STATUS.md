@@ -61,7 +61,7 @@ protocol：`2c410a83178d99b87c966dd5fe6fbf56ca39943f`；core-go：`de91acb9753e9
 
 ## M2 当前验收与公开源码
 
-本轮增量公开提交：protocol `b770001`、core-go `894f2ad`、server `e1572d6`、mobile `3b72a29`。Android v3 源码已核对实际产物范围并公开；其 AAR 验收仍以旧公开底座加10个冻结文件为界，不冒称最新 core 全树产物。恢复封套与设备管理已公开，连续恢复协议基元已公开，实际连续恢复服务/手机产品链尚未接通。workspace `b96c18b` 的第一次独立快照因暂停测试依赖尚未提交的管理接口而编译失败，测试未执行；本次补齐 core 固定依赖并保留失败，不放宽断言。
+本轮增量公开提交：protocol `b770001`、core-go `894f2ad`、server `b968223`、mobile `3b72a29`。Android v3 源码已核对实际产物范围并公开；其 AAR 验收仍以旧公开底座加10个冻结文件为界，不冒称最新 core 全树产物。恢复封套与设备管理已公开，连续恢复协议基元及服务已公开，真实客户端/手机产品链仍在联合验证。workspace `b96c18b` 的第一次独立快照因暂停测试依赖尚未提交的管理接口而编译失败，测试未执行；本次补齐 core 固定依赖并保留失败，不放宽断言。
 
 前次完整来源交付的固定提交：protocol `fe67023bf917faa895fabcc439c40c82ad0a8e1a`、core-go `0787b9f663c4f11ab713e2e421554a23c421fac8`、mobile `01dadefb37e22d3a3ccebe4ac5ed26b53a3a4661`、server `e4b3cf5c278058b82382641152babb2af8783256`。workspace 用 submodule 保存这些源码位置；原生库、APK、真实凭据、私有测试目录不进入源码提交。这些提交包含首根手机业务、自撤销、审批桥、cert3 多管理入网、原初始化精确 genesis、完整环境来源和批量轮换确认。前次新固定源码 17 项整体验收实际失败保留，现本轮25项完整公开快照已通过，详见下表；该结果不扩大为后续连续恢复或手机UI已完成。此前完整 13/13 使用 core-go `1801392`、server `0d4d08e`、mobile `591d081`、protocol `bdf9e23` 独立快照，保留为原受限恢复基线；后续完整来源恢复和连续恢复授权仍在候选中。此前 8/8 使用 core-go `d89872a`、server `4fe2cb8` 与其余相同公开提交，保留为历史结果。
 | 检查 | 实际结果与边界 |
@@ -79,6 +79,7 @@ protocol：`2c410a83178d99b87c966dd5fe6fbf56ca39943f`；core-go：`de91acb9753e9
 | 既有设备管理切片 | 服务端 `f5adbed` 的管理投影、原 ID grant/revoke 状态收据已公开，153/153 通过。`e1572d6` 补齐 none/expired/旧 KV 的历史签发者证明，不开放当前权限或返回数据；候选 Go 真实 HTTPS 管理流程通过：选定角色/期限、原包受保护保存、丢回应/重启只查原 ID、None/到期/重新授权、全局撤销及旧 boot/session 失效。core `887f932` 已公开；late status/POST 撤销重置会先持久清信任和待处理。最终两包 race 5.882/2.806 秒、真实原生联合 10.05 秒通过，Android 管理页仍未接 |
 | 显式进程扫描导入 | 新公开 core-go `731984a` 与其余相同公开提交的隔离源码快照，定向正式 CLI 纵链通过 2.964 秒（主项 2.52 秒）：只在完全合成 Env 的子进程列名，用户 select 后只取选中值；接受回应丢失后原 ID 查询仍序号 9，未选项不上传、暂停拒绝；保留 stdin 导入。此前当前源码同项也通过 2.787 秒。CLI 整包 race 7.702 秒、扫描定向 race 2.428 秒、vet、三平台默认构建和 Windows 测试编译通过；Windows 原生扫描未跑 |
 | 正式独立 CLI 与 daemon | 删除本地登录 session 后实际新 boot-session 200；正式编译 CLI 的 put/delete/仅选中 import、接受后 504 的原请求重查、历史重试不覆盖新值、本机 override 不上传、云删停止 override、暂停拒写及收到撤销清除通过；v2 独立 daemon 从加密双签证书重建逐环境历史来源，RO 写拒绝，不使用 daemon fixture。v2 新验收曾两次因 SIGTERM 返回 context canceled 失败；修正取消退出后定向及 7/7 全测通过，持久化错误仍返回失败 |
+| 连续恢复服务切片 | server `b968223d85872cb70536ba4ffaf0b415f65971cd` 已公开，178/178 通过、0 失败/跳过，typecheck/build 通过，总18.25秒、测试17.88秒。18项新增向量/Node TCP/workerd HTTP覆盖旧设备全部撤销后的25域双签过渡、仍受限、明确新设备18域双签登记、boot/proof3/v4委派、当前降权重查、SQL整笔回滚、原ID/hash查询和JSON/容量边界。HTTP封套是合成结构输入，此服务测试不等同真实PAKE/HPKE、手机强认证或新码回填验收。内嵌recovered actor proof3尚未接，后续复轮/部分新增环境再恢复失败关闭；未跑本批Docker/Wrangler，未部署/发布/加入CI |
 | server `mise run check` | 最新公开完整恢复来源图 `e4b3cf5` 144/144 通过、0 失败/跳过，类型检查和构建通过，任务 15.68 秒/测试 15.294 秒；独立 Node/workerd 恢复图 10/10 通过，7.536 秒，本地 Argon2id 相同参数约 1475 ms。此前原初始化锚 134/134、19.27/18.8906 秒保留；完整 before/after 授权与身份、历史写入者来源、精确原 genesis、缺原记录拒绝、跨环境数据隔离和 SQLite 原子回滚均回归。此前 v2 109/109 记录保留在服务端文档；本次未重跑 Docker/Wrangler，也未部署 |
 | SMTP TLS | 隔离证书的真实 TLS 握手 2/2 通过：强制 TLS、证书验证和拒绝降级；没有真实邮件投递 |
 | Workers / Docker | 本地 workerd D1 仅邮箱目录、账号 SQLite DO 与 64 MiB/3 次/p1 Argon2 路径通过，首登录约 1387 ms；当前 v2 Wrangler dry-run 265.14 KiB/gzip 65.50 KiB 通过，无部署。2026-10-02 UTC 最新 v2 Docker 镜像重新构建及隔离持久卷重启 smoke 通过，验证合成空账号持久化、非 root、0700 和拒绝远程明文绑定；本次容器/卷已清理，未发布端口 |
