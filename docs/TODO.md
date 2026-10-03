@@ -2,7 +2,7 @@
 
 更新时间：2026-10-03 17:13 UTC。此页按用户可操作功能分类；组件实现或局部通过不算整个功能完成。当前范围见 [STATUS.md](STATUS.md)，原始历史与失败见[完整归档](history/STATUS-20261003-1132.md)。
 
-当前公开来源：protocol `1c0b24180e7fabfcd9109dbabb2afbf6195f22d8`；server `2f15b94ce5023357320b415e5f3a4aebb29c2856`；core-go `1b370cb9adce19e953f4c11635d68083c8bdae69`；mobile `ecbbc6212c14ca4335038a14abb66900d7217373`。每项实跑仍以证据所记固定源码/产物为界；并行候选不计作公开能力。
+当前公开来源：protocol `1c0b24180e7fabfcd9109dbabb2afbf6195f22d8`；server `2f15b94ce5023357320b415e5f3a4aebb29c2856`；core-go `69bc7c77eac4f7320741a4986d8bd6f17bb33704`；mobile `ecbbc6212c14ca4335038a14abb66900d7217373`。每项实跑仍以证据所记固定源码/产物为界；并行候选不计作公开能力。
 
 | 用户功能 | 状态 | 已有证据 | 接下来需要完成 |
 | --- | --- | --- | --- |
