@@ -1,6 +1,6 @@
 # 功能待办总览
 
-更新时间：2026-10-03 14:42 UTC。此页按用户可操作功能分类；组件实现或局部通过不算整个功能完成。当前范围见 [STATUS.md](STATUS.md)，原始历史与失败见[完整归档](history/STATUS-20261003-1132.md)。
+更新时间：2026-10-03 14:54 UTC。此页按用户可操作功能分类；组件实现或局部通过不算整个功能完成。当前范围见 [STATUS.md](STATUS.md)，原始历史与失败见[完整归档](history/STATUS-20261003-1132.md)。
 
 当前公开来源：protocol `3168864b5228913e4286ba8d2fcca9f3f3574b6b`；server `d27fb2a98b86d2b657869830f00c1e8d07402aed`；core-go `dc28eb87c5cc49051210dece33e17cb83c8fe9e0`；mobile `ecbbc6212c14ca4335038a14abb66900d7217373`。每项实跑仍以证据所记固定源码/产物为界；并行候选不计作公开能力。
 
@@ -25,7 +25,7 @@
 | 邮箱证明账号重置 | 后端已验，App待接 | 新邮件证明、破坏性确认、generation、旧设备及会话失效测试通过 | App入口、最新永久首号不重开回归和真实邮件投递 |
 | macOS系统服务无人登录启动 | 真实内核纵链通过，安装器候选未实跑 | 固定b094/bd86正式配对、LaunchDaemon、清会话后完整重启未登录Boot/Pull、CLI写入、暂停签撤销和清理；独立页面/UID/boot/HTTP支持 | 原console Name字面检查FAIL保留；有限安装器v4候选71项race PASS含PID退出等待；公开POSIX切片根独立48/48 race与vet通过；源权限类负例修前FAIL保留；正式离线退出已公开且根独立163/163 race及vet通过；共享只读入网检查已公开且根独立218项race/vet通过；已停服卸载/中断重试待完成，安装器VM及多用户仍未验 |
 | Linux系统服务无人登录启动 | 完整内核纵链通过，范围有限 | 固定b094/bd86真实配对、清会话后重启、未登录Boot/Pull、CLI写入、SSH Bash刷新片段纠正/暂停/签撤销/逐key回退 | 新版POSIX整目录消失恢复48项独立通过；正式安装器总协调器实现中；共享只读入网检查已公开；其它发行版及三OS整体未验；保留旧失败，见docs/evidence |
-| Windows系统服务与用户环境 | Task Scheduler注册仍FAIL，根因未证 | 两SCM服务创建后从未启动，本轮精确清理及独立absence通过；普通Batch/同会话SID、profile加载/释放/权限恢复；80次AccessCheck API完成且自己任务目录create允许；合成typed VARIANT调用帧实际9/9通过 | password EMPTY一次实际新注册仍FAIL3.305秒、80020009/SCODE80070005；新资源清理待完成，优先专项审查Scheduler必要性与唯一决定性实验；不扩大权限、不把AccessCheck当根因证明；正式provider/CLI/SCM启动/boot未验 |
+| Windows系统服务与用户环境 | Task Scheduler注册仍FAIL，根因未证 | 两SCM服务创建后从未启动，本轮精确清理及独立absence通过；普通Batch/同会话SID、profile加载/释放/权限恢复；80次AccessCheck API完成且自己任务目录create允许；合成typed VARIANT调用帧实际9/9通过 | password EMPTY一次实际新注册仍FAIL3.305秒、80020009/SCODE80070005；新资源精确清理及独立absence通过；Scheduler仅为当前令牌获取选择，C++强类型对照未编译/执行，平台内容安全检查中止专项执行，见[收敛记录](evidence/WINDOWS-PATH-REVIEW.md)；不扩大权限、不把AccessCheck当根因证明；正式provider/CLI/SCM启动/boot未验 |
 | Docker自托管 | 本地固定范围已验 | 公开bd86 archive真实Docker11/11，首号/登录/同卷重启永久标记/后续403、非root/0700/明文拒绝与清理 | 新DAG Docker整链、真实TLS代理/手机组合未跑；不部署真实服务 |
 | Workers自托管 | 本地范围已验 | D1目录/账号DO同Argon2；首号registry/legacy迁移workerd回归；DAG新Node/workerd8项独立通过 | 最新完整产品链及线上CPU/内存/配额未测；不能为额度弱化参数 |
 | SMTP和Cloudflare发信 | 隔离SMTP部分通过 | 严格TLS两项通过，不降级、不secret debug | 真实SMTP投递未跑；CF Email Service可选接入未开始，不承诺全免费 |
