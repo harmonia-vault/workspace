@@ -4,22 +4,33 @@
 
 ## M2 用户流程总览
 
-2026-10-03 当前 workspace submodule 固定 protocol `de21d99`、core `b094a93`（原生账号、恢复、独立PIN包装及同锁来源投影）、mobile `875ff17`（含认证返回后的Pull修复及iOS隔离HTTPS测试入口）、server `bd86fec`（注册策略、空实例测试入口和待批准元数据）。公开核心联合39项有两个精确固定快照，另列真实Android和平台产物范围；新Flutter产品接线及视觉迭代仍在进行，不将组件证据合并冒称完整产品通过。
+2026-10-03 当前 workspace submodule 固定 protocol `de21d99`、core `b094a93`（原生账号、恢复、独立PIN包装及同锁来源投影）、mobile `c6df1cd`（含Pull与表单生命周期修复、iOS注册及PIN原生实际证据）、server `bd86fec`（注册策略、空实例测试入口和待批准元数据）。公开核心联合39项有两个精确固定快照，另列真实Android和平台产物范围；新Flutter产品接线及视觉迭代仍在进行，不将组件证据合并冒称完整产品通过。
 
 | 用户流程 | 完成及实际证据 | 待验 / 阻塞 |
 | --- | --- | --- |
-| 注册、邮箱验证、首机新码完整重输、环境/变量CRUD | 最终C账号段通过；完整新码重输、四次认证与最后Flutter Pull通过，设置导航通过；Pull修复已公开ac1e872 | 变量创建被接受但表单被认证生命周期销毁，整轮FAIL；非视觉表单生命周期修复和完整CRUD/CLI重验进行中。旧PARTIAL/FAIL保留，真实外部邮件投递未跑 |
+| 注册、邮箱验证、首机新码完整重输、环境/变量CRUD | 最终C账号、完整新码重输、四次认证与最后Flutter Pull、设置导航通过；8a0515c修复后变量create/edit/delete/recreate和环境create/rename/delete实际通过 | 整轮在CLI批准准备页因测试选择器不可见而FAIL，尚未开始CLI配对；正在核导航与滚动，旧失败保留。真实外部邮件投递未跑 |
 | 手机批准CLI及本机环境同步 | 正式cert3 CLI/daemon、原生PAKE、HPKE/AEAD、RO/RW、selected-only导入、override、暂停和撤销已实际通过；Android cert3 focused19次CryptoObject通过 | Flutter授权入口已接，完整实际用户链未验；不把编译当三OS boot |
 | 恢复后手机入网并批准CLI | Go完整旧码→受限→新码重输/连续两签→明确env/role/expiry cert4登记→Boot/Pull→CLI4 PAKE/原receipt504恢复→CGO0 daemon及RO拒写/RW写删已通过；源码`b28c46a`，新两验收文件公开 | 真实Android恢复3/3、30次强认证及两次force-stop已通过，22文件公开；Flutter向导仍在接线，第二次恢复DAG仅密码学库已验、HTTP与产品未接 |
 | 手机设备权限管理 | Go已有设备RO/RW/Admin/none、全局撤销、原包未知查询及保存失败门槛通过；Android新focused1/1、42次CryptoObject、真实Go peer通过 | 当前已通过管理Android产物是固定core894等公开底座+9冻结候选，不等于最新HEAD；恢复E/F低层控制已公开及真实Go验收通过，高层环境日志已公开并经真实HTTPS候选测试；Android及手机界面接线继续 |
 | Linux后台无登录 | 完整Ubuntu内核真实重启通过：先正常停止并删除设备会话缓存，新boot与两unit InvocationID改变，目标用户未登录时设备Boot/Pull成功；正式CLI共享写入下发、SSH交互Bash内刷新片段的纠正/暂停/真实签撤销/逐key回退通过 | 仅本次固定公开core b094/server bd86与合成VM范围；不等于其它发行版、安装器或三OS整体已验。首轮登录和首版观察器失败保留 |
-| macOS后台无登录 | 独立macOS VM桌面、真实UID、公开输入和正式CLI/daemon编译通过；固定安装材料12文件已审，BoringSSL SPAKE测试6项通过 | 正在私网传入隔离VM并准备LaunchDaemon；正式服务、整机重启和登录前Boot/Pull尚未验收 |
-| Windows后台无登录 | canonical账号名API往返SID及同会话目标校验通过；失败现场按精确范围清理，独立完整absence通过 | 注册仍80020009/SCODE80070005，名字候选未解决；LoadUserProfile缺失仅为待验证候选原因。正式CLI/SCM/provider/boot未验，不扩权限或改ACL |
+| macOS后台无登录 | 公开core b094/server bd86真实配对、LaunchDaemon、清设备会话后完整内核重启、未登录Boot/Pull通过；重启后CLI在线写入经Pull应用、暂停收到签名撤销后环境0、清理及absence通过 | 原观察器要求console Name字面等于loginwindow的检查FAIL；独立未登录页面、console UID0、新boot/进程与HTTP证据支持无人登录结论。安装器及更广兼容性待做 |
+| Windows后台无登录 | 两个SCM服务已创建但未启动；真实目标普通Batch token、同会话SID、规范名往返通过；新profile加载、child退出、卸载与权限恢复12阶段通过 | 失败点为Task Scheduler ITaskFolder::RegisterTask，HRESULT80020009/SCODE80070005；成功加载profile仍不能解决。尚未启动SCM或验证provider/正式CLI/boot，正核具体访问权 |
 | SMTP / Workers | 隔离SMTP严格TLS实际2/2通过；本地workerd/SQLite DO及相同Argon2id64MiB/t3/p1通过，公开server183/183+type/build通过 | 真实投递、线上CF配额为外部验证待办；未授权线上部署，不为额度弱化参数，也不无限阻挡其余已授权开发 |
 
 最近独立完整公开 snapshot：workspace `2ba0c1a`、core `457858f`、server `b968223`、protocol `b770001`、mobile `d169d74`，原生 race 33/33 通过161.661秒；同一固定源码 Go 全包293项通过、1项默认构建专属反向检查跳过，12个含测试包全部通过。仅提取公开 commit，无 working-tree overlay。该结果已包含连续恢复及正式CLI4新6主项，不包含后续恢复E/F管理、Android恢复或产品UI候选。其后纯公开 workspace `f1d10b1`/core `202a83c`/server `02689b4`/protocol `2edad19`/mobile `d169d74` 的5项新增或受影响用户流程 race 通过69.442秒；无工作树覆盖、0失败/跳过。该固定快照共有37主项，本轮没有将5项定向复验说成完整37项通过。新增高层环境业务在公开9eb77df/core006450d独立target1/1通过13.497秒；随后严格挑战时钟验收公开后，root仅提取五仓公开固定源码完成39/39主项原生race（247.939秒、0FAIL/SKIP）；同一core全包307 PASS、0FAIL、1默认构建专属SKIP；精确范围见下表。M2仍未闭环；CI、Tag/Release、安装包、签名钥生成/上传和真实线上部署均未执行。
 
-## 最新实际进展（2026-10-03 10:58 UTC）
+## 最新实际进展（2026-10-03 11:32 UTC）
+
+- Android表单生命周期修复已公开mobile `8a0515c`：短暂系统认证期间保留被遮蔽的编辑表单，实际后台/锁定/退出/失权立即销毁；定向5项、全90项与analyze通过。实际C账号、完整首机初始化与最后Pull、设置、变量创建和返回详情显示通过。第二次编辑已接受，18次真实系统认证完成，随后只读测试等待遇瞬时重复标签，整轮FAIL 93.089秒；仅测试等待改为有界等待严格唯一后，在新空实例复跑，同生产源码和AAR，局部测试CA变化使APK摘要不同。该新轮已实际通过变量create/edit/delete/recreate与环境create/rename/delete，28次系统认证；随后CLI批准准备页选择器不可见，整体FAIL 126.749秒，CLI尚未登录或配对、批准计数0。三次只读重复节点计数为2且不含editable/password，等待后编辑返回正常，支持先前转场时序原因。正在完整审查批准表单导航/滚动，再做有限复验。没有把服务接受计数代替UI验收。
+- PIN真实MainActivity插件/JNI三阶段全部通过（19.937/9.756/7.754秒）：真实NO_SYSTEM_AUTH、双录与错误PIN限流、账号/完整恢复码初始化、accepted502后force-stop原ID恢复、CRUD、批准正式CLI3限时RW、原生PAKE/Boot/验签Pull和在线写入、忘记后不同未可信身份。root独立核31项冻结输入和三份实际原始输出。此前三轮FAIL及只读资格诊断保留。Flutter PIN输入/忘记流程仍在候选验证，公开默认业务能力保持关闭。
+- macOS独立VM的LaunchDaemon真实运行后，正常停止设备服务并删除仅会话缓存，正常完整内核重启。新boot、新服务进程、console UID0、实际设备Boot/Pull200且账号login计数未增加，与root查看的空密码未登录页面共同支持无人登录通过。原观察器的Name字面检查FAIL单列保留。随后正常登录，用同正式CLI在线写入经Pull下发通过；暂停后真实管理签名none撤销使环境0/exportEmpty通过；精确logout、两任务bootout、程序/状态/两plist删除和独立absence通过。范围限公开core b094/server bd86及本次合成VM，未验证通用安装器。
+- Windows精确失败组件是Task Scheduler COM `ITaskFolder::RegisterTask`，不是SCM CreateService。调用采用TASK_CREATE=2、TASK_LOGON_S4U=2、当前普通目标用户、LeastPrivilege、无trigger、空password/SD；HRESULT为0x80020009，EXCEPINFO SCODE为0x80070005。两个SCM服务确已创建且未启动。规范名字往返没有解决；新一轮真实profile加载与释放、子进程关闭、原权限恢复均通过12阶段，注册仍相同拒绝。正在同合成账号范围核具体访问权，不将profile缺失宣传为根因。
+- iOS真实Flutter注册与邮箱证明各1次尝试/1次接受，系统官方模拟Face ID一次，界面仍明确未可信；初始化、登录和Pull计数0。两份脱敏证据公开mobile `9d259c1`，root核对原始计数及无秘密截图。实际包仍为9e底座加875测试入口；后续固定8a独立Debug已构建，尚未将其算作实际初始化通过。[证据](../mobile/docs/IOS_PRODUCT_REGISTRATION_SIMULATOR.md)。
+- 连续恢复DAG的服务器候选正在接Go真实流程。Node TCP/SQLite和必要workerd检查已有局部通过；root审查的跨操作ID、全旧设备撤销后的历史来源、Workers协商响应及历史恢复公钥复用问题已交回修正。尚无完整Go/CLI5联合验收或本轮发布，不将合成封套测试算真实HPKE/PAKE通过。
+
+M2仍未闭环。未配置CI、发布Release/安装包或部署真实线上服务，不宣称生产可用。下方保留历史结果。
+
+## 历史实际进展（2026-10-03 10:58 UTC）
 
 - Linux整机重启及真实撤销验收已公开：[结果](evidence/linux-kernel-systemd-result.json)、[复现](evidence/LINUX-KERNEL-REPRODUCTION.md)。同一目标SSH交互Bash中的主动纠正、暂停保留外改、管理签名none撤销、逐key原值恢复、无关key保留均通过；采用正式shell刷新片段，不声称外部强制改变已有进程env。
 - Android系统认证返回后的Pull修复已公开mobile `ac1e872`，定向10项、全85项与analyze通过。固定实际产物的账号、首机完整重输/四次认证/最后Pull、C设置导航通过，变量创建仍因表单被隐私遮罩替换销毁而失败。正在做保留短暂认证期间隐藏表单、真正后台/退出/失权立即销毁的非视觉修复，保留C设计；随后优先重跑完整产品CRUD和CLI闭环，不用新增边界测试代替实际验收。
