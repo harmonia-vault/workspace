@@ -1,18 +1,19 @@
 # 当前实现状态与验证
 
-更新时间：2026-10-03 14:00 UTC。M2 尚未闭环，项目仍是实验性安全软件。组件通过、实际产品步骤通过、整轮测试结果分别记录，不合并宣称完整产品或生产安全验收。全部用户功能及下一步见 [TODO.md](TODO.md)，完成条件见 [PLAN.md](PLAN.md)。
+更新时间：2026-10-03 14:12 UTC。M2 尚未闭环，项目仍是实验性安全软件。组件通过、实际产品步骤通过、整轮测试结果分别记录，不合并宣称完整产品或生产安全验收。全部用户功能及下一步见 [TODO.md](TODO.md)，完成条件见 [PLAN.md](PLAN.md)。
 
 此前 STATUS（最近更新为 11:32 UTC）已[按原字节完整归档](history/STATUS-20261003-1132.md)，SHA-256 为 `2ab49f34deed0026d54a8efcf65a23442208eeb61207aaa665309d0591012079`。归档中的“当前”、路径与未跑结论只对应当时上下文；原始失败和精确历史快照没有删除。
 
 ## 当前范围
 
-本次整理依据已公开 protocol `ccf8ec6`、core-go `6d8178a`、server `6c39ed1`、mobile `1cb8398`。运行结论仍分别绑定下列证据中的实际源码与产物，不能追认为这些最新提交的完整重跑。并行候选仅在明确标为候选的项目中列出，不算已公开能力。
+本次整理依据已公开 protocol `ccf8ec6`、core-go `6d8178a`、server `6c39ed1`、mobile `ecbbc62`。运行结论仍分别绑定下列证据中的实际源码与产物，不能追认为这些最新提交的完整重跑。并行候选仅在明确标为候选的项目中列出，不算已公开能力。
 
 | 用户流程 / 平台 | 已实际验证 | 仍缺什么 / 结果限制 |
 | --- | --- | --- |
 | 注册、邮箱证明与首号策略 | Node/workerd 永久首号 CAS 已验；Android 最终 C 产品完成连接、注册、邮件证明、普通登录未可信、完整新码首机初始化与 CRUD；iOS 注册/邮件证明及后续登录/初始化/变量 CRUD 分别有固定产物证据 | 真实外部邮件投递未跑；账号登录始终不等于设备可信。邮箱重置 App 入口仍待接 |
 | Android 产品 → 正式 CLI3 | 最新真实产品轮完成账号→首机→变量/环境 CRUD→明确授权→原生 SPAKE2→正式 CLI3 入网、Boot/Pull、CLI 写入→App 显示；34 次实际系统认证、批准接受 1、mutation 5、Pull 74 | **整轮 FAIL 149.966 秒**：最后 logout 的额外系统认证窗口未找到。主业务通过与尾部退出失败分开记；不能称整轮 PASS或完整生命周期通过。[本轮证据](../mobile/docs/ANDROID_PRODUCT_USERFLOW_20261003.md)已公开于 `b0778e3` |
 | Android 独立正式退出 | 同生产来源的新空实例最小回归 PASS，53.267 秒、9 次实际系统认证；正式退出后设备/workflow/alias 不存在，本地恢复被拒绝，正常 Activity 重启仍无材料；[证据](../mobile/docs/ANDROID_PRODUCT_LOGOUT_20261003.md)公开于 `cc22862` | 没有重复 CRUD/CLI；此前完整轮末尾失败原因仍未确定，不追认整轮通过；前台稳定只作测试排序，不能代替认证或产品忙状态证明 |
+| Android 原 ID 冷启动续办 | 产品业务修复已公开于 `ecbbc62`；实际单笔响应丢失→force-stop→取消认证→恢复原ID→明确续办→正式Pull→退出整轮PASS83.527秒，18次认证及1次取消；mutationAttempts=accepted=1；[证据](../mobile/docs/ANDROID_PRODUCT_PENDING_20261003.md) | 4465取消与4467入口隐藏FAIL保留；8项新业务回归及全98项通过，双ID仅组件通过。实际AAR仍固定b094，不追认最新Go PIN/DAG或重跑完整CRUD/CLI；realVaultReady仍false |
 | iOS 产品 | 固定 mobile `8a0515c` Debug 实际登录未可信；显式新首机完整重输及提交 6.464 秒；变量新增/读取/更新/删除、正常退出和本地恢复拒绝通过；init 1、mutation 3/3、Boot 8、Pull 20；[证据](../mobile/docs/IOS_PRODUCT_INITIALIZATION_CRUD_SIMULATOR.md)公开于 `91e499c` | 第一次过期流程的完成/查询均 FAIL并保留；原查询 HTTP 次数未采集，不能称已接受未知结果不可查。仅 Simulator；真机因素、iOS PIN、审批/恢复和完整生命周期未验 |
 | App 锁与 PIN | Android MainActivity原生三阶段PASS；Flutter最小输入链PASS40.683秒：真实双录、独立PIN restore、错误PIN零写、正确PIN一次写且同Pull验值、UI忘记和新身份NOT_TRUSTED；[证据](../mobile/docs/PIN_FLUTTER_RUNTIME.md)随16项逐操作门控公开于 `1cb8398` | 前五FAIL保留，精确ErrPIN分类已修。账号注册/邮件/首机初始化采用同设备真实原生bootstrap，不算PIN逐屏账号/恢复码向导；CLI批准UI、恢复、迁移、V4/V5及iOS PIN未验。系统取消/临时锁定不得降级；整体realVaultReady=false |
 | 首次恢复及恢复后管理手机 | 固定 Android 原生三阶段 3/3、94.475 秒、30 次系统认证、两次 force-stop，通过受限恢复→完整新码→显式 cert4 登记→CLI4；[证据](../core-go/mobilebridge/RECOVERY_NATIVE.md) | Flutter 恢复向导与普通管理产品入口仍待接线和实际验收；不能借原生通过开放所有操作 |
@@ -33,7 +34,7 @@ POSIX根独立验证的源码/日志摘要与边界见[记录](evidence/posix-cl
 
 ## 当前 M2 优先差距
 
-1. Android独立正式退出已通过；Flutter PIN最小输入链已通过，继续账号逐屏/批准入口与剩余生命周期；明确取消、后台、App kill、切服务和失权后的状态与原 ID恢复。整体 `realVaultReady` 和未验能力继续关闭。
+1. Android独立正式退出、单笔原ID跨kill续办与取消已实际通过；Flutter PIN最小输入链已通过，继续账号逐屏/批准入口、切服务、失权及其它未验生命周期。整体 `realVaultReady` 和未验能力继续关闭。
 2. 接通手机恢复向导、重复恢复 DAG高层、P4环境/授权管理和manager-reanchor；保留完整新码重输、先受限、显式环境/角色/期限和最终下发/保存门槛。
 3. 完成设备管理/前台授权提示和邮箱重置产品入口。Windows只沿实际最小拒绝原因继续；Mac/Linux正式安装器及各自 shell/多用户验收不能借单次脚本通过替代。
 4. 按最终公开提交再作有界固定快照集成验证，保留历史失败。真机、真实邮件、线上Workers配额和安全审计仍是各自明确未验项，不无限阻挡其它已授权本机实现。

@@ -9,7 +9,7 @@
 | 五个MIT public仓库、统一开发 | 完成 | 组织仓库创建、源码推送、submodule、完整设计/计划和合成测试资料 | 持续只公开审阅源码，不公开实际钥匙、账号状态或构建产物 |
 | 注册及独立邮箱验证开关 | 后端及两手机账号路径部分已验 | Android最终C真实注册/邮箱证明/登录未可信；iOS固定9e注册与证明各1/1，固定8a登录/首机/变量CRUD通过 | 真实外部邮件投递、完整账号生命周期和邮箱重置App入口；不混合各产物范围 |
 | 关闭注册时的实例首号 | 后端与实际空实例路径已验 | Node/workerd永久首号CAS；Android/iOS空实例首号、完整新码首机初始化已有实际产品证据 | 保留并发/持久首号门槛；后续重置不得重新开放，真实投递另验 |
-| App连接地址→登录/注册 | 两手机实际基础产品链已验 | Android最终C账号→首机→CRUD→CLI3主链通过；iOS连接/注册/邮箱证明及固定8a登录→首机→变量CRUD分轮通过 | Android旧整轮149.966秒末尾FAIL保留；独立正式退出53.267秒/9认证已通过；iOS过期pending产品状态缺口保留；完整冷启动/切服务继续 |
+| App连接地址→登录/注册 | 两手机实际基础产品链已验 | Android最终C账号→首机→CRUD→CLI3主链通过；iOS连接/注册/邮箱证明及固定8a登录→首机→变量CRUD分轮通过 | Android旧整轮149.966秒末尾FAIL保留；独立正式退出53.267秒/9认证已通过；iOS过期pending产品状态缺口保留；单笔原ID冷启动/取消/续办已实际PASS83.527秒（ecbbc62）；切服务等未验生命周期继续 |
 | UI分层、环境详情与编辑 | C预览与实际CRUD通过，完整体验待验 | 明暗12张合成预览；8a非视觉生命周期修复5/90及analyze；Android变量/环境CRUD和CLI回写显示、iOS变量CRUD实跑 | Android旧轮尾部logout失败保留、独立最小退出已过；PIN Flutter最小输入链已通过，账号逐屏与批准UI另验；键盘/TalkBack/屏宽字号与全生命周期仍待验 |
 | 设备列表、授权详情和前台提示 | 管理组件已验，产品进行中 | Go设备管理、Android42次系统认证管理、server最小pending DTO；Android产品手动批准CLI3主链通过 | 真实请求ID/代际去重、单提示、pending badge、取消/到期/撤销清理、角色/期限管理；不加后台推送 |
 | App锁、系统认证与App PIN | 原生和Flutter最小输入链通过，范围有限 | MainActivity三阶段PASS；Flutter第六轮40.683秒PASS：双录/独立PIN restore、错误PIN零写、正确PIN一次验签写、UI忘记/重建未可信；精确错误分类及16项门控公开1cb8398，[证据](../mobile/docs/PIN_FLUTTER_RUNTIME.md) | 前五FAIL保留；本轮账号初始化是实际原生bootstrap，PIN逐屏账号/完整码向导和CLI批准UI未验；恢复/迁移/V4/V5继续关闭，临时系统失败不降级 |
@@ -18,7 +18,7 @@
 | 环境和变量CRUD | 核心及手机普通路径已验，恢复后管理未完 | Android最终C变量create/edit/delete/recreate与环境create/rename/delete；iOS固定8a变量create/read/update/read/delete，mutation3/3、Pull20 | 手机恢复后高层和P4环境/授权管理、manager-reanchor接线；App kill原意图恢复和iOS额外环境管理另验 |
 | 多环境本机排序、同名覆盖和override | CLI范围已验 | 合并、显式本地override、云删/失权停用与逐key恢复已有测试；Linux实际交互Bash纠正/暂停/签撤销通过 | Mac独立shell接入、Windows真实provider、手机完整产品回归；不自动上传系统env修改 |
 | 勾选导入与在线共享写入 | CLI范围及手机CLI回写路径已验 | 仅选中上传、服务器成功后同pull下发、原ID幂等；Android产品批准CLI3后正式CLI写入并在App显示 | 手机导入交互、三OS最终产品验收；既有进程env不能由外部强改 |
-| 离线、暂停、期限、撤销和退出 | 核心及部分真实平台已验 | Go/CLI期限/回拨/撤销清缓存、暂停授权；公开Unix显式离线退出，根独立三包163/163 race及vet通过；Linux/macOS真实暂停签撤销；iOS正常退出后恢复拒绝；Android独立正式退出/材料清除/正常Activity重启PASS，[证据](../mobile/docs/ANDROID_PRODUCT_LOGOUT_20261003.md) | Android旧整轮尾部失败根因未证；各手机后台/失权/App kill和Windows实证；未收到撤销时离线有固有限制 |
+| 离线、暂停、期限、撤销和退出 | 核心及部分真实平台已验 | Go/CLI期限/回拨/撤销清缓存、暂停授权；公开Unix显式离线退出，根独立三包163/163 race及vet通过；Linux/macOS真实暂停签撤销；iOS正常退出后恢复拒绝；Android独立正式退出/材料清除/正常Activity重启PASS，[证据](../mobile/docs/ANDROID_PRODUCT_LOGOUT_20261003.md) | Android单笔原ID跨kill续办/取消已PASS83.527秒、仅一次POST；4465/4467 FAIL保留；旧整轮尾部失败根因未证，其它后台/失权与Windows实证仍缺；未收到撤销时离线有固有限制 |
 | 手机批准CLI和多管理手机 | Android产品CLI3主链已验，整轮仍FAIL | 34次系统认证轮完成正式CLI3 PAKE/Boot/Pull/RW写→App显示，批准1、mutation5、Pull74；[本轮证据](../mobile/docs/ANDROID_PRODUCT_USERFLOW_20261003.md)公开于b0778e3，原focused RO/RW独立 | 149.966秒整轮在最后logout窗口失败；多管理手机完整产品、Flutter PIN路径和iOS批准未验，不代表三OS无人登录 |
 | 全丢设备恢复→轮换→显式登记手机→CLI | Android原生已验，Flutter未闭环 | 固定原生3/3、94.475秒、30次认证、两次force-stop，cert4手机→正式CLI4/daemon通过；22源码公开 | Flutter受限恢复/完整新码/显式角色期限向导和实际操作；重复恢复DAG高层另列 |
 | 重复恢复与恢复设备继续轮换 | HTTP/Go/正式CLI5联合通过，手机高层未接 | 公开DAG major2/证书5/P4；A→B→C及CLI5 RO/RW主race32.89秒、Go34.356秒，Node/workerd8项独立PASS | B/C是Go API与测试加密存储，不是手机UI；DAG S1 journal/CAS已公开，根独立442项race/vet通过；S2a原ID冷查询及P4环境CRUD实现中，真实平台CAS/ABI、跨操作owner、授权管理和manager-reanchor仍缺 |
