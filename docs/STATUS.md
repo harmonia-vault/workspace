@@ -4,22 +4,33 @@
 
 ## M2 用户流程总览
 
-2026-10-03 当前 workspace submodule 固定 protocol `de21d99`、core `b094a93`（原生账号、恢复、独立PIN包装及同锁来源投影）、mobile `2b11f04`（C界面、默认关闭的PIN产品接线及iOS官方模拟认证补充）、server `bd86fec`（注册策略、空实例测试入口和待批准元数据）。公开核心联合39项有两个精确固定快照，另列真实Android和平台产物范围；新Flutter产品接线及视觉迭代仍在进行，不将组件证据合并冒称完整产品通过。
+2026-10-03 当前 workspace submodule 固定 protocol `de21d99`、core `b094a93`（原生账号、恢复、独立PIN包装及同锁来源投影）、mobile `875ff17`（含认证返回后的Pull修复及iOS隔离HTTPS测试入口）、server `bd86fec`（注册策略、空实例测试入口和待批准元数据）。公开核心联合39项有两个精确固定快照，另列真实Android和平台产物范围；新Flutter产品接线及视觉迭代仍在进行，不将组件证据合并冒称完整产品通过。
 
 | 用户流程 | 完成及实际证据 | 待验 / 阻塞 |
 | --- | --- | --- |
-| 注册、邮箱验证、首机新码完整重输、环境/变量CRUD | 最终C账号段通过；生命周期候选真实完整新码重输、四次认证与最后Flutter Pull通过，设置导航通过 | 候选尚未公开；后续变量创建被接受但页面选择器失败，整轮FAIL，CRUD/CLI未完整验。旧快照PARTIAL原样保留，真实外部邮件投递未跑 |
+| 注册、邮箱验证、首机新码完整重输、环境/变量CRUD | 最终C账号段通过；完整新码重输、四次认证与最后Flutter Pull通过，设置导航通过；Pull修复已公开ac1e872 | 变量创建被接受但表单被认证生命周期销毁，整轮FAIL；非视觉表单生命周期修复和完整CRUD/CLI重验进行中。旧PARTIAL/FAIL保留，真实外部邮件投递未跑 |
 | 手机批准CLI及本机环境同步 | 正式cert3 CLI/daemon、原生PAKE、HPKE/AEAD、RO/RW、selected-only导入、override、暂停和撤销已实际通过；Android cert3 focused19次CryptoObject通过 | Flutter授权入口已接，完整实际用户链未验；不把编译当三OS boot |
 | 恢复后手机入网并批准CLI | Go完整旧码→受限→新码重输/连续两签→明确env/role/expiry cert4登记→Boot/Pull→CLI4 PAKE/原receipt504恢复→CGO0 daemon及RO拒写/RW写删已通过；源码`b28c46a`，新两验收文件公开 | 真实Android恢复3/3、30次强认证及两次force-stop已通过，22文件公开；Flutter向导仍在接线，第二次恢复DAG仅密码学库已验、HTTP与产品未接 |
 | 手机设备权限管理 | Go已有设备RO/RW/Admin/none、全局撤销、原包未知查询及保存失败门槛通过；Android新focused1/1、42次CryptoObject、真实Go peer通过 | 当前已通过管理Android产物是固定core894等公开底座+9冻结候选，不等于最新HEAD；恢复E/F低层控制已公开及真实Go验收通过，高层环境日志已公开并经真实HTTPS候选测试；Android及手机界面接线继续 |
 | Linux后台无登录 | 完整Ubuntu内核真实重启通过：先正常停止并删除设备会话缓存，新boot与两unit InvocationID改变，目标用户未登录时设备Boot/Pull成功；正式CLI共享写入下发、SSH交互Bash内刷新片段的纠正/暂停/真实签撤销/逐key回退通过 | 仅本次固定公开core b094/server bd86与合成VM范围；不等于其它发行版、安装器或三OS整体已验。首轮登录和首版观察器失败保留 |
-| macOS后台无登录 | LaunchDaemon/目标UID/受保护状态/CLI及隔离shell组件通过；独立macOS 27.0 VM已安装并创建合成本地账号，正常桌面与解锁已核 | 自动输入公开字符时Shift被UTM丢弃，校验失败后停止安装；正在准备全小写下载入口、固定CLI与guest内管理控制器。正式LaunchDaemon及无人登录重启未跑 |
-| Windows后台无登录 | 原生配对与平台组件通过；上一轮资源严格清理及独立absence通过；新实际credential-name往返SID和同会话目标校验通过 | 新单次注册仍80020009/SCODE80070005，名字候选未解决。当前失败现场保留并按精确范围处理；正式CLI/SCM/provider/boot未验，不扩大权限或改ACL追求通过 |
+| macOS后台无登录 | 独立macOS VM桌面、真实UID、公开输入和正式CLI/daemon编译通过；固定安装材料12文件已审，BoringSSL SPAKE测试6项通过 | 正在私网传入隔离VM并准备LaunchDaemon；正式服务、整机重启和登录前Boot/Pull尚未验收 |
+| Windows后台无登录 | canonical账号名API往返SID及同会话目标校验通过；失败现场按精确范围清理，独立完整absence通过 | 注册仍80020009/SCODE80070005，名字候选未解决；LoadUserProfile缺失仅为待验证候选原因。正式CLI/SCM/provider/boot未验，不扩权限或改ACL |
 | SMTP / Workers | 隔离SMTP严格TLS实际2/2通过；本地workerd/SQLite DO及相同Argon2id64MiB/t3/p1通过，公开server183/183+type/build通过 | 真实投递、线上CF配额为外部验证待办；未授权线上部署，不为额度弱化参数，也不无限阻挡其余已授权开发 |
 
 最近独立完整公开 snapshot：workspace `2ba0c1a`、core `457858f`、server `b968223`、protocol `b770001`、mobile `d169d74`，原生 race 33/33 通过161.661秒；同一固定源码 Go 全包293项通过、1项默认构建专属反向检查跳过，12个含测试包全部通过。仅提取公开 commit，无 working-tree overlay。该结果已包含连续恢复及正式CLI4新6主项，不包含后续恢复E/F管理、Android恢复或产品UI候选。其后纯公开 workspace `f1d10b1`/core `202a83c`/server `02689b4`/protocol `2edad19`/mobile `d169d74` 的5项新增或受影响用户流程 race 通过69.442秒；无工作树覆盖、0失败/跳过。该固定快照共有37主项，本轮没有将5项定向复验说成完整37项通过。新增高层环境业务在公开9eb77df/core006450d独立target1/1通过13.497秒；随后严格挑战时钟验收公开后，root仅提取五仓公开固定源码完成39/39主项原生race（247.939秒、0FAIL/SKIP）；同一core全包307 PASS、0FAIL、1默认构建专属SKIP；精确范围见下表。M2仍未闭环；CI、Tag/Release、安装包、签名钥生成/上传和真实线上部署均未执行。
 
-## 最新实际进展（2026-10-03 10:31 UTC）
+## 最新实际进展（2026-10-03 10:58 UTC）
+
+- Linux整机重启及真实撤销验收已公开：[结果](evidence/linux-kernel-systemd-result.json)、[复现](evidence/LINUX-KERNEL-REPRODUCTION.md)。同一目标SSH交互Bash中的主动纠正、暂停保留外改、管理签名none撤销、逐key原值恢复、无关key保留均通过；采用正式shell刷新片段，不声称外部强制改变已有进程env。
+- Android系统认证返回后的Pull修复已公开mobile `ac1e872`，定向10项、全85项与analyze通过。固定实际产物的账号、首机完整重输/四次认证/最后Pull、C设置导航通过，变量创建仍因表单被隐私遮罩替换销毁而失败。正在做保留短暂认证期间隐藏表单、真正后台/退出/失权立即销毁的非视觉修复，保留C设计；随后优先重跑完整产品CRUD和CLI闭环，不用新增边界测试代替实际验收。
+- PIN第三次完整尝试在阶段一资格预检即失败：应为NO_SYSTEM_AUTH，实际BLOCKED；三段中的后两段未跑，16项服务端计数全部为0。两次历史前两段通过和CLI peer失败原样保留；此次测试包、包基线、本人模拟器和fixture清理通过。只做既有公开状态字段的有限资格诊断，默认PIN业务能力保持关闭，不把BLOCKED视为通过。
+- iOS独立HTTPS测试入口9文件公开mobile `875ff17`，root逐项核9份源码及12份真实产物/日志摘要。组件1有效/11拒绝/4endpoint检查通过；三个独立Simulator包实际fromBundle门槛通过；真实Flutter标准HTTPS连接到本机空实例通过，Debug Simulator与普通unsigned iPhoneOS Release构建通过。此实际产物基于9e0a00b，账号注册/邮箱证明/登录/首机初始化仍未跑；普通Release无测试资源，未做发布或真机验证。[范围与复现](../mobile/docs/IOS_PRODUCT_FIXTURE.md)。
+- macOS新VM公开输入已通过，真实guest身份、FileVault状态、固定公开core编译和BoringSSL六项测试已核。12个公共安装材料与21MiB临时bundle逐项摘要通过；仅向本人VM的私网短时传输，管理秘密在guest RAM及受保护本地存储中处理。LaunchDaemon安装与正常重启/无人登录实际结果尚待，不把材料准备算服务验收。
+- Windows规范账号名参数的单次真实实验仍返回80070005，因此不能将名字当作根因。该轮独立清理完整通过，包括本次账号、profile/hive、两个SCM服务、任务目录、安装路径、Batch权利和精确安装进程。源码中CreateProcessAsUser前缺显式LoadUserProfile是下一最小生命周期修复候选，尚无因果结论或正式service成功证据。
+
+M2仍未闭环。未配置CI、发布Release/安装包或部署真实线上服务，不宣称生产可用。下列时间段保留历史结果与失败。
+
+## 历史实际进展（2026-10-03 10:31 UTC）
 
 Linux本次完整内核验收的[脱敏结果](evidence/linux-kernel-systemd-result.json)与[复现步骤](evidence/LINUX-KERNEL-REPRODUCTION.md)已保存；root独立核对77项生成脚本和原始结果摘要。
 
