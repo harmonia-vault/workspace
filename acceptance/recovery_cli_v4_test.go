@@ -98,7 +98,7 @@ func buildRecoveryCLI4(t *testing.T, directory string, native bool) string {
 }
 
 // 正式程序登录/本机短码/真实PAKE/原收据重试/daemon全程只使用合成账号和临时目录。
-func actualRecoveryCLIPairAndDaemon(t *testing.T, f *mobileManagerFixture, e *mobileManagerActor, environment, role string, lose bool) {
+func actualRecoveryCLIPairAndDaemon(t *testing.T, f *mobileManagerFixture, e *mobileManagerActor, environment, role string, lose bool, approve ...func(context.Context, string, []byte)) {
 	t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), 45*time.Second)
 	defer cancel()
@@ -182,46 +182,53 @@ func actualRecoveryCLIPairAndDaemon(t *testing.T, f *mobileManagerFixture, e *mo
 		t.Fatal("actual compiled cert4 CLI never created native PAKE")
 	}
 	defer clear(local.code)
-	approver := environmentValue(manager.NewApproverV4(local.id, e.config.SigningKey))
-	defer approver.Close()
-	confirmed := environmentValue(approver.Confirm(ctx, local.code))
-	proof := environmentValue(manager.CurrentIssuerRecoveryEvidence())
-	var own cryptox.SignedGrantWire
-	for _, target := range proof.Targets {
-		if target.EnvironmentID == environment {
-			for _, node := range proof.Authorities {
-				h := environmentValue(cryptox.IssuerAuthorityHash(node.Grant))
-				if h == target.AuthorityHash {
-					own = node.Grant
+	if len(approve) > 1 || len(approve) == 1 && approve[0] == nil {
+		t.Fatal("invalid formal CLI4 approval callback")
+	}
+	if len(approve) == 1 {
+		approve[0](ctx, local.id, local.code)
+	} else {
+		approver := environmentValue(manager.NewApproverV4(local.id, e.config.SigningKey))
+		defer approver.Close()
+		confirmed := environmentValue(approver.Confirm(ctx, local.code))
+		proof := environmentValue(manager.CurrentIssuerRecoveryEvidence())
+		var own cryptox.SignedGrantWire
+		for _, target := range proof.Targets {
+			if target.EnvironmentID == environment {
+				for _, node := range proof.Authorities {
+					h := environmentValue(cryptox.IssuerAuthorityHash(node.Grant))
+					if h == target.AuthorityHash {
+						own = node.Grant
+					}
 				}
 			}
 		}
+		if own.Grant.Role != "admin" {
+			t.Fatal("recovered manager lacks exact selected current Admin")
+		}
+		g := own.Grant
+		packet := environmentValue(cryptox.DecodeBase64(g.Envelope, 80, 80))
+		key := environmentValue(cryptox.UnwrapEnvironmentKey(e.config.ReceivingPrivateKey, cryptox.EnvelopeContext{AccountID: g.AccountID, AccountGeneration: g.AccountGeneration, EnvironmentID: g.EnvironmentID, KeyVersion: g.KeyVersion, RecipientType: "device", RecipientID: g.SubjectDeviceID, RecipientGeneration: g.GrantGeneration, RecipientPublicKey: g.SubjectReceivingPublicKey}, packet))
+		defer clear(key)
+		g.IssuerDeviceID = managerID
+		g.SubjectDeviceID = confirmed.Context.InitiatorDeviceID
+		g.SubjectSigningPublicKey = confirmed.Context.InitiatorSigningPublicKey
+		g.SubjectReceivingPublicKey = confirmed.Context.InitiatorReceivingPublicKey
+		g.GrantGeneration = "1"
+		g.Role = role
+		g.IdempotencyKey = local.id + "-grant"
+		envelope := environmentValue(cryptox.WrapEnvironmentKey(key, cryptox.EnvelopeContext{AccountID: g.AccountID, AccountGeneration: g.AccountGeneration, EnvironmentID: g.EnvironmentID, KeyVersion: g.KeyVersion, RecipientType: "device", RecipientID: g.SubjectDeviceID, RecipientGeneration: g.GrantGeneration, RecipientPublicKey: g.SubjectReceivingPublicKey}))
+		g.Envelope = cryptox.EncodeBase64(envelope)
+		signed := environmentValue(cryptox.SignGrant(g, e.config.SigningKey))
+		approval := environmentValue(approver.PrepareApproval([]cryptox.SignedGrantWire{cryptox.GrantToWire(signed)}))
+		seal, load := recoveryNativeSeal(t, "synthetic-native-cert4-manager-original")
+		originMust(t, seal(environmentValue(json.Marshal(approval))))
+		var original cryptox.EnrollmentApprovalV4
+		data := load()
+		originMust(t, json.Unmarshal(data, &original))
+		clear(data)
+		_ = environmentValue(approver.Submit(ctx, original))
 	}
-	if own.Grant.Role != "admin" {
-		t.Fatal("recovered manager lacks exact selected current Admin")
-	}
-	g := own.Grant
-	packet := environmentValue(cryptox.DecodeBase64(g.Envelope, 80, 80))
-	key := environmentValue(cryptox.UnwrapEnvironmentKey(e.config.ReceivingPrivateKey, cryptox.EnvelopeContext{AccountID: g.AccountID, AccountGeneration: g.AccountGeneration, EnvironmentID: g.EnvironmentID, KeyVersion: g.KeyVersion, RecipientType: "device", RecipientID: g.SubjectDeviceID, RecipientGeneration: g.GrantGeneration, RecipientPublicKey: g.SubjectReceivingPublicKey}, packet))
-	defer clear(key)
-	g.IssuerDeviceID = managerID
-	g.SubjectDeviceID = confirmed.Context.InitiatorDeviceID
-	g.SubjectSigningPublicKey = confirmed.Context.InitiatorSigningPublicKey
-	g.SubjectReceivingPublicKey = confirmed.Context.InitiatorReceivingPublicKey
-	g.GrantGeneration = "1"
-	g.Role = role
-	g.IdempotencyKey = local.id + "-grant"
-	envelope := environmentValue(cryptox.WrapEnvironmentKey(key, cryptox.EnvelopeContext{AccountID: g.AccountID, AccountGeneration: g.AccountGeneration, EnvironmentID: g.EnvironmentID, KeyVersion: g.KeyVersion, RecipientType: "device", RecipientID: g.SubjectDeviceID, RecipientGeneration: g.GrantGeneration, RecipientPublicKey: g.SubjectReceivingPublicKey}))
-	g.Envelope = cryptox.EncodeBase64(envelope)
-	signed := environmentValue(cryptox.SignGrant(g, e.config.SigningKey))
-	approval := environmentValue(approver.PrepareApproval([]cryptox.SignedGrantWire{cryptox.GrantToWire(signed)}))
-	seal, load := recoveryNativeSeal(t, "synthetic-native-cert4-manager-original")
-	originMust(t, seal(environmentValue(json.Marshal(approval))))
-	var original cryptox.EnrollmentApprovalV4
-	data := load()
-	originMust(t, json.Unmarshal(data, &original))
-	clear(data)
-	_ = environmentValue(approver.Submit(ctx, original))
 	<-scanDone
 	pairErr := pair.Wait()
 	if lose && pairErr == nil || !lose && pairErr != nil {
