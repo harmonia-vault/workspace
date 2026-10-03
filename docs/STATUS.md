@@ -4,7 +4,7 @@
 
 ## M2 用户流程总览
 
-2026-10-03 当前 workspace submodule 固定 protocol `de21d99`、core `1544501`（原生账号四意图、恢复、独立PIN包装与Windows原生构建）、mobile `c18598a`（原生账号重启验收、独立PIN存储和固定debug TLS配置）、server `bd86fec`（注册策略、空实例测试入口和待批准元数据）。公开核心联合39项有两个精确固定快照，另列真实Android和平台产物范围；新Flutter产品接线及视觉迭代仍在进行，不将组件证据合并冒称完整产品通过。
+2026-10-03 当前 workspace submodule 固定 protocol `de21d99`、core `b094a93`（原生账号、恢复、独立PIN包装及同锁来源投影）、mobile `a06acaf`（已选C砂岩明暗界面、圆角底导航及受控原生业务接线）、server `bd86fec`（注册策略、空实例测试入口和待批准元数据）。公开核心联合39项有两个精确固定快照，另列真实Android和平台产物范围；新Flutter产品接线及视觉迭代仍在进行，不将组件证据合并冒称完整产品通过。
 
 | 用户流程 | 完成及实际证据 | 待验 / 阻塞 |
 | --- | --- | --- |
@@ -18,6 +18,18 @@
 | SMTP / Workers | 隔离SMTP严格TLS实际2/2通过；本地workerd/SQLite DO及相同Argon2id64MiB/t3/p1通过，公开server183/183+type/build通过 | 真实投递、线上CF配额为外部验证待办；未授权线上部署，不为额度弱化参数，也不无限阻挡其余已授权开发 |
 
 最近独立完整公开 snapshot：workspace `2ba0c1a`、core `457858f`、server `b968223`、protocol `b770001`、mobile `d169d74`，原生 race 33/33 通过161.661秒；同一固定源码 Go 全包293项通过、1项默认构建专属反向检查跳过，12个含测试包全部通过。仅提取公开 commit，无 working-tree overlay。该结果已包含连续恢复及正式CLI4新6主项，不包含后续恢复E/F管理、Android恢复或产品UI候选。其后纯公开 workspace `f1d10b1`/core `202a83c`/server `02689b4`/protocol `2edad19`/mobile `d169d74` 的5项新增或受影响用户流程 race 通过69.442秒；无工作树覆盖、0失败/跳过。该固定快照共有37主项，本轮没有将5项定向复验说成完整37项通过。新增高层环境业务在公开9eb77df/core006450d独立target1/1通过13.497秒；随后严格挑战时钟验收公开后，root仅提取五仓公开固定源码完成39/39主项原生race（247.939秒、0FAIL/SKIP）；同一core全包307 PASS、0FAIL、1默认构建专属SKIP；精确范围见下表。M2仍未闭环；CI、Tag/Release、安装包、签名钥生成/上传和真实线上部署均未执行。
+
+## 07:52 UTC 增量与当前用户路径
+
+- 用户已正式选定C砂岩明暗风格并接受整项圆角底高亮导航。共享Flutter源码与受控原生接线17文件已公开为mobile `a06acaf`；最终分析通过、既有68测试通过，独立debug预览APK实际构建通过10.649秒。HTML明暗导航示例仅为设计图；最终Flutter运行截图和完整业务用户链尚待验。
+- 真实Android产品夹具已完成实际服务地址输入→严格HTTPS实例合同检查→默认注册页。五次测试输入定位失败完整保留，最终通过使用标准SDK输入/焦点操作，未绕过产品按钮门槛。账户阶段随后在系统屏幕锁设置测试夹具选择器处失败，注册/邮箱验证/普通登录尚未跑到，初始化/CRUD/CLI仍未跑；只读屏幕锁状态与清理读回正在核验。不能将组件68项通过当作用户链通过。
+- 独立PIN新实际Go JNI5/5通过（2.286秒，完整23.704秒），真实系统无认证能力分类/正常权限、错误PIN持久计数、并发锁、Keychain替代的AndroidKeystore MAC与AtomicFile/CAS、忘记PIN新钥和早期失败清理均覆盖。两次模拟器路径准备失败保留；实际测试包已卸载，包基线恢复，新测试AVD已停。此8文件切片待公开，Plugin/UI能力仍关闭，正确PIN仅返回未可信，不等于批准CLI。
+- Go同锁来源投影三文件公开为core `b094a93`。root仅从公开底座及冻结三文件独立race通过8主/14子项（19叶场景），9.204秒；owner相关两包133项通过。首机、V3、V4来源重新验签、期限、未知原请求和最后保存门槛保留；新Android来源ABI及冷恢复审批尚未开启。
+- Windows1007精确资源清理及独立absence通过；注册80070005历史保留。新1008进程内COM设置实验失败，只实际确认普通Batch/Users/非Admin/Session0，后续API到达尚无证据。正式CLI/SCM/provider/无人登录开机未通过，不扩系统权限或改ACL。
+- Linux新独立bundle材料经过官方镜像签名和修正ISO填充核验，通过。正常UTM import已创建持久managed VM并保持stopped；多余save脚本命令不受SDEF支持而失败，既有VM配置及状态未变。首次完整kernel boot/SSH/systemd隔离仍未跑。
+- 用户将iOS改为当前并行范围。独立平台owner已启动：Xcode27.0与iOS/Simulator27.0 SDK存在，Simulator runtime/device为空；现iOS仅Flutter注册脚手架，Go/Keychain/LocalAuthentication平台桥尚未实现。官方runtime及独立测试模拟器准备中，不购买开发者计划或发布安装包，不把Simulator等同真机认证验收。
+
+全部源码公开前基础秘密扫描通过，仅源码、脱敏文档及合成测试公开。M2仍未闭环，CI、Release/安装包及真实线上部署未执行；当前不能宣传生产可用。
 
 ## M0 已完成
 
