@@ -75,3 +75,14 @@ Unix 默认软件机器钥是权限保护的可读随机文件，服务在系统
 `core-go/service-templates/boot-test` 保存本次可复核合成输入与流程，`orbstack-boot-result.json` 保存脱敏结果。只创建并重启新的 Ubuntu 24.04 ARM64 来宾，无宿主 home/SSH agent 共享。设备 UID 30001 与 server UID 30002 各有私密目录；本次普通 UID 服务 cap 为 0，0700/0600 和第二 UID 拒绝均通过。共享值来自服务端签名密文经正常 pull/HPKE/AEAD 下发，未用 fixture env 或测试 trust 布尔绕过替代入网。TLS 使用进程显式 CA 文件并保留主机名/链校验。
 
 整个实验没有重启既有 Ubuntu、UTM 或宿主，没有修改全局 LXC 沙盒、电源、代理或系统 CA。两台既有 UTM 仍运行，Windows/macOS 原生执行能力 gate 不变。新测试来宾在清理本次账号/units/keys/SQLite/缓存后正常停机；官方工具链与公开源码保留用于后续隔离验收。服务模板已改为正式 `--local-directory`/`--local-user`，fixture 脚本保持明确隔离路径；模板解析通过不等于原生服务安装或权限完成。
+
+
+## 暂停期间的缓存数据来源与当前授权
+
+普通读取把环境的 `KeyVersion`、`GrantGeneration`、已验读授权 hash 和 canonical fingerprint 一起保存为数据来源；当前授权仍以加密来源账本的精确 target 及 `GrantCheckpoints/GrantFingerprints` 为准。暂停授权刷新只推进 `AuthorizationSequence`、当前授权检查点和账本，不推进普通 `Sequence` 或 `SeenMutations`，不解密或下发新的变量值。
+
+收到纯 KV 轮换时，只有全图验签通过、连续的真实签名 before/after 证明同账号 generation、同设备 Ed25519/X25519 双公钥、精确旧 grant hash → 新 grant hash，才可保留旧的已验值与原数据 KV/GG。保存的路径每段都复验：同 KV 下一授权代际，或 exact origin 绑定的下一 KV/下一代际；缺签来源、跳代际、错误公钥、错误当前 target、循环及篡改指纹均拒绝。角色与期限取原缓存、全部路径和当前授权的最小边界；暂停期间不能据升级或续期扩大本地权限。路径受既有 512 条 authority 上限约束，缺完整证据不能降级成服务器公钥首次信任。
+
+重启在使用缓存前重新验证原始固定根、完整来源图、数据来源 fingerprint、连续路径与精确当前 target；来源与值同一 AEAD 状态事务落盘。没有新来源字段的旧缓存只能在 KV/GG/fingerprint/权限均与受保护旧证据精确一致时首次识别。撤销、失去自身环境 scope、删除和到期立即删除缓存来源与 override，并逐 key 回退剩余环境或恢复原值；暂停不屏蔽这些安全变化。恢复同步仍从零普通拉取，通过当前 HPKE 封套、所有内部签名及已见检查点后，才以当前授权重建新的数据来源。
+
+本轮 `localstate`、`syncclient` race 回归通过，覆盖两次连续轮换与漏收补链、11 类来源/账本篡改、保存失败的原子性、旧缓存严格首次识别及同序号调用方不变。真实 HTTPS/SQLite、空 vault 注册与邮件证明、首次双签初始化、固定 BoringSSL 双向 PAKE、加密 Store 重启的联合回归已通过：暂停纯轮换保留配置，以及后续签名撤销、非最后环境删除、离线截止与服务端真实到期、降权/期限缩短和升级/续期延后到完整恢复。该结果不增加三平台物理无人登录开机或完整安全审计的证据。

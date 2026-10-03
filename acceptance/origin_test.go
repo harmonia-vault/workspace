@@ -646,8 +646,12 @@ func TestNativeSPAKE2EnvironmentOriginsV3PrivacyRotationAndSealedResume(t *testi
 	if bytes.Equal(pausedBefore.IssuerEvidence, pausedAfter.IssuerEvidence) {
 		t.Fatal("paused current origin evidence did not persist")
 	}
-	if pausedAfter.Environments[x].Values["X_PRIVATE_NAME_ORIGIN_TEST"] != "" {
-		t.Fatal("paused new-key authority retained invalid old-key cache")
+	beforeSource, afterSource := pausedBefore.Environments[x], pausedAfter.Environments[x]
+	if afterSource.ID != x || afterSource.Values["X_PRIVATE_NAME_ORIGIN_TEST"] != beforeSource.Values["X_PRIVATE_NAME_ORIGIN_TEST"] || afterSource.KeyVersion != beforeSource.KeyVersion || afterSource.GrantGeneration != beforeSource.GrantGeneration || afterSource.Source == nil || beforeSource.Source == nil || afterSource.Source.AuthorityHash != beforeSource.Source.AuthorityHash || afterSource.Source.Fingerprint != beforeSource.Source.Fingerprint || pausedAfter.GrantCheckpoints[x] <= pausedBefore.GrantCheckpoints[x] || len(afterSource.Source.AuthorizationPath) != 2 {
+		t.Fatal("paused rotation lost its exact verified old data source or failed to advance current authorization")
+	}
+	if f.grant(d, x).Grant.KeyVersion != "2" {
+		t.Fatal("paused current authorization did not advance to new KV")
 	}
 	originMust(t, d.verifier.ValidateStoredIssuerEvidence(pausedAfter))
 	f.restart(d)
