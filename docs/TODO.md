@@ -1,20 +1,20 @@
 # 功能待办总览
 
-更新时间：2026-10-03 04:55 UTC。此页按用户可操作功能分类；组件实现或局部通过不算整个功能完成。详细历史、失败及精确测试源码范围见 [STATUS.md](STATUS.md)。
+更新时间：2026-10-03 05:45 UTC。此页按用户可操作功能分类；组件实现或局部通过不算整个功能完成。详细历史、失败及精确测试源码范围见 [STATUS.md](STATUS.md)。
 
-本轮公开四子库：protocol `de21d9907dd7b73636afeabee4806655aaa0a82e`；core `292e3f761b6a0c6d21793df70fcbbf6b7e977f8f`；mobile `56ac910d4c1778083d94fe2091a84392aa603362`；server `bd86fec6215b6f7149234578e7bf5dc764a639c2`。本文所在workspace提交固定这些gitlink；不对并行未提交工作树作验收。
+本轮公开四子库：protocol `de21d9907dd7b73636afeabee4806655aaa0a82e`；core `32b02936fe24de9e6b7d5da1100c158b7a89b3eb`；mobile `c18598a850b23971ad362cb724c0f903828dbc28`；server `bd86fec6215b6f7149234578e7bf5dc764a639c2`。本文所在workspace提交固定这些gitlink；不对并行未提交工作树作验收。
 
 | 用户功能 | 状态 | 已有证据 | 接下来需要完成 |
 | --- | --- | --- | --- |
 | 五个MIT public仓库、统一开发 | 完成 | 组织仓库创建、源码推送、submodule、完整设计/计划和合成测试资料 | 持续只公开审阅源码，不公开实际钥匙、账号状态或构建产物 |
-| 注册及独立邮箱验证开关 | 后端已验，App进行中 | 注册时固定要求，旧免验证不锁、required pending不绕过，公开server245/245 | Flutter注册/邮件证明/登录真实链与HTTPS测试CA |
+| 注册及独立邮箱验证开关 | 后端已验，App进行中 | 注册时固定要求，旧免验证不锁、required pending不绕过，公开server245/245 | 原生账号3/3和固定debug公共CA配置已公开；新空实例实际Flutter注册/邮件证明/登录链仍未跑 |
 | 关闭注册时的实例首号 | 后端已验，App进行中 | Node/workerd非独占pending与永久首完成CAS、并发/故障/reset与closed→open补完测试通过 | 空实例真实Flutter入口；公开前先注册文档已说明先到先得风险 |
 | App连接地址→登录/注册 | 新需求，进行中 | 新真实instance-info合同已审；普通200不当成功 | 独立连接和注册页、HTTPS/产品/major/caps验证、未初始化默认注册、快速点击/错误/回退及服务切换隔离 |
-| UI分层、环境详情与编辑 | 原界面已验，产品化和接线中 | 32/32、analyze、实际Android安装点击及9张Library截图；列表→详情→独立编辑已实现 | Claude主导tokens/共用视觉组件/普通用户文案与截图QA；真实gateway账号/CRUD/权限/重启原ID接线，演示不算账号验收 |
+| UI分层、环境详情与编辑 | 原界面已验，产品化和接线中 | 32/32、analyze、实际Android安装点击及9张Library截图；列表→详情→独立编辑已实现 | 旧HTML四图未获采纳；Claude按用户完整原话自主A/B/C同页候选，选定前暂停新视觉落地；业务64项通过且实际gateway账号/CRUD/权限接线继续 |
 | 设备列表、授权详情和前台提示 | 新需求，进行中 | Go设备权限及批准机制已测，Android42次强认证管理通过；server最小pending DTO公开255项通过 | 真请求来源、ID/代际去重、单提示、pending badge、取消/到期/撤销清理、最终角色/期限确认；不加后台推送 |
-| App锁、系统认证与App PIN | 独立PIN组件已验，产品未接 | 系统每敏感intent已有实证；公开独立64MiB Argon/AES随机钥封装、durable限流及单用lease 11主4子race通过 | 冷启动/背景遮罩、native provider/PIN setup/升级与CLI审批，只有无系统能力才fallback |
+| App锁、系统认证与App PIN | 独立PIN组件已验，产品未接 | 系统每敏感intent已有实证；公开独立64MiB Argon/AES封装及11主4子race，AndroidKeystore/AtomicFile/CAS/latch独立5/5通过；classifier仍BLOCKED | 冷启动/背景遮罩、native provider/PIN setup/升级与CLI审批，只有无系统能力才fallback |
 | 忘记App PIN | 新需求，设计中 | 用户确认无找回，正常重登录且不得变成可信设备 | 只清本地key/login/unlock/oldtrusted，重新授权或恢复，不删云vault；无绕过测试 |
-| 账号登录与可信设备分离 | 进行中 | Go/Android严格未可信拒绝、受限恢复门槛已测 | Flutter状态机、深链/返回/重启/切服务；独立loginAccount真实helper已测但尚未随产品公开 |
+| 账号登录与可信设备分离 | 进行中 | Go/Android严格未可信拒绝、受限恢复门槛已测 | Flutter状态机、深链/返回/重启/切服务；原生login/restore/pending/retry四意图真实3/3且12文件公开，Flutter实际链仍待验 |
 | 环境和变量CRUD | 核心已验，手机进行中 | Go/CLI真实HTTPS、HPKE/AEAD、原ID故障重试和高层环境通过；Android原生管理通过 | Flutter普通/恢复后高层操作全部接线和App kill原请求恢复 |
 | 多环境本机排序、同名覆盖和override | CLI范围已验 | 合并、显式本地override、云删/失权停用、逐key原值测试通过 | 三OS实际后台及手机完整产品回归；不自动上传系统env修改 |
 | 勾选导入与在线共享写入 | CLI范围已验 | 仅选中上传、只提交服务器、相同pull下发、幂等原ID测试通过 | 手机导入交互、最终产品验收；进程现有env不可外部强改 |
@@ -25,7 +25,7 @@
 | 邮箱证明账号重置 | 后端已验，App待接 | 新邮件证明、破坏性确认、generation、旧设备及会话失效测试通过 | App入口、最新首号标记不重开回归和真实邮件投递 |
 | macOS系统服务无人登录启动 | 受阻 | LaunchDaemon/UID/本地密封状态组件及隔离shell通过 | 当前UTM后端不支持guestexec，无桌面工具；需现有guestSSH合成测试入口或正常桌面执行器。真实boot单列未验 |
 | Linux系统服务无人登录启动 | 部分通过 | OrbStack新测试用户init重启后的boot/pull/IPC/sh/SSH、隔离通过 | LXC共享内核，完整VM kernel启动及systemd sandbox未验 |
-| Windows系统服务与用户环境 | 进行中 | 原生pairing真实Win11主/12子及上游6项通过，默认guard真实通过；Mac CGO0 WindowsCLI AMD/ARM编译通过；COM/installer inspect通过 | 前两次profile失败已exact清理；第三次profile S_OK后batch-add未知正在精确核对，固定长度bug不当权限不足；正式IPC/服务/任务/boot未跑，gate关闭 |
+| Windows系统服务与用户环境 | 进行中 | 原生pairing真实Win11主/12子及上游6项通过，默认guard真实通过；Mac CGO0 WindowsCLI AMD/ARM编译通过；COM/installer inspect通过 | 前三次失败精确清理；第四次profile和Batch实证通过，self-register失败原数值未记录，零任务/twoStopped已复核且exact resolver通过；cleanup及独立资源不存在复核PASS；正式IPC/服务/provider/boot未跑 |
 | Docker自托管 | 本地范围已验 | 最新公开bd86仅archive真实Docker11/11，首号/登录/同卷重启永久标记/后续403、非root/0700/明文拒绝通过，测试资源清理 | 真实TLS代理/手机链未跑；不部署真实服务 |
 | Workers自托管 | 本地范围已验 | D1目录/账号DO同Argon2；新增实例首号registry与legacy迁移真实workerd回归通过 | 最新产品链、线上CPU/内存/配额未测，不能为额度弱化参数 |
 | SMTP和Cloudflare发信 | 部分通过 | 隔离SMTP严格TLS两项通过，不降级、不secret debug | 真实SMTP投递未跑；CF Email Service可选接入尚未开始，不承诺全免费 |
