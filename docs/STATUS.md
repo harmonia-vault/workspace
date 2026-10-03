@@ -8,7 +8,7 @@
 
 | 用户流程 | 完成及实际证据 | 待验 / 阻塞 |
 | --- | --- | --- |
-| 注册、邮箱验证、首机新码完整重输、环境/变量CRUD | 真实Android注册、邮箱证明、退出、普通登录未可信、完整新码重输、首机初始化和Boot/Pull进入可信环境列表均通过 | 该实际链仍使用旧界面；后续导航定位失败，整体PARTIAL，CRUD/CLI未跑。最终C两文件新组合analyze及68项通过，当前公开核心新AAR已构建，完整C链继续；真实外部邮件投递未跑 |
+| 注册、邮箱验证、首机新码完整重输、环境/变量CRUD | 真实Android注册、邮箱证明、退出及普通登录未可信通过；完整新码重输、原生初始化/会话恢复/未决查询完成，Flutter最后一次Pull待验 | 该实际链仍使用旧界面；脚本少回应最后一次Pull的系统认证，整体PARTIAL，完整首页/CRUD/CLI未跑。最终C两文件新组合analyze及68项通过，当前公开核心新AAR已构建，完整C链继续；真实外部邮件投递未跑 |
 | 手机批准CLI及本机环境同步 | 正式cert3 CLI/daemon、原生PAKE、HPKE/AEAD、RO/RW、selected-only导入、override、暂停和撤销已实际通过；Android cert3 focused19次CryptoObject通过 | Flutter授权入口已接，完整实际用户链未验；不把编译当三OS boot |
 | 恢复后手机入网并批准CLI | Go完整旧码→受限→新码重输/连续两签→明确env/role/expiry cert4登记→Boot/Pull→CLI4 PAKE/原receipt504恢复→CGO0 daemon及RO拒写/RW写删已通过；源码`b28c46a`，新两验收文件公开 | 真实Android恢复3/3、30次强认证及两次force-stop已通过，22文件公开；Flutter向导仍在接线，第二次恢复DAG仅密码学库已验、HTTP与产品未接 |
 | 手机设备权限管理 | Go已有设备RO/RW/Admin/none、全局撤销、原包未知查询及保存失败门槛通过；Android新focused1/1、42次CryptoObject、真实Go peer通过 | 当前已通过管理Android产物是固定core894等公开底座+9冻结候选，不等于最新HEAD；恢复E/F低层控制已公开及真实Go验收通过，高层环境日志已公开并经真实HTTPS候选测试；Android及手机界面接线继续 |
@@ -21,7 +21,7 @@
 
 ## 最新实际进展（2026-10-03 09:43 UTC）
 
-- Android真实注册→邮箱证明→退出→普通登录未可信→完整新恢复码重输→首机初始化→Boot/Pull进入可信环境列表通过；共13个不同CryptoObject系统认证窗口，修正了旧窗口尚未消失时的驱动误判。随后设置导航选择器失败，整体准确记为PARTIAL，CRUD和CLI批准未跑。原失败报告保留，不能用前半段PASS覆盖尾部失败；每轮官方清除合成系统PIN及独立SDK noSecure均通过。
+- Android真实注册→邮箱证明→退出→普通登录未可信通过。完整新恢复码重输、原生初始化、restoreSession和businessPendingInfo已完成；旧驱动只回应此段前三次系统认证，环境标题提前显示，但最后Flutter Pull的第四次认证未回应，故初始化整体为PARTIAL，完整首页/CRUD/CLI未跑。累计服务端Boot/Pull成功响应不能归为最后Flutter Pull通过。13个不同CryptoObject窗口、原报告和尾部失败保留；每轮官方清除合成系统PIN及独立SDK noSecure通过。前一文档提交误将此段整体算通过，本项明确更正。
 - 已核实上述实际账号链使用旧界面快照，不是最终C界面。业务lib与当前公开底座逐文件相同，仅两UI文件不同。新独立候选只换入最终公开C两文件，analyze通过3.529秒、既有68项通过4.725秒；完整C用户链另验。当前公开core `b094a93`新AAR构建5.558秒通过，root独立对照公开archive的350源码文件零差异，APK产物和旧证据分开记。
 - PIN产品安全审查修复了服务器可能已接受后的原ID保留、状态故障关闭明文与业务能力、prepare后晚注册owner与dispose竞态，以及忘记PIN必须只清PIN所属材料。v2非视觉候选35项定向测试、确定性JVM交错及完整App编译通过；这是候选与合成故障端口证据，真实PIN完整用户链未跑。一次本机Claude Opus5.5 medium已完成两文件UI；机械清理修正后analyze和既有68项通过。所有PIN产品能力仍默认关闭，候选未公开为已可用。
 - 新独立macOS VM使用本机已有官方恢复镜像安装至100%并启动。已接受本次获授权的Apple许可，语言、地区、新机和隐私步骤通过，合成本地测试账号设置继续中，尚未确认进入正常桌面。旧VM按明确授权停止，磁盘及配置保留；无真实Apple ID或宿主权限变更。
