@@ -21,11 +21,11 @@
 | 离线、暂停、期限、撤销和退出 | 核心及部分真实平台已验 | Go/CLI期限/回拨/撤销清缓存、暂停授权；公开Unix显式离线退出，根独立三包163/163 race及vet通过；Linux/macOS真实暂停签撤销；iOS正常退出后恢复拒绝；Android独立正式退出/材料清除/正常Activity重启PASS，[证据](../mobile/docs/ANDROID_PRODUCT_LOGOUT_20261003.md) | Android旧整轮尾部失败根因未证；各手机后台/失权/App kill和Windows实证；未收到撤销时离线有固有限制 |
 | 手机批准CLI和多管理手机 | Android产品CLI3主链已验，整轮仍FAIL | 34次系统认证轮完成正式CLI3 PAKE/Boot/Pull/RW写→App显示，批准1、mutation5、Pull74；[本轮证据](../mobile/docs/ANDROID_PRODUCT_USERFLOW_20261003.md)公开于b0778e3，原focused RO/RW独立 | 149.966秒整轮在最后logout窗口失败；多管理手机完整产品、Flutter PIN路径和iOS批准未验，不代表三OS无人登录 |
 | 全丢设备恢复→轮换→显式登记手机→CLI | Android原生已验，Flutter未闭环 | 固定原生3/3、94.475秒、30次认证、两次force-stop，cert4手机→正式CLI4/daemon通过；22源码公开 | Flutter受限恢复/完整新码/显式角色期限向导和实际操作；重复恢复DAG高层另列 |
-| 重复恢复与恢复设备继续轮换 | HTTP/Go/正式CLI5联合通过，手机高层未接 | 公开DAG major2/证书5/P4；A→B→C及CLI5 RO/RW主race32.89秒、Go34.356秒，Node/workerd8项独立PASS | B/C是Go API与测试加密存储，不是手机UI；手机DAG高层、P4环境/授权管理、manager-reanchor及新WindowsSCM继续 |
+| 重复恢复与恢复设备继续轮换 | HTTP/Go/正式CLI5联合通过，手机高层未接 | 公开DAG major2/证书5/P4；A→B→C及CLI5 RO/RW主race32.89秒、Go34.356秒，Node/workerd8项独立PASS | B/C是Go API与测试加密存储，不是手机UI；DAG S1 journal/CAS已公开，根独立442项race/vet通过；S2a原ID冷查询及P4环境CRUD实现中，真实平台CAS/ABI、跨操作owner、授权管理和manager-reanchor仍缺 |
 | 邮箱证明账号重置 | 后端已验，App待接 | 新邮件证明、破坏性确认、generation、旧设备及会话失效测试通过 | App入口、最新永久首号不重开回归和真实邮件投递 |
-| macOS系统服务无人登录启动 | 真实内核纵链通过，安装器候选未实跑 | 固定b094/bd86正式配对、LaunchDaemon、清会话后完整重启未登录Boot/Pull、CLI写入、暂停签撤销和清理；独立页面/UID/boot/HTTP支持 | 原console Name字面检查FAIL保留；有限安装器v4候选71项race PASS含PID退出等待；公开POSIX切片根独立48/48 race与vet通过；源权限类负例修前FAIL保留；正式离线退出已公开且根独立163/163 race及vet通过；已停服卸载/中断重试待完成，安装器VM及多用户仍未验 |
-| Linux系统服务无人登录启动 | 完整内核纵链通过，范围有限 | 固定b094/bd86真实配对、清会话后重启、未登录Boot/Pull、CLI写入、SSH Bash刷新片段纠正/暂停/签撤销/逐key回退 | 新版POSIX整目录消失恢复48项独立通过；正式安装器实现中，其它发行版及三OS整体未验；保留旧失败，见docs/evidence |
-| Windows系统服务与用户环境 | Task Scheduler注册仍FAIL，根因未证 | 两SCM服务创建后从未启动，本轮精确清理及独立absence通过；普通Batch/同会话SID、profile加载/释放/权限恢复；80次AccessCheck API完成且自己任务目录create允许 | RegisterTask仍80020009/SCODE80070005；不扩大权限、不把AccessCheck当根因证明；正式provider/CLI/SCM启动/boot未验 |
+| macOS系统服务无人登录启动 | 真实内核纵链通过，安装器候选未实跑 | 固定b094/bd86正式配对、LaunchDaemon、清会话后完整重启未登录Boot/Pull、CLI写入、暂停签撤销和清理；独立页面/UID/boot/HTTP支持 | 原console Name字面检查FAIL保留；有限安装器v4候选71项race PASS含PID退出等待；公开POSIX切片根独立48/48 race与vet通过；源权限类负例修前FAIL保留；正式离线退出已公开且根独立163/163 race及vet通过；共享只读入网检查已公开且根独立218项race/vet通过；已停服卸载/中断重试待完成，安装器VM及多用户仍未验 |
+| Linux系统服务无人登录启动 | 完整内核纵链通过，范围有限 | 固定b094/bd86真实配对、清会话后重启、未登录Boot/Pull、CLI写入、SSH Bash刷新片段纠正/暂停/签撤销/逐key回退 | 新版POSIX整目录消失恢复48项独立通过；正式安装器总协调器实现中；共享只读入网检查已公开；其它发行版及三OS整体未验；保留旧失败，见docs/evidence |
+| Windows系统服务与用户环境 | Task Scheduler注册仍FAIL，根因未证 | 两SCM服务创建后从未启动，本轮精确清理及独立absence通过；普通Batch/同会话SID、profile加载/释放/权限恢复；80次AccessCheck API完成且自己任务目录create允许；合成typed VARIANT调用帧实际9/9通过 | RegisterTask仍80020009/SCODE80070005；不扩大权限、不把AccessCheck当根因证明；正式provider/CLI/SCM启动/boot未验 |
 | Docker自托管 | 本地固定范围已验 | 公开bd86 archive真实Docker11/11，首号/登录/同卷重启永久标记/后续403、非root/0700/明文拒绝与清理 | 新DAG Docker整链、真实TLS代理/手机组合未跑；不部署真实服务 |
 | Workers自托管 | 本地范围已验 | D1目录/账号DO同Argon2；首号registry/legacy迁移workerd回归；DAG新Node/workerd8项独立通过 | 最新完整产品链及线上CPU/内存/配额未测；不能为额度弱化参数 |
 | SMTP和Cloudflare发信 | 隔离SMTP部分通过 | 严格TLS两项通过，不降级、不secret debug | 真实SMTP投递未跑；CF Email Service可选接入未开始，不承诺全免费 |

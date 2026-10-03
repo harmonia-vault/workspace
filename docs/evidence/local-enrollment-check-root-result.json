@@ -1,0 +1,76 @@
+{
+  "schema": "harmonia-local-test-evidence-v1",
+  "recordedAt": "2026-10-03T14:00:00Z",
+  "status": "PASS",
+  "publicCommit": "6d8178ae3116e6eb9dc4c1a9197c885c6a7687b1",
+  "archiveBase": "08dcf018bc0f1969b799703dcf74b08d3caa69aa",
+  "overlayFiles": [
+    {
+      "path": "cmd/harmonia/main.go",
+      "sha256": "125e6b94591d37f91b5f8d355fc28ec98df945f9e48b7e69ed0cb8940cadf6ba",
+      "bytes": 19392,
+      "baseSHA256": "3eb7185a38146e9ff297bbbf7fea99a3cd3c5edc64858ab6c3e8b6f17927dc47"
+    },
+    {
+      "path": "cmd/harmonia/protected_enrollment_check.go",
+      "sha256": "b9367bfc8ed87e50adf0a08b12b606184e613d6e6a8152932aab9a6ba0e72c1b",
+      "bytes": 2263,
+      "baseSHA256": null
+    },
+    {
+      "path": "cmd/harmonia/protected_enrollment_check_test.go",
+      "sha256": "6d581ace7180dc4ff882f6b6a7d4791e4c3924b897eb80fd763100a392173056",
+      "bytes": 15641,
+      "baseSHA256": null
+    },
+    {
+      "path": "mise.toml",
+      "sha256": "c3c2e8fc49c7451349f61ca6bc3889b31009d0b2e9a6ea04c8de02444e3055e7",
+      "bytes": 1110,
+      "baseSHA256": "63e25f2f63c7a8e5d4b9945a1c91777c9776c5719e058642568bb3f72db0cd93"
+    },
+    {
+      "path": "docs/LOCAL-ENROLLMENT-CHECK.md",
+      "sha256": "e36572f86b488c8493d6d59cc2009fd3bc544f0ee1c4f1d4fa5420b52abc433e",
+      "bytes": 2579,
+      "baseSHA256": null
+    },
+    {
+      "path": "docs/LOCAL-ENROLLMENT-CHECK-VALIDATION.md",
+      "sha256": "bc5b37cb68ea6329c96e65fbc16c2ad475c57b272cb5e017bddbdda33a1a6e8c",
+      "bytes": 2467,
+      "baseSHA256": null
+    }
+  ],
+  "goVersion": "go version go1.26.4 darwin/arm64",
+  "commands": [
+    "go test -race ./cmd/harmonia ./localkeys ./platform -count=1 -timeout=180s -json",
+    "go vet ./cmd/harmonia ./localkeys ./platform"
+  ],
+  "results": {
+    "race": {
+      "exitCode": 0,
+      "seconds": 33.722,
+      "stdoutSHA256": "10cd32fca76a8305645d19b7b095684e76235eafba9be56277a0a8056265c0f6",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "tests": {
+        "pass": 218,
+        "fail": 0,
+        "skip": 0
+      }
+    },
+    "vet": {
+      "exitCode": 0,
+      "seconds": 3.614,
+      "stdoutSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+      "stderrSHA256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    }
+  },
+  "limitations": [
+    "Only existing local signed material is verified; current online permission requires Boot",
+    "Synthetic temporary Vaults and public v3/v4/v5 signed vectors only",
+    "Zero provider or HTTP construction; existing locks/keys required",
+    "No Linux native execution, installer or VM acceptance"
+  ],
+  "rawLogsPublished": false
+}
