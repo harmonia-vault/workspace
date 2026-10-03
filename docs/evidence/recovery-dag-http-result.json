@@ -1,0 +1,83 @@
+{
+  "schema": "harmonia/recovery-dag-http-result/v1",
+  "status": "EXPERIMENTAL_SLICE_PASS",
+  "dateUTC": "2026-10-03",
+  "publicBases": {
+    "workspace": "fd8c3cc7f703369178abdc038e1493d820351407",
+    "core-go": "b094a933bf1922347b4a41ea8baaa5699ffbf5c1",
+    "server": "bd86fec6215b6f7149234578e7bf5dc764a639c2",
+    "protocol": "de21d9907dd7b73636afeabee4806655aaa0a82e"
+  },
+  "sourceReviewManifests": {
+    "server-review-2": "673b23172b49726544b8bf616f8b3706e8df774e6da938be77b4920b485f9226",
+    "core-review-1-source": "0df0bf3f6195005b9ed7eaffaceaa1d69d4a34c4ec681f09e800d4dd29d45f57",
+    "core-review-2-journal": "072973725dd264ad62567e73acefd9e41ac05b2d95fcc26860bb7fe77b177b64",
+    "core-review-3-cli": "9fd02fcdca534091f5e006cf5a287445ed4bf982cacdfbbf6aa41f7d7870830b"
+  },
+  "rootIndependentServer": {
+    "typecheck": "PASS",
+    "typecheckSeconds": 1.284,
+    "tests": "PASS",
+    "passed": 8,
+    "failed": 0,
+    "skipped": 0,
+    "seconds": 7.033,
+    "scope": "Node and workerd SQLite, synthetic envelope shapes"
+  },
+  "rootIndependentNative": {
+    "status": "PASS",
+    "race": true,
+    "mainTests": 1,
+    "subcases": 2,
+    "mainSeconds": 32.89,
+    "goSeconds": 34.356,
+    "wallSecondsIncludingBuild": 45.332,
+    "frozenOverlayFiles": 42,
+    "nativeArtifactHashesChecked": 106,
+    "rawLogSHA256": "76dd5c59444aca700fb45fcb8106c43e6efa3ba59c3905ad708fc7a084a18737"
+  },
+  "ownerAffectedPackages": {
+    "syncclientRaceSeconds": 16.614,
+    "localkeysRaceSeconds": 1.724,
+    "cliRaceSeconds": 7.167,
+    "status": "PASS",
+    "vet": "PASS"
+  },
+  "passed": [
+    "A initialization, B recovery, then C recovery",
+    "Complete new code reentry and signed nonce with every current recovery envelope",
+    "Accepted response loss resolves original operation ID and hash without a new write",
+    "New recovery session remains restricted after resolving old receipt",
+    "B and C HPKE countersigned enrollment, Boot, P4 Pull, AEAD and encrypted state restart",
+    "Native SPAKE2 and compiled CLI certificate 5 for RO and RW",
+    "CLI completion response loss recovers encrypted original receipt",
+    "CGO0 daemon Boot, verified Pull, native IPC and isolated shell fragment",
+    "RO shared write rejected; RW write accepted and applied through normal Pull",
+    "Owner close and logout epoch prevent stale journal use"
+  ],
+  "preservedFailures": [
+    {
+      "stage": "initial test compile",
+      "reason": "test referenced nonexistent View field",
+      "fixedIn": "test only"
+    },
+    {
+      "stage": "initial joint runtime",
+      "seconds": 2.02,
+      "reason": "test encrypted store returned version zero for empty state",
+      "fixedIn": "test only, use EmptyState"
+    }
+  ],
+  "unrunOrIncomplete": [
+    "Android and iOS high-level recovery workflow and UI",
+    "P4 environment CRUD and authorization management controls",
+    "manager-reanchor HTTP workflow",
+    "Windows SCM integration for this new recovery flow"
+  ],
+  "limits": [
+    "B and C use Go recovery API with a test adapter over native encrypted Vault; they are not mobile UI runs",
+    "CLI pairing, daemon, protected trust, IPC and provider use compiled production paths",
+    "Temporary CLI binaries were cleaned; no retained binary hash is claimed",
+    "No production readiness, deployment, Release or installer publication"
+  ]
+}
