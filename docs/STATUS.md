@@ -13,7 +13,7 @@
 | 恢复后手机入网并批准CLI | Go完整旧码→受限→新码重输/连续两签→明确env/role/expiry cert4登记→Boot/Pull→CLI4 PAKE/原receipt504恢复→CGO0 daemon及RO拒写/RW写删已通过；源码`b28c46a`，新两验收文件公开 | root固定公开快照33/33已通过；高层V4批准已公开且真实CLI通过；Android Recovery Registry/每op强认证与Flutter接线在进行；第二次恢复DAG明确合同已保存，实现仍未验 |
 | 手机设备权限管理 | Go已有设备RO/RW/Admin/none、全局撤销、原包未知查询及保存失败门槛通过；Android新focused1/1、42次CryptoObject、真实Go peer通过 | 当前已通过管理Android产物是固定core894等公开底座+9冻结候选，不等于最新HEAD；恢复E/F低层控制已公开及真实Go验收通过，高层环境日志已公开并经真实HTTPS候选测试；Android及手机界面接线继续 |
 | Linux后台无登录 | OrbStack独立Ubuntu/UID30001 init重启后正式Boot/Pull/IPC/sh/SSH及隔离通过 | LXC共享kernel；物理虚拟kernel boot和完整systemd sandbox未验，正在只读盘点正常完整VM实验路径 |
-| macOS后台无登录 | LaunchDaemon/目标UID与受保护状态/CLI实现和隔离shell验证已完成；UTM来宾运行中、普通osascript查询通过 | 本次guestexec返回-2700/后端不支持；执行器无CUA且原生Accessibility只读查询false，正常GUI尚未尝试，不是已证实的来宾登录拒绝。无人登录真实boot未跑，未修改宿主服务/env |
+| macOS后台无登录 | LaunchDaemon/目标UID与受保护状态/CLI实现和隔离shell验证已完成；UTM来宾运行中、普通osascript查询通过 | guestexec后端不支持；执行器无CUA且Accessibility false。官方只读配置为Apple/shared网络1项/serial0，queryIP返回0；SSH配置仅按UTM/macOS显式别名检查无匹配、不读密钥/Includes，不能据此宣称SSH关闭。最小缺口为现有来宾SSH地址与合成测试账号入口，或具有桌面工具执行器的正常授权；真实boot单列未验证，未修改设置/宿主env |
 | Windows后台无登录 | SID/DPAPI/SCM/用户env组件已实现，受托profile lease合成9/9及platform19项race通过；amd64交叉编译通过；UTM来宾运行中 | 正式token来源、SYSTEM broker/服务和IPC认证仍在实现。正常UTM guestexec已输出精确合成标记，官方文件往返通过；SYSTEM/Session0、64位build26100、ProfSvc/Schedule运行已只读确认，因此Windows工具阻塞解除。原生profile/ACL/Session0/boot未跑，正式入口关闭 |
 | SMTP / Workers | 隔离SMTP严格TLS实际2/2通过；本地workerd/SQLite DO及相同Argon2id64MiB/t3/p1通过，公开server183/183+type/build通过 | 真实投递、线上CF配额为外部验证待办；未授权线上部署，不为额度弱化参数，也不无限阻挡其余已授权开发 |
 

@@ -56,7 +56,7 @@ bash 使用 `PROMPT_COMMAND`，保留原来的字符串或数组内容；zsh 使
 | systemd 沙盒实际生效 | 未验证 | OrbStack Ubuntu 报告 LXC，全局 `zzz-lxc-service.conf` 覆盖关闭 `NoNewPrivileges/ProtectHome/ProtectSystem` 等；未修改该配置 |
 | 新隔离 Ubuntu 来宾 init 重启后无登录真实授权 | 通过 | 来宾内原生 SPAKE2 上游 6/6、firstroot 双签、新设备入网、签名共享写；删除登录 slot/引导输入及旧服务端 sessions 后，重启仅新机，init/两 unit InvocationID 改变，目标 UID 无登录 session，新 boot challenge/session/pull 200 且无密码登录；正式 IPC、真实 sh 和第二 UID 拒绝通过 |
 | 三平台物理内核开机、磁盘解锁与完整原生权限 | 未跑 | OrbStack 检测为 LXC，namespace boot ID 变化但共享内核 uptime 连续；不能把该 init 重启当物理 kernel boot。Windows hive 生命周期及完整安装器仍有门槛 |
-| UTM Windows/macOS 原生服务 | 阻塞，未跑 | 两台既有 VM 正常启动。Windows 官方 guest-agent 版本查询两次返回 OSStatus -10004，macOS 后端明确不支持 exec；CUA 通道两次 Transport closed，未取得来宾桌面执行能力。没有读取来宾密码/钥匙或改变登录/安全设置；本轮只读状态仍为 started |
+| UTM Windows/macOS 原生服务 | 原生服务未跑，精确缺口见右列 | 两台既有VM仍started。Windows历史guest-agent -10004现已解除：官方exec输出精确合成标记、文件往返、SYSTEM/Session0/build26100只读确认通过；正式SYSTEM broker/S4U token/profile/IPC正在实现，未声称boot通过。macOS Apple后端不支持exec，当前无CUA且Accessibility false；官方只读网络为shared1项、serial0、queryIP0地址。没有读取真实密码/钥匙或更改登录、安全、远程登录设置 |
 
 可复现命令：在 `core-go` 执行平台测试；在 Linux 执行 `sh service-templates/verify-linux.sh service-templates/examples/linux-harmonia-user-10001.service`。服务样例在 `core-go/service-templates/examples`。测试数据与输出没有真实凭据。新增 OrbStack 验收脚本与脱敏 JSON 位于 `core-go/service-templates`；官方 OpenSSH/acl 测试依赖保留，默认 SSH service/socket 都是 inactive，socket 为 disabled。临时测试账号、系统单元、目录、专用 sshd 与合成密钥已清理。
 
@@ -74,7 +74,7 @@ Unix 默认软件机器钥是权限保护的可读随机文件，服务在系统
 
 `core-go/service-templates/boot-test` 保存本次可复核合成输入与流程，`orbstack-boot-result.json` 保存脱敏结果。只创建并重启新的 Ubuntu 24.04 ARM64 来宾，无宿主 home/SSH agent 共享。设备 UID 30001 与 server UID 30002 各有私密目录；本次普通 UID 服务 cap 为 0，0700/0600 和第二 UID 拒绝均通过。共享值来自服务端签名密文经正常 pull/HPKE/AEAD 下发，未用 fixture env 或测试 trust 布尔绕过替代入网。TLS 使用进程显式 CA 文件并保留主机名/链校验。
 
-整个实验没有重启既有 Ubuntu、UTM 或宿主，没有修改全局 LXC 沙盒、电源、代理或系统 CA。两台既有 UTM 仍运行，Windows/macOS 原生执行能力 gate 不变。新测试来宾在清理本次账号/units/keys/SQLite/缓存后正常停机；官方工具链与公开源码保留用于后续隔离验收。服务模板已改为正式 `--local-directory`/`--local-user`，fixture 脚本保持明确隔离路径；模板解析通过不等于原生服务安装或权限完成。
+整个实验没有重启既有 Ubuntu、UTM 或宿主，没有修改全局 LXC 沙盒、电源、代理或系统 CA。两台既有UTM仍运行；历史执行能力缺口后来已在Windows官方API解除，但Windows正式服务门槛仍关闭，macOS真实验收仍缺合法入口。新测试来宾在清理本次账号/units/keys/SQLite/缓存后正常停机；官方工具链与公开源码保留用于后续隔离验收。服务模板已改为正式 `--local-directory`/`--local-user`，fixture 脚本保持明确隔离路径；模板解析通过不等于原生服务安装或权限完成。
 
 
 ## 暂停期间的缓存数据来源与当前授权
@@ -105,3 +105,9 @@ Unix 默认软件机器钥是权限保护的可读随机文件，服务在系统
 新增合成测试验证 stop 与读写并发、失败清理不复活、只释放自身引用、加载/子 key 打开失败、SID 错配和输入/路径拒绝；它们不调用 Windows API。Windows 交叉编译只检查 API 绑定，原生 ACL、profile 文件句柄与 User Profile Service 的兼容性、临时 profile 回退、登录/注销并发、SCM/Session 0 和重启无人登录均未跑。正式 Windows daemon gate 保持关闭。当前可见来宾执行工具仍阻塞；恢复正常 Windows 来宾执行能力后，先在隔离临时账号验证标准用户不能启动该适配器及原生身份/ACL，实际 SYSTEM profile 加载需一个可审查测试组件并通过工具审批。先完成受托 token 的加载/卸载验收，再独立验证无人登录 token 来源；不能把一次交互登录产生的 token 当作无人登录证据。
 
 本轮实际结果：`mise exec -- go test -race ./platform -count=1 -v` 通过，新增 profile 合成测试 9/9，整个平台包 19 项顶层测试通过（1.921s）。`GOOS=windows GOARCH=amd64 CGO_ENABLED=0` 的平台测试交叉编译通过；Windows API 未执行。workspace 源码基础检查和差异空白检查通过。未创建测试服务、broker、账号或 VM，没有原生资源需要清理。
+
+## macOS来宾最小待办
+
+当前没有已验证的来宾执行入口。本机SSH配置只按UTM/macOS等明确别名只读检查，没有匹配项；没有跟随Includes、读取私钥或尝试用户真实认证，因此不能将其说成来宾SSH服务关闭。官方UTM queryIP返回0个地址，也不证明来宾没有地址。
+
+继续原生LaunchDaemon验收需要提供一个正常入口：若已配置SSH，给出该来宾地址及专用合成测试账号/公钥入口；否则由用户自行在来宾或具备桌面工具的执行器正常建立并授权测试入口。不得擅自开启远程登录或辅助功能，不要求发送真实密码。macOS无人登录boot在取得入口后再验证，当前明确单列未验证，不无限阻挡Android、Windows及其他已授权开发。
