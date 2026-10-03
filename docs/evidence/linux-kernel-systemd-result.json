@@ -1,0 +1,153 @@
+{
+  "schema": 1,
+  "date": "2026-10-03",
+  "status": "通过（实验性平台验收）",
+  "scope": {
+    "os": "Ubuntu 24.04.5 ARM64",
+    "kernel": "6.8.0-142-generic aarch64",
+    "pid1": "systemd",
+    "runtime": "独立完整内核虚拟机",
+    "userData": "仅本次生成的合成账号、凭据和变量",
+    "realCLIEnrollment": "BoringSSL SPAKE2、证书版本3、双向确认与签名接受回执"
+  },
+  "publicSources": [
+    {
+      "repository": "workspace",
+      "commit": "fdd8ea135b1022a9456513d164ec721d798c9ac2",
+      "archiveSHA256": "24f03e64c8a12562f7f2cf2e90877a65013fc8da646d16e02a865bfc08e9d3fd"
+    },
+    {
+      "repository": "core-go",
+      "commit": "b094a933bf1922347b4a41ea8baaa5699ffbf5c1",
+      "archiveSHA256": "d7188cd42c968c0efb86298d7a196b8dab23c26deb9c99c1dee721bb8e7d9556"
+    },
+    {
+      "repository": "server",
+      "commit": "bd86fec6215b6f7149234578e7bf5dc764a639c2",
+      "archiveSHA256": "3dc20c31370b653b10132db0d4f076b65721b74720216b9d1f1ac05683694ba8"
+    }
+  ],
+  "toolchain": {
+    "go": "1.26.4",
+    "node": "24.16.0",
+    "pnpm": "11.5.2",
+    "boringSSLCommit": "fab96f87245d7c6b941515201843665122650b88",
+    "boringSSLPrefix": "HARMONIA_BSSL",
+    "securityParametersChanged": false
+  },
+  "artifactSHA256": {
+    "harmonia-native": "e484f1feef6c758cf987e472dd88df52ba7d37e4a18c4be752a18f2f2d6f120b",
+    "harmonia-daemon": "f1c2df5ab1f71c8b27b46091bc3a9f99636e980ac186daa69b67fd92446331bf",
+    "kernel-lab-v2": "ff7a815c56e683fb2bf90767a25d07e2c18f628c2dcb123d0e71a3769a41c8cc"
+  },
+  "checks": [
+    {
+      "name": "官方SPAKE2测试与Go原生配对测试",
+      "status": "通过"
+    },
+    {
+      "name": "真实注册、首次初始化及正式CLI本机生成钥匙后PAKE入网",
+      "status": "通过",
+      "sequence": 4
+    },
+    {
+      "name": "重启前正常停止服务、独占钥匙库释放、仅删除旧会话缓存",
+      "status": "通过"
+    },
+    {
+      "name": "完整内核正常重启，启动ID变化",
+      "status": "通过"
+    },
+    {
+      "name": "目标用户未登录、未运行本次CLI时systemd后台持钥授权",
+      "status": "通过",
+      "bootChallengeHTTP200": 1,
+      "bootSessionHTTP200": 1,
+      "pullHTTP200AtObservation": 96,
+      "targetUserLoginSessionsAtObservation": 0
+    },
+    {
+      "name": "重启后当前用户CLI经OS认证IPC激活、在线写入、同一验证拉取下发",
+      "status": "通过",
+      "sequence": 6
+    },
+    {
+      "name": "真实SSH交互Bash外部改值纠正及暂停保留改值",
+      "status": "通过"
+    },
+    {
+      "name": "暂停仍处理管理设备签名撤销，同一shell逐key恢复原值、无关变量不动",
+      "status": "通过",
+      "sequence": 7
+    },
+    {
+      "name": "CLI和SSH关闭后后台服务仍为同一运行进程",
+      "status": "通过"
+    },
+    {
+      "name": "受保护目录与文件权限、撤销值不再进入shell片段",
+      "status": "通过"
+    }
+  ],
+  "retainedFailures": [
+    {
+      "name": "首次合成CLI登录",
+      "status": "失败并保留",
+      "cause": "本次测试的公有父目录为0711，受保护存储按O_RDONLY打开祖先需要读取权限；仅公有父目录改0755，末级0700保持不变。原合成账号保留，以独立新合成账号重试通过。"
+    },
+    {
+      "name": "重启后首次观测脚本",
+      "status": "失败并保留",
+      "cause": "观测脚本错误要求RAM会话重新写盘；公开daemon仅在内存保存续期会话。修正观测项后通过，未修改产品。"
+    }
+  ],
+  "notRun": [
+    "本次完整重启链路未运行zsh或Windows/macOS/iOS验收",
+    "本次没有测试加密系统磁盘解锁、已运行GUI进程或任意业务服务环境注入",
+    "本次不作为生产可用或完整安全审计结论"
+  ],
+  "boundaries": [
+    "服务端仅回环HTTPS和持久SQLite；不部署公网",
+    "系统服务软件钥匙由用户隔离权限和本地AEAD保护，不能声称始终硬件内",
+    "未迁移已有设备钥匙、未读取真实用户凭据、未修改宿主环境",
+    "旧VM不属于本次测试变更范围；新测试资源保留供复核"
+  ],
+  "rawEvidenceSHA256": [
+    {
+      "check": "原生构建",
+      "sha256": "943d53d85cc716b869b31422c58e090c6c304c1179ff963b1e9d37b85feccc57"
+    },
+    {
+      "check": "真实PAKE入网",
+      "sha256": "e733d6b12530f7bab77f2568bdfa84e60cd51fa2da0ec9dca59843fc61f1368d"
+    },
+    {
+      "check": "无人登录自动授权",
+      "sha256": "808c90f0e2564db5873594cbae97e33360292eda50f4f5073092f67d320fae0f"
+    },
+    {
+      "check": "重启后在线写",
+      "sha256": "a12cf754e89b3503b77599e10fac2cfe3f3a5ca4972bfe797522e82e223c2553"
+    },
+    {
+      "check": "真实SSH暂停撤销",
+      "sha256": "b97c0993426269db57bb488c87a26a79910b8a2af1b5dd3d03064574a6291cee"
+    },
+    {
+      "check": "签名撤销",
+      "sha256": "e8987873edfd6d83af8e17f90390e62f7140b9d765f52eff4f6d22b5cbe118fd"
+    },
+    {
+      "check": "最终只读核对",
+      "sha256": "49c7fad5ecd048eab126c16e74330de8db89e8c20431bac63c6dc7aa1558a800"
+    },
+    {
+      "check": "首次登录失败",
+      "sha256": "bae44c172131a3ff90daa80566ba5b17471074c19b600bb246eaf98a22f352bd"
+    },
+    {
+      "check": "首次观测失败",
+      "sha256": "a609e5a488f9f5ec9dc0f3309482d0e613dca7d5f2cf1d40af23fa014e79aa5b"
+    }
+  ]
+}

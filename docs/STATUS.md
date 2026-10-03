@@ -8,7 +8,7 @@
 
 | 用户流程 | 完成及实际证据 | 待验 / 阻塞 |
 | --- | --- | --- |
-| 注册、邮箱验证、首机新码完整重输、环境/变量CRUD | 真实Android注册、邮箱证明、退出及普通登录未可信通过；完整新码重输、原生初始化/会话恢复/未决查询完成，Flutter最后一次Pull待验 | 该实际链仍使用旧界面；脚本少回应最后一次Pull的系统认证，整体PARTIAL，完整首页/CRUD/CLI未跑。最终C两文件新组合analyze及68项通过，当前公开核心新AAR已构建，完整C链继续；真实外部邮件投递未跑 |
+| 注册、邮箱验证、首机新码完整重输、环境/变量CRUD | 最终C账号段通过；生命周期候选真实完整新码重输、四次认证与最后Flutter Pull通过，设置导航通过 | 候选尚未公开；后续变量创建被接受但页面选择器失败，整轮FAIL，CRUD/CLI未完整验。旧快照PARTIAL原样保留，真实外部邮件投递未跑 |
 | 手机批准CLI及本机环境同步 | 正式cert3 CLI/daemon、原生PAKE、HPKE/AEAD、RO/RW、selected-only导入、override、暂停和撤销已实际通过；Android cert3 focused19次CryptoObject通过 | Flutter授权入口已接，完整实际用户链未验；不把编译当三OS boot |
 | 恢复后手机入网并批准CLI | Go完整旧码→受限→新码重输/连续两签→明确env/role/expiry cert4登记→Boot/Pull→CLI4 PAKE/原receipt504恢复→CGO0 daemon及RO拒写/RW写删已通过；源码`b28c46a`，新两验收文件公开 | 真实Android恢复3/3、30次强认证及两次force-stop已通过，22文件公开；Flutter向导仍在接线，第二次恢复DAG仅密码学库已验、HTTP与产品未接 |
 | 手机设备权限管理 | Go已有设备RO/RW/Admin/none、全局撤销、原包未知查询及保存失败门槛通过；Android新focused1/1、42次CryptoObject、真实Go peer通过 | 当前已通过管理Android产物是固定core894等公开底座+9冻结候选，不等于最新HEAD；恢复E/F低层控制已公开及真实Go验收通过，高层环境日志已公开并经真实HTTPS候选测试；Android及手机界面接线继续 |
@@ -20,6 +20,8 @@
 最近独立完整公开 snapshot：workspace `2ba0c1a`、core `457858f`、server `b968223`、protocol `b770001`、mobile `d169d74`，原生 race 33/33 通过161.661秒；同一固定源码 Go 全包293项通过、1项默认构建专属反向检查跳过，12个含测试包全部通过。仅提取公开 commit，无 working-tree overlay。该结果已包含连续恢复及正式CLI4新6主项，不包含后续恢复E/F管理、Android恢复或产品UI候选。其后纯公开 workspace `f1d10b1`/core `202a83c`/server `02689b4`/protocol `2edad19`/mobile `d169d74` 的5项新增或受影响用户流程 race 通过69.442秒；无工作树覆盖、0失败/跳过。该固定快照共有37主项，本轮没有将5项定向复验说成完整37项通过。新增高层环境业务在公开9eb77df/core006450d独立target1/1通过13.497秒；随后严格挑战时钟验收公开后，root仅提取五仓公开固定源码完成39/39主项原生race（247.939秒、0FAIL/SKIP）；同一core全包307 PASS、0FAIL、1默认构建专属SKIP；精确范围见下表。M2仍未闭环；CI、Tag/Release、安装包、签名钥生成/上传和真实线上部署均未执行。
 
 ## 最新实际进展（2026-10-03 10:31 UTC）
+
+Linux本次完整内核验收的[脱敏结果](evidence/linux-kernel-systemd-result.json)与[复现步骤](evidence/LINUX-KERNEL-REPRODUCTION.md)已保存；root独立核对77项生成脚本和原始结果摘要。
 
 - Linux完整内核纵链通过：真实CLI cert3配对后，正常停止设备unit并只删除会话缓存，正常整机重启。新boot ID、两unit InvocationID和实际独立进程UID已核；目标用户登录session为0且本次未运行其CLI时，已有设备挑战/会话与Pull 200。新会话仅在内存；首版观察器误要求落盘而失败，修正只读观察后通过，生产源码未改。随后正式CLI共享put经相同Pull下发通过，真实目标SSH交互Bash中纠正、暂停保留外改、管理端签none撤销、逐key原值恢复与无关key保留通过1.206秒。首轮CLI失败来自公开父目录以O_RDONLY打开时权限不足；仅本次公开父目录改0755、私有末目录仍0700，旧失败与第一合成账号保留。
 - Android最终C与公开b094 AAR的新实际链再次通过账号段。系统认证返回可能早于Flutter resumed，导致最后Pull被隐私状态阻止；纯业务候选同时在Pull前后有界等待真正foreground，暂停/退出/销毁/超时均关闭访问。旧代码定向失败已复现，修复10项与全85项测试、analyze通过；新实际完整重输、四次真实CryptoObject及最后Flutter Pull通过，随后C设置导航通过，创建变量阶段选择器失败，整体FAIL；mutation接受计数1不能代替Flutter显示验收，CRUD/CLI仍未完整验证。候选尚未公开，不把累计Boot/Pull计数当作旧失败已通过。
