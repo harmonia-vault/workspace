@@ -295,6 +295,15 @@ func TestNativeMobileDeviceGrantManagementSealedRetryAndOtherRevocation(t *testi
 	}
 	// 其他设备全局撤销：丢接受响应后密封重启，只查同ID exacthash，旧会话与boot均失效。
 	environmentValue(w.PrepareOtherDeviceRevocation(ctx, "management-global", b.keys.DeviceID, env))
+	// 尚未POST就原生Close/New；fresh boot只用于刷新当前权，提交仍持原短期token/sessionHash。
+	prepared := load()
+	w.Close()
+	cfg.ProtectedState = prepared
+	w = environmentValue(mobileworkflow.New(cfg))
+	clear(prepared)
+	if revokePosts.Load() != 0 {
+		t.Fatal("prepared native restart submitted revocation")
+	}
 	loseRevoke.Store(true)
 	if r, e := w.RetryManagement(ctx, "management-global"); !errors.Is(e, mobileworkflow.ErrManagementPending) || !r.AcceptanceUnknown {
 		t.Fatal("lost global revoke did not retain original pending", e)
