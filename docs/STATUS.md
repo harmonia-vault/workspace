@@ -1,12 +1,12 @@
 # 当前实现状态与验证
 
-更新时间：2026-10-03 20:18 UTC。M2 尚未闭环，项目仍是实验性安全软件。组件通过、实际产品步骤通过、整轮测试结果分别记录，不合并宣称完整产品或生产安全验收。全部用户功能及下一步见 [TODO.md](TODO.md)，完成条件见 [PLAN.md](PLAN.md)。
+更新时间：2026-10-03 20:40 UTC。M2 尚未闭环，项目仍是实验性安全软件。组件通过、实际产品步骤通过、整轮测试结果分别记录，不合并宣称完整产品或生产安全验收。全部用户功能及下一步见 [TODO.md](TODO.md)，完成条件见 [PLAN.md](PLAN.md)。
 
 此前 STATUS（最近更新为 11:32 UTC）已[按原字节完整归档](history/STATUS-20261003-1132.md)，SHA-256 为 `2ab49f34deed0026d54a8efcf65a23442208eeb61207aaa665309d0591012079`。归档中的“当前”、路径与未跑结论只对应当时上下文；原始失败和精确历史快照没有删除。
 
 ## 当前范围
 
-本次整理依据已公开 protocol `038f2db`、core-go `952f853`、server `36ab16f`、mobile `9f49125`。运行结论仍分别绑定下列证据中的实际源码与产物，不能追认为这些最新提交的完整重跑。并行候选仅在明确标为候选的项目中列出，不算已公开能力。
+本次整理依据已公开 protocol `038f2db`、core-go `e3541d1`、server `36ab16f`、mobile `09d3ce4`。运行结论仍分别绑定下列证据中的实际源码与产物，不能追认为这些最新提交的完整重跑。并行候选仅在明确标为候选的项目中列出，不算已公开能力。
 
 | 用户流程 / 平台 | 已实际验证 | 仍缺什么 / 结果限制 |
 | --- | --- | --- |
@@ -49,6 +49,8 @@ iOS全writer候选已有六组Simulator组件及实际Go Check×2/普通Save×1�
 [未可信恢复账号范围根复验](evidence/dag-account-scope-root-result.json)：新增高层CAS入口供原生桥在跨认证前保存精确账号/代际；根一个主项、三个子项race PASS（4.231秒），vet PASS。拒绝换号/换代和旧业务pending，不保存登录或恢复秘密；尚不代表手机SDK业务接线通过。
 
 [B3b恢复设备激活根复验](evidence/mobile-dag-b3b-root-result.json)：原登记→完整来源重验→正式Boot/P4 Pull→最后CAS；695项race PASS（172主项，212.614秒）、vet PASS、真实HTTPS/SQLite/HPKE主项PASS（44.940秒）。CAS失败/回执丢失、离线到期、当前撤销及另一实例退出后的迟到结果均有限验证；保留原journal和黏性CAS要求，不开放手机DAG能力。
+
+[Android DAG B 原生分派根复验](evidence/android-native-dag-b-root-result.json)：封闭B1/B2/S2a命令、每次SDK认证入口及清理闭锁源码已公开。最新核心上mobilebridge 51项race、内部registry 14项race和两包vet通过；原首命令因误加不存在的包整体FAIL保留。重新构建AAR通过6.859秒，Kotlin/API36通过5.154秒，host17项通过。真实SDK/JNI/跨认证业务尚未跑，Flutter与能力开关继续关闭。
 
 ## 最新验证如何使用
 
