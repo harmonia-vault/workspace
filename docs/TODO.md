@@ -1,8 +1,8 @@
 # 功能待办总览
 
-更新时间：2026-10-03 07:52 UTC。此页按用户可操作功能分类；组件实现或局部通过不算整个功能完成。详细历史、失败及精确测试源码范围见 [STATUS.md](STATUS.md)。
+更新时间：2026-10-03 08:26 UTC。此页按用户可操作功能分类；组件实现或局部通过不算整个功能完成。详细历史、失败及精确测试源码范围见 [STATUS.md](STATUS.md)。
 
-本轮公开四子库：protocol `de21d9907dd7b73636afeabee4806655aaa0a82e`；core `b094a933bf1922347b4a41ea8baaa5699ffbf5c1`；mobile `a06acaf9944e71523e5116404111993483be93d7`；server `bd86fec6215b6f7149234578e7bf5dc764a639c2`。本文所在workspace提交固定这些gitlink；不对并行未提交工作树作验收。
+本轮公开四子库：protocol `de21d9907dd7b73636afeabee4806655aaa0a82e`；core `b094a933bf1922347b4a41ea8baaa5699ffbf5c1`；mobile `dd487ebccf1c45ddfee507edb1c0506113731563`；server `bd86fec6215b6f7149234578e7bf5dc764a639c2`。本文所在workspace提交固定这些gitlink；不对并行未提交工作树作验收。
 
 | 用户功能 | 状态 | 已有证据 | 接下来需要完成 |
 | --- | --- | --- | --- |
@@ -10,10 +10,10 @@
 | 注册及独立邮箱验证开关 | 后端已验，App进行中 | 注册时固定要求，旧免验证不锁、required pending不绕过，公开server245/245 | 原生账号3/3和固定debug公共CA配置已公开；新空实例实际Flutter注册/邮件证明/登录链仍未跑 |
 | 关闭注册时的实例首号 | 后端已验，App进行中 | Node/workerd非独占pending与永久首完成CAS、并发/故障/reset与closed→open补完测试通过 | 真实Android连接/默认注册入口已通过；系统屏幕锁夹具修复后继续注册/验证链；公开前先注册文档已说明先到先得风险 |
 | App连接地址→登录/注册 | 新需求，进行中 | 新真实instance-info合同已审；普通200不当成功 | 独立连接和注册页、HTTPS/产品/major/caps验证、未初始化默认注册、快速点击/错误/回退及服务切换隔离 |
-| UI分层、环境详情与编辑 | 原界面已验，产品化和接线中 | 32/32、analyze、实际Android安装点击及9张Library截图；列表→详情→独立编辑已实现 | 用户已接受C砂岩和圆角底导航，17文件已公开；最终分析/既有68tests/debugAPK通过，实际Flutter截图待跑；真实连接→默认注册页通过，账户阶段夹具设置失败，完整用户链仍待验 |
+| UI分层、环境详情与编辑 | C界面已验，真实业务链进行中 | 最终analyze/68测试/debugAPK通过；真实Flutter明暗12张合成截图通过并保存Library，逐图核验与预览清理通过 | 真实连接→默认注册页通过；注册/CRUD/CLI完整用户链及键盘/TalkBack/其他屏宽字号仍待验 |
 | 设备列表、授权详情和前台提示 | 新需求，进行中 | Go设备权限及批准机制已测，Android42次强认证管理通过；server最小pending DTO公开255项通过 | 真请求来源、ID/代际去重、单提示、pending badge、取消/到期/撤销清理、最终角色/期限确认；不加后台推送 |
-| App锁、系统认证与App PIN | 独立PIN组件已验，产品未接 | 系统每敏感intent已有实证；公开独立64MiB Argon/AES封装及11主4子race，AndroidKeystore/AtomicFile/CAS/latch独立5/5通过；原无额外权限classifier为BLOCKED，不能当PIN资格；新Go wrapper6主3子race已公开通过 | 新独立AAR实际JNI5/5通过、清理及真实NO_SYSTEM_AUTH分类通过，8文件待公开；Plugin/UI接线和PIN CLI审批未跑；旧正常AAR未替换 |
-| 忘记App PIN | 新需求，设计中 | 用户确认无找回，正常重登录且不得变成可信设备 | 只清本地key/login/unlock/oldtrusted，重新授权或恢复，不删云vault；无绕过测试 |
+| App锁、系统认证与App PIN | 独立PIN组件已验，产品接线中 | Go wrapper6主3子race；Android真实JNI5/5与NO_SYSTEM_AUTH分类通过；8文件已公开。当前公开Flutter底座加候选AAR整包编译35秒通过 | Plugin/严格六方法合同及非视觉Dart适配进行中；PIN产品入口关闭，完整PIN批准CLI未跑；既有普通AAR未替换 |
+| 忘记App PIN | 组件已验，产品入口待接 | JNI实际忘记旧slot、重新创建新设备钥匙及早期失败清理通过 | 产品入口要只清本地，重新登录仍未可信、另需授权或恢复；不删除云vault |
 | 账号登录与可信设备分离 | 进行中 | Go/Android严格未可信拒绝、受限恢复门槛已测 | Flutter状态机、深链/返回/重启/切服务；原生login/restore/pending/retry四意图真实3/3且12文件公开，Flutter实际链仍待验 |
 | 环境和变量CRUD | 核心已验，手机进行中 | Go/CLI真实HTTPS、HPKE/AEAD、原ID故障重试和高层环境通过；Android原生管理通过 | Flutter普通/恢复后高层操作全部接线和App kill原请求恢复 |
 | 多环境本机排序、同名覆盖和override | CLI范围已验 | 合并、显式本地override、云删/失权停用、逐key原值测试通过 | 三OS实际后台及手机完整产品回归；不自动上传系统env修改 |
@@ -24,14 +24,14 @@
 | 重复恢复与恢复设备继续轮换 | 进行中 | 新DAG库、固定向量、Go62主242子与TS230全项通过，真实合成HPKE/AEAD解密 | 新HTTP/major2/原子history、Go/CLI及Android第二次恢复；不以库通过冒称产品闭环 |
 | 邮箱证明账号重置 | 后端已验，App待接 | 新邮件证明、破坏性确认、generation、旧设备及会话失效测试通过 | App入口、最新首号标记不重开回归和真实邮件投递 |
 | macOS系统服务无人登录启动 | 受阻 | LaunchDaemon/UID/本地密封状态组件及隔离shell通过 | 当前UTM后端不支持guestexec，无桌面工具；需现有guestSSH合成测试入口或正常桌面执行器。真实boot单列未验 |
-| Linux系统服务无人登录启动 | 部分通过 | OrbStack新测试用户init重启后的boot/pull/IPC/sh/SSH、隔离通过 | LXC共享内核；新官方独立bundle已正常import并stopped，clipboard/目录/USB共享均关闭且4文件核验通过；完整kernel启动、SSH及systemd sandbox未跑 |
-| Windows系统服务与用户环境 | 进行中 | 原生pairing真实Win11主/12子及上游6项通过，默认guard真实通过；Mac CGO0 WindowsCLI AMD/ARM编译通过；COM/installer inspect通过 | XML旧FAIL/修复validate-only PASS，前一轮strict resolver/readback/cleanup/absence通过；1007注册FAIL80070005和精确清理/absence通过；1008仅普通Batch上下文实际确认，COM实验提前FAIL仍Pending，窄API句柄诊断中；不扩ACL/升权/换SYSTEM，正式服务/provider/CLI/boot未验 |
+| Linux系统服务无人登录启动 | 部分通过 | OrbStack隔离用户init重启后的Boot/Pull/IPC/sh/SSH已过；新独立VM真实Ubuntu内核6.8及systemd启动已观察 | 新VM cloud-init未完成、网络等待失败、SSH未验；正在修正seed介质呈现，完整kernel中的Harmonia服务及systemd sandbox未跑 |
+| Windows系统服务与用户环境 | 进行中 | 原生配对及跨架构编译已过。修正安装后文件名的只读探针证实本次两服务Stopped、空任务目录、安装进程0且无查询失败；严格解除未知结果及真实manifest读回通过 | 新COM实验失败，仅目标Batch上下文有实证，错误阶段/码未知；本次精确cleanup已返回PASS，独立资源absence正在核验。旧进程探针不能证明安装进程不存在。正式服务/provider/CLI/boot未验，不扩ACL或系统策略 |
 | Docker自托管 | 本地范围已验 | 最新公开bd86仅archive真实Docker11/11，首号/登录/同卷重启永久标记/后续403、非root/0700/明文拒绝通过，测试资源清理 | 真实TLS代理/手机链未跑；不部署真实服务 |
 | Workers自托管 | 本地范围已验 | D1目录/账号DO同Argon2；新增实例首号registry与legacy迁移真实workerd回归通过 | 最新产品链、线上CPU/内存/配额未测，不能为额度弱化参数 |
 | SMTP和Cloudflare发信 | 部分通过 | 隔离SMTP严格TLS两项通过，不降级、不secret debug | 真实SMTP投递未跑；CF Email Service可选接入尚未开始，不承诺全免费 |
 | 自动检查、安装更新和回滚 | 未开始实现 | 已保存更新信任/版本/渠道/限流/签名/回滚设计 | M2后按授权实现和测试，不生成或读取真实签名私钥 |
 | CI/CD | 未开始实现 | 用户已授权M2后开展，计划已保存 | 先可审实现与真实检查；Tag/Release/安装包发布/真实线上部署仍未授权 |
-| iOS | 已纳当前并行，进行中 | project/scheme可解析；Xcode27.0及两SDK存在；runtime/device为空；平台owner已启动 | 官方runtime/新独立Simulator、Go XCFramework与Swift Keychain/LA、app lock/PIN/同业务合同、实际build/run/journey；不声称模拟器等同真机认证 |
+| iOS | 当前并行，构建通过、运行验证中 | 官方iOS27运行时下载完成；Go/BoringSSL双slice及完整Simulator arm64、不签名iPhoneOS arm64构建通过 | 新独立模拟器安全harness首轮超时，测试host Scene修正中；Swift Keychain/LA及原子存储已审，PIN关闭并修复关闭错误/失败清理。真实认证、产品链及真机仍未验 |
 
 最新独立完整五仓快照为workspace8b84/core504/mobile56ac/server909/protocolde21：原生race39/39通过（251.752秒、0FAIL/SKIP），root同server909独立245/245及typecheck/build通过。它包含公开恢复组件及注册服务兼容性，不包含后续PIN、Windows、pending route或Flutter真实链；前一次全core307 PASS/1默认构建专属SKIP仍是旧精确源码结果。当前gitlinks更晚，不追认整个最新树已验；新组件证据分别列于STATUS。此结果不是完整安全审计或生产可用声明。
 

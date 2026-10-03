@@ -4,20 +4,32 @@
 
 ## M2 用户流程总览
 
-2026-10-03 当前 workspace submodule 固定 protocol `de21d99`、core `b094a93`（原生账号、恢复、独立PIN包装及同锁来源投影）、mobile `a06acaf`（已选C砂岩明暗界面、圆角底导航及受控原生业务接线）、server `bd86fec`（注册策略、空实例测试入口和待批准元数据）。公开核心联合39项有两个精确固定快照，另列真实Android和平台产物范围；新Flutter产品接线及视觉迭代仍在进行，不将组件证据合并冒称完整产品通过。
+2026-10-03 当前 workspace submodule 固定 protocol `de21d99`、core `b094a93`（原生账号、恢复、独立PIN包装及同锁来源投影）、mobile `dd487eb`（C砂岩界面、实际明暗预览证据及独立原生PIN适配）、server `bd86fec`（注册策略、空实例测试入口和待批准元数据）。公开核心联合39项有两个精确固定快照，另列真实Android和平台产物范围；新Flutter产品接线及视觉迭代仍在进行，不将组件证据合并冒称完整产品通过。
 
 | 用户流程 | 完成及实际证据 | 待验 / 阻塞 |
 | --- | --- | --- |
-| 注册、邮箱验证、首机新码完整重输、环境/变量CRUD | 合成邮箱捕获→真实HTTPS/SQLite→Go验证与密封保存已通过 | Flutter真实产品界面尚未接；真实外部邮件投递未跑 |
-| 手机批准CLI及本机环境同步 | 正式cert3 CLI/daemon、原生PAKE、HPKE/AEAD、RO/RW、selected-only导入、override、暂停和撤销已实际通过；Android cert3 focused19次CryptoObject通过 | Flutter用户操作入口尚未接；不把编译当三OS boot |
+| 注册、邮箱验证、首机新码完整重输、环境/变量CRUD | 合成邮箱捕获→真实HTTPS/SQLite→Go验证与密封保存已通过 | Flutter入口已接，连接到默认注册页已通过；系统认证测试前置仍受阻，完整注册/初始化/CRUD未验；真实外部邮件投递未跑 |
+| 手机批准CLI及本机环境同步 | 正式cert3 CLI/daemon、原生PAKE、HPKE/AEAD、RO/RW、selected-only导入、override、暂停和撤销已实际通过；Android cert3 focused19次CryptoObject通过 | Flutter授权入口已接，完整实际用户链未验；不把编译当三OS boot |
 | 恢复后手机入网并批准CLI | Go完整旧码→受限→新码重输/连续两签→明确env/role/expiry cert4登记→Boot/Pull→CLI4 PAKE/原receipt504恢复→CGO0 daemon及RO拒写/RW写删已通过；源码`b28c46a`，新两验收文件公开 | 真实Android恢复3/3、30次强认证及两次force-stop已通过，22文件公开；Flutter向导仍在接线，第二次恢复DAG仅密码学库已验、HTTP与产品未接 |
 | 手机设备权限管理 | Go已有设备RO/RW/Admin/none、全局撤销、原包未知查询及保存失败门槛通过；Android新focused1/1、42次CryptoObject、真实Go peer通过 | 当前已通过管理Android产物是固定core894等公开底座+9冻结候选，不等于最新HEAD；恢复E/F低层控制已公开及真实Go验收通过，高层环境日志已公开并经真实HTTPS候选测试；Android及手机界面接线继续 |
-| Linux后台无登录 | OrbStack独立Ubuntu/UID30001 init重启后正式Boot/Pull/IPC/sh/SSH及隔离通过 | LXC共享kernel；新独立官方Ubuntu完整kernel VM已创建且保持stopped，尚未启动。默认剪贴板须在首次启动前关闭并确认加载配置；不改宿主或既有VM，完整systemd sandbox仍未验 |
+| Linux后台无登录 | OrbStack独立Ubuntu/UID30001 init重启后正式Boot/Pull/IPC/sh/SSH及隔离通过 | LXC共享kernel；新独立Ubuntu VM已关闭共享并真实启动内核/systemd，但seed/cloud-init配置未完成、网络等待失败、SSH未验；完整systemd sandbox仍未验 |
 | macOS后台无登录 | LaunchDaemon/目标UID与受保护状态/CLI实现和隔离shell验证已完成；UTM来宾运行中、普通osascript查询通过 | guestexec后端不支持；执行器无CUA且Accessibility false。官方只读配置为Apple/shared网络1项/serial0，queryIP返回0；SSH配置仅按UTM/macOS显式别名检查无匹配、不读密钥/Includes，不能据此宣称SSH关闭。最小缺口为现有来宾SSH地址与合成测试账号入口，或具有桌面工具执行器的正常授权；真实boot单列未验证，未修改设置/宿主env |
 | Windows后台无登录 | SID/DPAPI/SCM/用户env组件、原生配对11主/12子及默认关闭guard已通过；官方UTM exec及SYSTEM/Session0可用 | XML去掉encoding后validate-only旧FAIL/新PASS，旧资源exact cleanup与独立absence通过。最新fresh单次真实RegisterTask仍FAIL，SCODE80070005；profile/Batch创建通过，但目标目录已有本账号权限，根因尚未证实。两服务Stopped、无任务/子进程，保持Pending并只读定位；正式CLI/SCM/provider/boot未验 |
 | SMTP / Workers | 隔离SMTP严格TLS实际2/2通过；本地workerd/SQLite DO及相同Argon2id64MiB/t3/p1通过，公开server183/183+type/build通过 | 真实投递、线上CF配额为外部验证待办；未授权线上部署，不为额度弱化参数，也不无限阻挡其余已授权开发 |
 
 最近独立完整公开 snapshot：workspace `2ba0c1a`、core `457858f`、server `b968223`、protocol `b770001`、mobile `d169d74`，原生 race 33/33 通过161.661秒；同一固定源码 Go 全包293项通过、1项默认构建专属反向检查跳过，12个含测试包全部通过。仅提取公开 commit，无 working-tree overlay。该结果已包含连续恢复及正式CLI4新6主项，不包含后续恢复E/F管理、Android恢复或产品UI候选。其后纯公开 workspace `f1d10b1`/core `202a83c`/server `02689b4`/protocol `2edad19`/mobile `d169d74` 的5项新增或受影响用户流程 race 通过69.442秒；无工作树覆盖、0失败/跳过。该固定快照共有37主项，本轮没有将5项定向复验说成完整37项通过。新增高层环境业务在公开9eb77df/core006450d独立target1/1通过13.497秒；随后严格挑战时钟验收公开后，root仅提取五仓公开固定源码完成39/39主项原生race（247.939秒、0FAIL/SKIP）；同一core全包307 PASS、0FAIL、1默认构建专属SKIP；精确范围见下表。M2仍未闭环；CI、Tag/Release、安装包、签名钥生成/上传和真实线上部署均未执行。
+
+## 本轮实际进展（2026-10-03 08:26 UTC）
+
+- mobile `dd487eb`公开9个精确文件：8个已审PIN适配/测试/脱敏证据，加C界面实际验收文档。root逐文件摘要与公开源码扫描通过；没有公开AAR/APK、密钥或本机日志。
+- 实际Flutter C浅色/深色共12张原始截图通过，涵盖连接、环境列表、Admin/RO详情、设备和设置。第一轮脚本焦点检测失败保留，第二轮仅修检测后通过；临时包卸载、171包名基线、主题恢复、本人模拟器退出均通过。截图只含纯内存合成数据，已保存Library。
+- PIN原JNI5/5保持原源码范围；另从公开mobile `a06acaf`加同8文件及候选AAR进行完整App编译，35秒通过，134源文件摘要未变化。三个私有构建准备失败保留。插件、Kotlin PIN类及Go LocalPINCore实际进入DEX/JNI产物；此构建未安装，PIN产品入口仍关闭。
+- Android真实账号链仍受系统锁屏测试驱动阻塞。多轮尝试均未发账户写请求，退出时实际SDK确认未残留系统锁屏。按要求停止反复猜选择器，先完成无需强认证的合法段，并比对既有成功认证脚本；不修改产品认证规则。截图诊断曾被自动审批拒绝，已使用不读取敏感输入的公开页面标识替代。
+- Windows修正旧探针的安装文件名遗漏，重新实际确认本次installed进程0、无查询失败、两服务Stopped、任务目录空。严格处理未知结果及实际manifest只三字段变化读回通过；同源精确cleanup返回PASS，独立资源absence尚在核验。历史数值未知与前轮ACCESS_DENIED保留，不将旧错误筛选的process0当作完整证明。
+- Linux新VM真实Ubuntu24.04.5、Linux6.8 aarch64及systemd多用户目标启动已观察；180秒串口捕获未等到cloud-init/host指纹，网络等待失败。因此没有SSH、格式化或Harmonia安装。正在核对seed呈现，不能将kernel已启动说成无人登录服务通过。
+- iOS官方运行时下载完成，Go/BoringSSL的设备与模拟器slice和完整两个架构App构建通过；未签名、未使用开发者账号。新模拟器安全harness首轮超时，已定位测试host缺Scene生命周期；修正后再验。Swift平台源码审阅发现PIN关闭错误与早期失败清理需要修正，能力仍关闭。
+
+M2仍未闭环。下一步优先可实际操作的最小用户流程，受阻认证段明确列出最小环境操作；其他平台继续。未配置CI、发布Release或安装包、部署真实线上服务，不宣称生产可用。下方带时间的段落保留当时状态，以上为最新增量。
 
 ## 07:52 UTC 增量与当前用户路径
 
