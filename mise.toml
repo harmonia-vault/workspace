@@ -22,3 +22,7 @@ run = "go test -tags harmonia_boringssl -v ./acceptance"
 [tasks.test-mobile-dag-query-https]
 description = "三个隔离原事务场景的手机 DAG 冷查询 HTTPS/SQLite 验收，不运行 SDK 或配对"
 run = "go test -race ./acceptance -run '^TestMobileDAGOriginalQueryHTTPS$' -count=1 -timeout=150s -json"
+
+[tasks.test-mobile-dag-owner-https]
+description = "一个隔离 B1 owner 跨两个 Workflow 的真实 HTTPS 只读场景"
+run = "go test -race ./acceptance -run '^TestMobileDAGOwnerTwoWorkflowHTTPS$' -count=1 -timeout=90s -json"

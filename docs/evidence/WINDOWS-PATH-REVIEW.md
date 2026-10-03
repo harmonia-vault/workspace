@@ -26,13 +26,13 @@ Task Scheduler 是当前取得无人登录时目标用户令牌的实现选择�
 
 普通用户为自身注册 S4U 在官方文档中是允许的，因此当前失败不能证明 Windows 一概禁止该方案。[Task Scheduler 安全上下文](https://learn.microsoft.com/en-us/windows/win32/taskschd/security-contexts-for-running-tasks)
 
-## 收敛后的唯一对照与当前阻塞
+## 计划对照与当前阻塞（该实验停止）
 
 已选定的对照保持同进程、线程、held folder、身份、XML、参数及 COM 配置，只将最终 Go Invoke 改为编译器生成的 C++ 强类型 `ITaskFolder::RegisterTask`。计划静态 CGO 链接以避免增加 DLL 安装流程，使用已固定 LLVM-mingw 头文件，明确其第三方来源；新候选尚未编译或执行。
 
 成功只说明两条调用路径存在差异，之后仍须验证实际 S4U Run、broker、用户环境与正式 CLI。若强类型调用同样拒绝，则停止 VARIANT 探针，重新审查安装和授权约束；不扩大 ACL、添加 SeTcb、保存用户系统密码或以管理员注册掩盖现有问题。QI/构建失败只算对照未完成。
 
-准备期间，Windows 专项子代理被平台自动内容安全检查中止。这是执行器阻塞，不是新的 Windows 权限证据，也不是一次工具审批拒绝；未另开执行路径。其余本机组件继续实现。
+准备期间，Windows 专项子代理被平台自动内容安全检查中止。这是执行器阻塞，不是新的 Windows 权限证据，也不是一次工具审批拒绝；未另开执行路径。该令牌/计划任务对照保持停止，不能改写提示或改用代理/工具绕行。Windows整体继续：与此实验实质独立的CLI、存储和环境恢复测试另列验收；SYSTEM运行不能记为普通用户DPAPI或CLI通过。其余平台继续实现。
 
 ## 清理结果
 
