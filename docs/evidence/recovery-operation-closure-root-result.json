@@ -1,0 +1,295 @@
+{
+  "schema": "harmonia/recovery-operation-closure-root-validation/v1",
+  "status": "PASS-server-protocol-scope-only",
+  "publicBases": {
+    "workspace": {
+      "commit": "a2992fc47d31cff44bfb5fc61d48be944bdf60aa",
+      "archiveSHA256": "56f2b82775249093e392db817f650a96f23c66f7b13637d35e1f5e44e1c77e9e"
+    },
+    "core-go": {
+      "commit": "acf369c192deac6d29e0254e6009c9693a0c8e31",
+      "archiveSHA256": "f4ed61a6e53519ef6b2632e73d50bd7a6cf53c40b8e46043359fa277f4094850"
+    },
+    "server": {
+      "commit": "2f15b94ce5023357320b415e5f3a4aebb29c2856",
+      "archiveSHA256": "91cf36d8442ab0dac9c467182f13a4d09fa722bf74901acfce41d3348e1ae3e3"
+    },
+    "protocol": {
+      "commit": "1c0b24180e7fabfcd9109dbabb2afbf6195f22d8",
+      "archiveSHA256": "47d02f4cb6523bbad3685389b8402b9a73c609bca009a8d5503ff24799ceaa41"
+    }
+  },
+  "publishedSources": {
+    "protocol": "038f2db696647eceb4b0a5716784f976a55a2646",
+    "server": "36ab16fbaadacd766548e201c05acd5e80ccb89b"
+  },
+  "candidateManifestSHA256": "ab44b31859fe11fbbf6ecf0cddeb72802d3489a7b869a60bd3f28b35ae48ba85",
+  "sources": [
+    {
+      "path": "server/docs/RECOVERY-OPERATION-CLOSURE-IMPLEMENTATION.md",
+      "baseSHA256": null,
+      "sha256": "29e277ae3be96a2b6db8c1832e90eb693fd3fcb2eef55ea4cdd6710e75e08ef0",
+      "bytes": 7938
+    },
+    {
+      "path": "server/docs/RECOVERY-OPERATION-CLOSURE-VALIDATION.md",
+      "baseSHA256": null,
+      "sha256": "0a83662319a7762dc56073fbfcc395bb96a973265c1d8dc45bdae60e305d5f36",
+      "bytes": 8531
+    },
+    {
+      "path": "server/src/http-recovery-operation-resolution.ts",
+      "baseSHA256": null,
+      "sha256": "151926d448f9ef81edfc7d0592a3d3c6f9915206ed6ef595fa300273d324c1b1",
+      "bytes": 2088
+    },
+    {
+      "path": "server/src/http.ts",
+      "baseSHA256": "86f33dad2c36ff75f56750df92093768479df0f89e55e72657913a30f6519fde",
+      "sha256": "7a732f6710bc13af6efbfa32cd488ad771b747091c4915ae993a2b0011227533",
+      "bytes": 11197
+    },
+    {
+      "path": "server/src/lifecycle.ts",
+      "baseSHA256": "113bdc842cad7fc91f2445cf38fe3004a8a6b77575775031c6f9bcad873539cf",
+      "sha256": "73be38b87b7e529fb06e2c5a16bb38440dcce422adae5a6a147316c7f81a57fd",
+      "bytes": 16500
+    },
+    {
+      "path": "server/src/model.ts",
+      "baseSHA256": "a5cdc09a25e28432970a1b4a6d4b2d1b4fb87365a8da05c81cffde3dde32fab8",
+      "sha256": "033a5294fe7611f0d5c976493809e0a9520e2e3d74c4b2740a15c05ab70c5de5",
+      "bytes": 3885
+    },
+    {
+      "path": "server/src/node-runtime.ts",
+      "baseSHA256": "c2ba1642e8250cbdac0231845bf6c7f988f8a67d4f3c25ea5f51e0f385c2df44",
+      "sha256": "9727099ebcad7836c75e7feb32f7324730993128652e832db16d6e03c6f1079a",
+      "bytes": 5026
+    },
+    {
+      "path": "server/src/protocol-info.ts",
+      "baseSHA256": "e2a7146e1669de726b6ea6dae1d02f8fbe6031df1c0f425ba08650ed5da6ede4",
+      "sha256": "bf967bacc9ad87d1891c215fb84341ccb6cdccb0b75428a8bbb516c6b16ca5a0",
+      "bytes": 2518
+    },
+    {
+      "path": "server/src/recovery-authority.ts",
+      "baseSHA256": "4cb6745300e5b144b8729d69c526cf36332eb8ad2db54ca875ad16c8ff55d79e",
+      "sha256": "64aa8c00b2271bfa675f674dee17975f63ce44fdd4511dcab91c687b514f817a",
+      "bytes": 25411
+    },
+    {
+      "path": "server/src/recovery-dag-service.ts",
+      "baseSHA256": "19e1fe3b97eaa78e92c427fca7c9c0af06c448073bc6c7ca37fb8339eda74402",
+      "sha256": "4db2b5814f58267e4bda775353b6d52a8cdd235ec5aa74050f039eff8fdcfd16",
+      "bytes": 21070
+    },
+    {
+      "path": "server/src/recovery-operation-guards.ts",
+      "baseSHA256": null,
+      "sha256": "648b7312ba67bff86a285f960f4c8892b7f36b42db80dec88ac551c332edaebd",
+      "bytes": 6387
+    },
+    {
+      "path": "server/src/recovery-operation-resolution-wire.ts",
+      "baseSHA256": null,
+      "sha256": "dea6030881e738f898413b7e17b36c72f584b5ef9285e08b1dc6d29196ca7721",
+      "bytes": 9104
+    },
+    {
+      "path": "server/src/recovery-operation-resolution.ts",
+      "baseSHA256": null,
+      "sha256": "332533fe738f72d6bd7f53dc306ad8768de93e3adaac13d42b66935e012dec9e",
+      "bytes": 7872
+    },
+    {
+      "path": "server/src/store.ts",
+      "baseSHA256": "f7a525ce8cf4ead7aea59fa88dbec4d560fabfb77b171d24f25fb0abda25dd31",
+      "sha256": "012d546b0002d309e9021e5d7c11744d42e900ab89a4c474c3655b4fb6ce72d0",
+      "bytes": 3829
+    },
+    {
+      "path": "server/src/worker.ts",
+      "baseSHA256": "463847a5be6d9b9f901565e5b985b2bb2c61e4d0fbe725bb35a456e319112ff3",
+      "sha256": "b8cc6f3aa5738261b86539583d4da4837f5a066f27766914325f5d47e3681158",
+      "bytes": 16826
+    },
+    {
+      "path": "server/test/protocol-info.test.ts",
+      "baseSHA256": "f8bac35d1e72aa42ff17bb86d4a9ddf1b28536a6e563008d6d7aa92330eadace",
+      "sha256": "f5a92708d651a193c7d015ce9d741d72774e49ab5df92decfec9461fe6c16779",
+      "bytes": 1830
+    },
+    {
+      "path": "server/test/recovery-operation-fixtures.ts",
+      "baseSHA256": null,
+      "sha256": "fcc620896f165dee29347d96d34ed9c8a828cb990fb0fe60b0559552d00e23ba",
+      "bytes": 13534
+    },
+    {
+      "path": "server/test/recovery-operation-resolution.test.ts",
+      "baseSHA256": null,
+      "sha256": "b1b4596b7d8d1fd103063cfa00a912275c8bb614cd08617440a1e6d2b14805e4",
+      "bytes": 19116
+    },
+    {
+      "path": "server/test/recovery-operation-worker-harness.ts",
+      "baseSHA256": null,
+      "sha256": "38f55071720f0db14affca653f4ec4d4b681d83739a773a7698996b9163df08b",
+      "bytes": 2279
+    },
+    {
+      "path": "protocol/docs/RECOVERY-OPERATION-CLOSURE.md",
+      "baseSHA256": null,
+      "sha256": "5b6bfa5c511493458471e19d08f88d30c481400d15f7de2caaab5131b3d17f2d",
+      "bytes": 11192
+    },
+    {
+      "path": "protocol/tests/recovery-operation-resolution.test.ts",
+      "baseSHA256": null,
+      "sha256": "c5a4b980d2dd8996a2c7c142eab139d7107189063aba76c87bf96221e9765b8f",
+      "bytes": 4859
+    },
+    {
+      "path": "protocol/vectors/recovery-operation-resolution-v1.json",
+      "baseSHA256": null,
+      "sha256": "92986cfc5e4747fbf5a0a5fbc9d71a2aa142d4cbd4b1083ad50853e2ab83d05e",
+      "bytes": 17862
+    },
+    {
+      "path": "server/test/recovery-operation-legacy-gap.test.ts",
+      "baseSHA256": null,
+      "sha256": "f75ab68470d8df1c39e334753c52037284409b71b48a282f2017dd1248365c2f",
+      "bytes": 4231
+    }
+  ],
+  "rootResults": [
+    {
+      "name": "typecheck",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 1.333,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "build",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 0.812,
+      "stdout": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "server-51-v2",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 24.134,
+      "tests": {
+        "tests": 51,
+        "pass": 51,
+        "fail": 0,
+        "skipped": 0
+      },
+      "stdout": {
+        "bytes": 14196,
+        "sha256": "79b0d054b36901ca19ad1fbfb110175bd8c006d2c700dfdf09f90fe8a8271f4a"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "protocol-vectors",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 0.138,
+      "tests": {
+        "tests": 4,
+        "pass": 4,
+        "fail": 0,
+        "skipped": 0
+      },
+      "stdout": {
+        "bytes": 1093,
+        "sha256": "94ec29d2ede4fca936d82e5944e42e19f6d7e8a88b7727d4d73f4c20cc43d4ae"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    },
+    {
+      "name": "b3a-https",
+      "status": "PASS",
+      "exitCode": 0,
+      "seconds": 34.523,
+      "tests": {
+        "pass": 4,
+        "fail": 0,
+        "skip": 0
+      },
+      "stdout": {
+        "bytes": 8021,
+        "sha256": "ffb4e9eea00a463b7d4a4c76996438d96e408287cbaa51c8f77dd28bdd7c39a9"
+      },
+      "stderr": {
+        "bytes": 0,
+        "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+      }
+    }
+  ],
+  "independentReview": {
+    "initialTests": {
+      "pass": 0,
+      "fail": 2,
+      "seconds": 1.574
+    },
+    "initialResultSHA256": "f181f93bdeb5e29abe31e18d97f338a644f24f2a31ab604d057e8670b1b928ac",
+    "finding": "同ID已关闭后，不同ID合法旧轮换造成DAG断链，fresh当前恢复会话查询原关闭收据被错误拒绝。",
+    "resolution": "先验证当前恢复会话、账号代际、恢复代际、签名和精确原目标，再读取不可变关闭收据；新增关闭和pending/accepted路径仍验证当前DAG。",
+    "v2Tests": {
+      "pass": 4,
+      "fail": 0,
+      "seconds": 2.412
+    },
+    "v2ResultSHA256": "630454f0b94df67b7cb348a01433d2c67933f670f4d77888a83d8de2b450c97d",
+    "blockingFinding": false
+  },
+  "retainedFailures": [
+    "独立首轮Node/workerd两个失败原样保留，修后原场景及附加拒绝用例分别通过。",
+    "新增测试初次对已删除旧会话预期403，而实际401；仅修正测试期待，保留失败。",
+    "根首轮51项输出全部通过，但结果汇总器按TAP解析Node默认spec输出而失败，未保存进程exit receipt；保留日志，显式TAP再跑并先保存exit receipt。"
+  ],
+  "firstRootServerOutput": {
+    "bytes": 6288,
+    "sha256": "7424d77c2d22d200a528c4bc89785ff34950582a2d63f21ecc1970e90e7944d6",
+    "reportedPass": 51,
+    "reportedFail": 0,
+    "processExitReceipt": "not-recorded",
+    "countedInFinalPassTotal": false
+  },
+  "limits": [
+    "只发布服务端与协议；手机关闭操作的journal/CAS、typed bridge和UI尚未接入。",
+    "已有B3a三个HTTPS场景在新server回归通过，仍不代表B3b授信或手机DAG端到端通过。",
+    "Node SQLite与workerd Durable Object为本地真实运行时测试；未部署Cloudflare或生产Docker。",
+    "关闭收据与未接受预留共享永久256项预算，兼容旧记录的转换受界限约束；不驱逐收据。",
+    "含关闭状态的新数据不能回滚到旧写者，混合版本写者不受支持。"
+  ],
+  "mobileCapabilityEnabled": false,
+  "notProductionReady": true
+}
