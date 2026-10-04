@@ -1,0 +1,33 @@
+{
+  "version": 1,
+  "scope": "P2 pending pairing hints and explicit Flutter management; P3 guarded native account reset",
+  "coreCommit": "33f0fa29b20930d942ef38c272729d2744b549ad",
+  "mobileCommit": "b625727f3dfd80110bfd8859ee8f5858efc6a044",
+  "capabilities": "CLOSED",
+  "productAcceptance": "INCOMPLETE",
+  "results": {
+    "P2GoRace": "PASS: client 2 and native 2 main tests",
+    "P2RealHTTPS": "PASS: current manager lists actual pending request; invalidation rejects late hints; signed downgrade blocks subsequent list",
+    "P2Flutter": "PASS: 43 tests including 16 new; isolated offline restoration regression PASS; analyzer clean",
+    "P3GoRace": "PASS: 31 main/sub events; vet PASS",
+    "P3AndroidBuild": "PASS: ARM64 AAR and API36 Kotlin compile",
+    "P3KotlinHost": "PASS: 22 cases including 5 cancellation/drain cases",
+    "combinedGoIntegration": {
+      "status": "PASS",
+      "seconds": 2.718,
+      "packages": [
+        "accountreset",
+        "mobilebridge",
+        "syncclient"
+      ],
+      "initialFailure": "FAIL: sandbox denied local test listener; preserved; same selection rerun with authorized loopback access"
+    },
+    "actualSDKAndProductUI": "UNRUN for these new paths"
+  },
+  "limits": [
+    "Pending entries are hints, never approval authority. Every list uses current Boot/Pull and permission checks.",
+    "Reset cold startup supports proof query only. Original prepared password/request retry remains RAM-bound.",
+    "Native cleanup and protected-slot checks precede reset submit or completion delivery.",
+    "No real email, production deployment, CI/CD, release, or distributable installer."
+  ]
+}

@@ -6,6 +6,14 @@
 
 此前 STATUS（最近更新为 11:32 UTC）已[按原字节完整归档](history/STATUS-20261003-1132.md)，SHA-256 为 `2ab49f34deed0026d54a8efcf65a23442208eeb61207aaa665309d0591012079`。归档中的“当前”、路径与未跑结论只对应当时上下文；原始失败和精确历史快照没有删除。
 
+## 2026-10-04 01:26 UTC 补充
+
+P2/P3 必要源码已更新至 core-go `33f0fa2`、mobile `b625727`，详见[P1–P3 接线进度](P1-P3-NATIVE-PROGRESS.md)与[精确结果](evidence/p2-p3-source-result.json)。下方历史表格仍绑定各自旧源码，不代表新快照全套通过。
+
+Linux 正式 exec 安装、真实配对、Start/Boot/Pull 和同安装无人登录重启已实际通过；整轮 26.089 秒仍 FAIL 于最终正式离线卸载。只读检查确认账号槽已清除、journal 停在 service-drained，服务 inactive/dead；最终托管项恢复及测试账号清理尚未完成。Android 非空 SDK 首轮 FAIL，后续宿主严格 TLS 实证定位合成证书缺少 AKI；仅测试证书生成窄修后原严格 TLS 与完整服务清理 PASS，尚未重测非空 SDK。
+
+用户已明确同意 Windows 当前条款，恢复观察时已在普通合成用户桌面；身份核验通过。三个普通用户存储测试仍未跑，当前专用 stage 准备 guest exit1 正在定位。此前 token/TaskScheduler 专项仍停止。恢复向导已由本机 Claude Opus 5.5 medium 单次生成，集成候选 analyze 与 131 项既有 Dart 回归通过；尚未公开此 UI 候选，也未完成实际手机恢复验收。
+
 ## 当前范围
 
 本次整理依据已公开 protocol `038f2db`、core-go `78d7dd8`、server `36ab16f`、mobile `09d3ce4`。运行结论仍分别绑定下列证据中的实际源码与产物，不能追认为这些最新提交的完整重跑。并行候选仅在明确标为候选的项目中列出，不算已公开能力。
