@@ -141,6 +141,14 @@ func TestNativeBridgeDAGResolutionHTTPS(t *testing.T) {
 		t.Fatal("original closed receipt not durably restored")
 	}
 	closedSeq := data["sequence"]
+	// 全registry/Workflow重开后只读发现：不从all-none或error推断closed。
+	r.Close()
+	r = environmentValue(mobilebridge.NewNativeDAGRegistry("synthetic.closure.bridge", "workflow", 44))
+	before = requests.Load()
+	discover := must("dagRecoveryResolutionDiscovery", nil, nil)["data"].(map[string]any)
+	if discover["state"] != "closed" || discover["operationId"] != id || discover["targetHash"] != hash || requests.Load() != before {
+		t.Fatal("cold durable closure discovery missing or used network")
+	}
 	out = must("dagRecoveryResolutionInfo", nil, nil)
 	if out["data"].(map[string]any)["sequence"] != closedSeq {
 		t.Fatal("cold closed metadata not retained")

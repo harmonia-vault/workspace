@@ -27,3 +27,11 @@ P2 已公开独立 pending V3/V4 查询：fresh Boot/Pull 后获取有限提示�
 P3 已公开 Go 原生账号重置及 Android 所有者排空/受保护槽清理接线。原请求仅在 RAM；冷启动只能查询。原生先验证邮件证明状态、账号与代际匹配，再清理本机材料、独立确认槽为空，最后才提交或交付已完成结果。取消与旧操作迟到不能回填新状态。机器码、系统认证和实际 Flutter 入口仍须产品验证。
 
 本次 Go/Flutter/Kotlin 组件和真实 HTTPS 的结果范围见[精确摘要](evidence/p2-p3-source-result.json)。根在当前公开核心加本片后的三个包定向 race 通过，2.718 秒；首轮沙箱禁止本地监听的 FAIL 保留。P1–P3 仍未勾选，未开放未经验证的能力。
+
+## 独立 DAG 能力、冷启动发现与恢复界面
+
+已公开零参数 DAG 编译名单及本机闭锁四态发现；普通操作名单不混入 DAG。仅已验证的原事务或持久关闭记录返回原 ID/目标摘要；none/unsupported 不得解释成已关闭，读取失败也不能伪装为空。真实 HTTPS 主链验证关闭 registry 后重新发现同一目标且不新增网络请求。
+
+Flutter 已接关闭原事务、同 ID 查询、明确重新开启受限恢复，且通过独立 DAG 编译名单与逐操作证据相交，默认证据仍为空。C 砂岩恢复界面由本机 Claude Opus 5.5 medium 单次生成，接入完整码重输、明确环境/角色/期限、原事务续办与破坏性确认；Codex 只调整路由、表单清理及状态/文案映射。没有新增 Claude 反复调用或 UI 测试矩阵。
+
+根在固定合并快照上定向 Go race PASS 17.555 秒、Flutter analyzer PASS 5.024 秒、既有回归 141 PASS/0 FAIL（11.080 秒）。[精确摘要](evidence/recovery-ui-discovery-result.json)区分组件、真实 HTTPS 与尚未跑的手机 UI/SDK；P1 仍未完成，整体能力没有开放。
