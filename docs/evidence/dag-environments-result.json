@@ -1,0 +1,230 @@
+{
+  "experimental": true,
+  "bases": {
+    "core-go": "94a7d53344c0ae2488a5f55fb945ad0996583434",
+    "server": "36ab16fbaadacd766548e201c05acd5e80ccb89b",
+    "protocol": "038f2db696647eceb4b0a5716784f976a55a2646",
+    "workspace": "b6737fe1ece22dde2f04821d5d3f8214b63abecf"
+  },
+  "tests": [
+    {
+      "attempt": "components-01",
+      "packageResults": [
+        {
+          "package": "github.com/harmonia-vault/core-go/mobilebridge",
+          "action": "fail",
+          "elapsed": 1.7690000000000001
+        },
+        {
+          "package": "github.com/harmonia-vault/core-go/mobileworkflow",
+          "action": "pass",
+          "elapsed": 13.801
+        }
+      ],
+      "tests": [
+        {
+          "name": "TestDAGEnvironmentExactCommandAndProfile",
+          "action": "fail",
+          "elapsed": 0
+        },
+        {
+          "name": "TestDAGEnvironmentUntrustedConsumesIndependentNames",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "name": "TestDAGEnvironmentMetadataExactDecimal",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "name": "TestDAGEnvironmentRestrictedOriginalZeroNetwork",
+          "action": "pass",
+          "elapsed": 10.92
+        },
+        {
+          "name": "TestDAGEnvironmentStrictJournalShape",
+          "action": "pass",
+          "elapsed": 0
+        }
+      ]
+    },
+    {
+      "attempt": "components-bridge-02",
+      "packageResults": [
+        {
+          "package": "github.com/harmonia-vault/core-go/mobilebridge",
+          "action": "pass",
+          "elapsed": 1.532
+        }
+      ],
+      "tests": [
+        {
+          "name": "TestDAGEnvironmentExactCommandAndProfile",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "name": "TestDAGEnvironmentUntrustedConsumesIndependentNames",
+          "action": "pass",
+          "elapsed": 0.01
+        },
+        {
+          "name": "TestDAGEnvironmentMetadataExactDecimal",
+          "action": "pass",
+          "elapsed": 0
+        }
+      ]
+    },
+    {
+      "attempt": "receivers-01",
+      "packageResults": [
+        {
+          "package": "github.com/harmonia-vault/core-go/mobileworkflow",
+          "action": "fail",
+          "elapsed": 61.015
+        }
+      ],
+      "tests": [
+        {
+          "name": "TestDAGEnvironmentReceiverHistorySurvivesMismatchAndCold",
+          "action": "fail",
+          "elapsed": 60.34
+        }
+      ]
+    },
+    {
+      "attempt": "receivers-02",
+      "packageResults": [
+        {
+          "package": "github.com/harmonia-vault/core-go/mobileworkflow",
+          "action": "pass",
+          "elapsed": 124.51
+        }
+      ],
+      "tests": [
+        {
+          "name": "TestDAGEnvironmentReceiverHistorySurvivesMismatchAndCold",
+          "action": "pass",
+          "elapsed": 122.88
+        }
+      ]
+    },
+    {
+      "attempt": "receiver-basis-01",
+      "packageResults": [
+        {
+          "package": "github.com/harmonia-vault/core-go/mobileworkflow",
+          "action": "pass",
+          "elapsed": 1.558
+        }
+      ],
+      "tests": [
+        {
+          "name": "TestDAGEnvironmentReceiverPersistenceFailureExactBasis/captured",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "name": "TestDAGEnvironmentReceiverPersistenceFailureExactBasis/native-advanced",
+          "action": "pass",
+          "elapsed": 0
+        },
+        {
+          "name": "TestDAGEnvironmentReceiverPersistenceFailureExactBasis",
+          "action": "pass",
+          "elapsed": 0
+        }
+      ]
+    },
+    {
+      "attempt": "joint-01",
+      "packageResults": [
+        {
+          "package": "github.com/harmonia-vault/workspace/acceptance",
+          "action": "fail",
+          "elapsed": 0
+        }
+      ],
+      "tests": []
+    },
+    {
+      "attempt": "joint-02",
+      "packageResults": [
+        {
+          "package": "github.com/harmonia-vault/workspace/acceptance",
+          "action": "fail",
+          "elapsed": 0.607
+        }
+      ],
+      "tests": [
+        {
+          "name": "TestNativeBridgeDAGEnvironmentHTTPS",
+          "action": "fail",
+          "elapsed": 0.04
+        }
+      ]
+    },
+    {
+      "attempt": "joint-03",
+      "packageResults": [
+        {
+          "package": "github.com/harmonia-vault/workspace/acceptance",
+          "action": "fail",
+          "elapsed": 2.988
+        }
+      ],
+      "tests": [
+        {
+          "name": "TestNativeBridgeDAGEnvironmentHTTPS",
+          "action": "fail",
+          "elapsed": 2.51
+        }
+      ]
+    },
+    {
+      "attempt": "joint-04",
+      "packageResults": [
+        {
+          "package": "github.com/harmonia-vault/workspace/acceptance",
+          "action": "pass",
+          "elapsed": 85.262
+        }
+      ],
+      "tests": [
+        {
+          "name": "TestNativeBridgeDAGEnvironmentHTTPS",
+          "action": "pass",
+          "elapsed": 84.74
+        }
+      ]
+    }
+  ],
+  "vet": {
+    "packages": [
+      "mobileworkflow",
+      "mobilebridge",
+      "syncclient"
+    ],
+    "exitCode": 0,
+    "stdoutBytes": 0,
+    "stderrBytes": 0
+  },
+  "boundaries": [
+    "latest joint04 nonrace; receiver and scope component race independent",
+    "30s business deadline unchanged",
+    "106 existing native inputs fixed, no BoringSSL rebuild",
+    "AES temporary Go adapter, not system authentication/SDK/JNI/Flutter",
+    "none/higherGG lower bounds protect seen history, not proof of unobserved absence",
+    "no cap opened; per-env management/global revoke/reanchor pending"
+  ],
+  "retainedFailures": [
+    "compile01 cache permission",
+    "components01 strict ID budget (fixed new bridge len64)",
+    "joint01 wrong guessed Device export API",
+    "joint02 no fixed tsx dependency",
+    "joint03 omitted manager original approval confirmation",
+    "receivers01 controls must have exact one own-env target",
+    "dependencies01/02 wrong pnpm executable path; dependencies03 offline install passed"
+  ]
+}
