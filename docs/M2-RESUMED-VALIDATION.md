@@ -2,6 +2,14 @@
 
 日期：2026-10-04。以下结果各自绑定源码和实际测试，不等同于最终五仓完整产品验收。执行器连接中断及恢复检查不计作产品通过或失败。
 
+## 恢复设备的单环境授权管理
+
+core-go `2aa0c48fbe2fdbfa5348e37d02c8ff69733a6b98` 已公开五个独立 DAG 管理操作：设备列表、准备 RO/RW/Admin/none 与期限、原待办查询、原 ID 续办和未尝试取消。已确认的原签包与管理目录共同保存权限代际、签包摘要和接受序号下界；接受但未应用的撤销仍限制后续发钥，冷启动重新验证。共享写入只有原回执、正式 Pull、最终原生 CAS 和再检查成功后才返回同来源 view。
+
+真实 HTTPS/Node SQLite/native V5 PAKE/HPKE 联合主项 PASS 142.86 秒、包 PASS 144.297 秒，覆盖限期 RW、实际读写、Admin/RO/none、响应丢失后的原 ID 冷续办且仅一次 POST、本地取消退休 ID、保存失败零提交。每操作含冷 Open 1.885–14.901 秒，原 30 秒期限未改。直接接受撤销/共享权限下界/冷复验 race 主项 PASS 139.72 秒、包 PASS 141.349 秒；三个未变小测试通过结果复用，三个受影响包 vet 通过。见[可复现实验](../acceptance/mobile_bridge_dag_management_test.go)、[脱敏结果](evidence/dag-management-result.json)及[调用合同](../core-go/mobilebridge/DAG-MANAGEMENT-CONTRACT.md)。
+
+组件首次 240.534 秒预算超时、联合首次 95.896 秒错误断言 FAIL，以及第二次执行器中断 UNCONFIRMED 均保留。取消的实际返回是 ok:false 与原 pending，不是取消成功。独立审阅确认已接受撤销下界与精确本机降权例外两处问题已修复；未用降低验证要求消除失败。Android ABI、SDK/系统认证及 Flutter 此五操作尚未实际执行，能力未开放；全设备撤销和管理者重新锚定仍须实现。按[测试分层](TESTING.md)，共享角色/期限组合不再重复搬到两端 UI。
+
 ## Windows 本地存储
 
 core-go 基线 c5866f59299cbb6838c3f753dda7aaefeb7fcf82；仅 localkeys/vault_test.go 修正测试夹具。Windows ARM64 合成普通用户实际执行受影响单项，1 主 + 9 子全部 PASS，主项 0.11 秒；无超时、截断、stderr，记录子进程已排空。
