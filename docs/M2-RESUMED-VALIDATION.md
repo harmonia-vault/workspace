@@ -18,6 +18,18 @@ core-go 基线 c5866f59299cbb6838c3f753dda7aaefeb7fcf82；仅 localkeys/vault_te
 
 限制：原 post-reboot shell 已由旧运行收尾并退出，本次无法追认其卸载后的同 shell 原值恢复断言；该项仍 UNRUN。此前显式 release 的原值恢复、新增变量移除及无关变量保留通过，Stop 保配置通过，持久原值清理门槛也通过。这些是不同断言。随后独立真实 `/bin/sh` 验证 PASS 0.776 秒：仅删除片段仍保留配置，删除本次 owned 目录后恢复原值、移除新增项且保留无关项。该临时目录已移除；原 shell 的未跑断言仍保留。精确清理 PASS 0.722 秒，只有已核三个诊断对象及本次合成账号/组被清除，四个身份索引均缺失，旧失败证据保留。原首次失败原因仍未确认。完整分段结果见 [Linux 脱敏证据](https://github.com/harmonia-vault/core-go/blob/28a35f286e9ff4bafabf62c0daedca84e0530de3/linuxinstall/evidence/P5-LIFECYCLE.md)。
 
+## 2026-10-04 首次安装失败与 iOS 入口失败
+
+macOS 正式 P6 首次执行使用公开 core-go `b6c8f9d` 对应的已冻结安装器和原生 CLI。合成用户正常登录、公包传输、SHA 校验、stage、root 工具摘要和安装前清单均实际通过。严格目标解析接受且目标不在 disabled 映射中；正式安装驱动返回 1。原驱动将底层退出和 stderr 隐去，安装后的三个断言也可能导致相同失败，因此不能判定是否发生部分安装。现场保留，后续 HTTPS 夹具、配对、Start、Boot/Pull、重启、终端、卸载与清理均 UNRUN。正在准备固定只读状态投影，不重复安装。
+
+Windows 标准 SCM 私有候选的四叶 stage、官方传输和完整摘要检查通过。唯一安装进程退出 1，后续目标查询确认服务数为零、两个实例目录和收据缺失。原第一次完成查询未同时保留输出，后续错误查询不可用；官方 QEMU 文档说明退出后的 guest-exec-status 会回收进程元数据，因此之后的流程改为在首次完成响应中同时保存允许的结果。[QEMU guest-exec-status](https://qemu-project.gitlab.io/qemu/interop/qemu-ga-ref.html#command-guest-exec-status)。这只是丢失诊断的可能解释，不是原安装错误的证明。
+
+独立固定只读 helper 实际退出 0，严格 DTO 指明 `preflightPassed=false`，当前账号名查询和有效服务登录权利查询均因身份解析拒绝。SYSTEM 身份、固定计划、配置验证、服务及实例缺失、直接权利读取、来源二进制摘要通过；两个父目录为 `ABSENT_NO_CREATE`。`rightsReadCompleted=false` 时，其余 false 占位不能解释为没有授权或拒绝权利。helper 报告零变更；唯一新增的第五个公开程序经完整摘要、ACL、无 reparse 和进程检查后精确删除，原四叶复核不变。未执行第二次安装或 Start。当前代码复用了 SCM 的 `.\用户名` 简写作 SID 查询；修复将区分 [CreateServiceW 的账号形式](https://learn.microsoft.com/en-us/windows/win32/api/winsvc/nf-winsvc-createservicew)与 [LookupAccountNameW 推荐的明确域限定名](https://learn.microsoft.com/en-us/windows/win32/api/winbase/nf-winbase-lookupaccountnamew)，继续绑定本机、用户类型和精确 SID。
+
+iOS 新原生生命周期候选在固定 Simulator 的实际前置窗口检查、安装和启动通过，五秒后的应用窗口仍白屏，记为 `FAIL_PUBLIC_ENTRY_BLANK`。本轮没有执行登录、系统认证、退出或 CRUD。原 PID 的限定启动日志不足以证明 Dart 首帧或插件完成注册；不能据此断言唯一根因。当前仅修复一次性原生冷启动绑定和有界启动元数据等待，原来固定旧产物的初始化/CRUD/退出通过记录保留且不追认新候选。独立测试 HTTPS 夹具和 RAM 助手已停止。
+
+上述实际结果的公开投影不含本机路径、VM 标识、用户 SID、账号名、凭据或原始日志，见[限定结果](evidence/platform-install-failures.json)。
+
 ## Linux 清理后只读确认与 macOS 解析修正
 
 Linux 在 2026-10-04 06:09 UTC 进行了唯一一次固定 VM/SSH 身份下的只读复核，PASS 0.584 秒。合成账号名称及 UID、组名称及 GID 四个索引均缺失，目标 UID 进程为零，原八个正式资源路径缺失，unit not-found、MainPID 为零、cgroup 为空。没有再次清理、重启或修改 VM。原 cleanup PASS 0.722 秒单独保留；原完整 P5 FAIL 和已退役原 shell 的恢复 UNRUN 不变。见[脱敏原始结果投影](evidence/linux-final-cleanup-readonly.json)。

@@ -1,0 +1,160 @@
+{
+  "version": 1,
+  "scope": "Synthetic isolated test environments only; no production readiness claim",
+  "macOS": {
+    "coreCommit": "b6c8f9d2d3ba333f5a66895be08755ad2c7ef697",
+    "actualManifestSHA256": "db8c3d833a520735801d3b8f6fc1c12d5b4954aff90e4c6dcc098cbf15704a8d",
+    "installInvocations": 1,
+    "driverExit": 1,
+    "status": "FAIL",
+    "underlyingInstallerExit": "UNKNOWN",
+    "postconditions": "UNKNOWN",
+    "preflight": {
+      "parseAccepted": true,
+      "targetPresent": false,
+      "targetDisabled": false
+    },
+    "unrun": [
+      "fixture",
+      "pairing",
+      "Start",
+      "Boot/Pull",
+      "reboot",
+      "shell",
+      "Uninstall",
+      "cleanup"
+    ]
+  },
+  "windows": {
+    "candidateManifestSHA256": "d77cdacf1b89b220a9933858dfcfbddd721ac4f9eba762e4537edbb8ed4204ef",
+    "installInvocations": 1,
+    "installExit": 1,
+    "installStatus": "FAIL",
+    "originalError": "UNKNOWN",
+    "serviceCount": 0,
+    "installDirectoryPresent": false,
+    "stateDirectoryPresent": false,
+    "receiptPresent": false,
+    "readonly": {
+      "hostExitCode": 0,
+      "seconds": 9.459609,
+      "guestExitCode": 0,
+      "stdoutClass": "VALID_FIXED_DTO",
+      "stderrClass": "EMPTY",
+      "dto": {
+        "schema": "harmonia/scm-readonly-preflight/v1",
+        "stages": [
+          {
+            "stage": "installer-system-identity",
+            "ok": true,
+            "code": "OK"
+          },
+          {
+            "stage": "fixed-plan-read",
+            "ok": true,
+            "code": "OK"
+          },
+          {
+            "stage": "fixed-plan-hash",
+            "ok": true,
+            "code": "OK"
+          },
+          {
+            "stage": "plan-json",
+            "ok": true,
+            "code": "OK"
+          },
+          {
+            "stage": "fixed-request-scope",
+            "ok": true,
+            "code": "OK"
+          },
+          {
+            "stage": "configuration-validate",
+            "ok": true,
+            "code": "OK"
+          },
+          {
+            "stage": "service-absent",
+            "ok": true,
+            "code": "OK"
+          },
+          {
+            "stage": "install-instance-absent",
+            "ok": true,
+            "code": "OK"
+          },
+          {
+            "stage": "state-instance-absent",
+            "ok": true,
+            "code": "OK"
+          },
+          {
+            "stage": "account-name-lookup",
+            "ok": false,
+            "code": "IDENTITY_REJECTED"
+          },
+          {
+            "stage": "target-direct-rights-read",
+            "ok": true,
+            "code": "OK"
+          },
+          {
+            "stage": "effective-service-rights-read",
+            "ok": false,
+            "code": "IDENTITY_REJECTED"
+          },
+          {
+            "stage": "install-parent-current",
+            "ok": true,
+            "code": "ABSENT_NO_CREATE"
+          },
+          {
+            "stage": "state-parent-current",
+            "ok": true,
+            "code": "ABSENT_NO_CREATE"
+          },
+          {
+            "stage": "source-binary-hash",
+            "ok": true,
+            "code": "OK"
+          }
+        ],
+        "preflightPassed": false,
+        "rightsReadCompleted": false,
+        "directServiceAllow": false,
+        "effectiveServiceAllow": false,
+        "effectiveServiceDeny": false,
+        "wouldAddDirectServiceRight": false,
+        "mutations": 0
+      }
+    },
+    "cleanup": {
+      "hostExitCode": 0,
+      "seconds": 5.383448,
+      "status": "FIFTH_REMOVED_FOUR_UNCHANGED"
+    },
+    "unrun": [
+      "second install",
+      "Start",
+      "ordinary CLI IPC",
+      "unattended reboot",
+      "Boot/Pull",
+      "Uninstall"
+    ]
+  },
+  "iOS": {
+    "actualManifestSHA256": "1f5596ce2c473167019a4b1b2aa32fdd02dc5cb27d7ae1b61b3dff2905a0f591",
+    "status": "FAIL_PUBLIC_ENTRY_BLANK",
+    "installExit": 0,
+    "launchExit": 0,
+    "unrun": [
+      "login",
+      "system authentication",
+      "logout",
+      "CRUD"
+    ],
+    "fixtureStopped": true,
+    "RAMHelperStopped": true
+  }
+}
