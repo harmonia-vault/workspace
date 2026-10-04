@@ -18,6 +18,16 @@ core-go 基线 c5866f59299cbb6838c3f753dda7aaefeb7fcf82；仅 localkeys/vault_te
 
 限制：原 post-reboot shell 已由旧运行收尾并退出，本次无法追认其卸载后的同 shell 原值恢复断言；该项仍 UNRUN。此前显式 release 的原值恢复、新增变量移除及无关变量保留通过，Stop 保配置通过，持久原值清理门槛也通过。这些是不同断言。随后独立真实 `/bin/sh` 验证 PASS 0.776 秒：仅删除片段仍保留配置，删除本次 owned 目录后恢复原值、移除新增项且保留无关项。该临时目录已移除；原 shell 的未跑断言仍保留。精确清理 PASS 0.722 秒，只有已核三个诊断对象及本次合成账号/组被清除，四个身份索引均缺失，旧失败证据保留。原首次失败原因仍未确认。完整分段结果见 [Linux 脱敏证据](https://github.com/harmonia-vault/core-go/blob/28a35f286e9ff4bafabf62c0daedca84e0530de3/linuxinstall/evidence/P5-LIFECYCLE.md)。
 
+## 恢复后 DAG 变量业务与授权收紧保存
+
+core-go `94a7d53344c0ae2488a5f55fb945ad0996583434` 已公开来源专用变量写入、删除、持久原 ID 查询与重试；普通入口仍拒绝该来源。完整验签拉取后的授权状态先按原 owner/hash/epoch 和原生整份 CAS 持久保存，首次拉取或 Writer 内部拉取降权后即使拒写，也不会保留旧权限。日志保存过程中明确失去设备信任的原因继续传递；取消时只允许已验的授权安全收紧投影，不推进数据序号、新值或增权。详见[核心合同](../core-go/docs/DAG-VARIABLE-BUSINESS.md)。
+
+限定真实 HTTPS/TypeScript/SQLite/HPKE 与 AES-CAS 适配器联合测试 PASS 59.843 秒：原响应丢失后冷查询、同 ID 续办、后续覆盖与旧收据重试不重写、同 ID 输入冲突、RO 拒写、共享删除经正式拉取移除，以及 CAS 拒绝时零 mutation POST。成熟 Writer 的待办序号实际是固定单槽：未知为 `["0"]`，接受后为单个非零序号；转换器和联合测试均有实际断言。不是系统认证、JNI、原生 PAKE 或真实 Flutter 产品证明。
+
+定向 race 检查分别通过 Writer 内部拉取失权、保存期间撤销、两类取消、两个错误合并分支、严格回调范围与实际 Writer 序号转换。首次权限测试的 initial-pull 子项通过，但原整包随后因 240 秒总预算超时仍记 FAIL；后续只分组完成剩余场景，没有把原失败改成通过。旧夹具、命令、超时和构建失败均保留。三包 vet 通过。详细分段结果见[脱敏记录](evidence/dag-variable-business-result.json)，可复现实验源码见[联合测试](../acceptance/mobile_bridge_dag_business_test.go)。
+
+Dart 业务修订的 76 项受影响回归和独立源码复核通过，修正了未知重试必须先查询、固定序号槽，以及无效业务响应关闭旧明文显示。手机候选尚未完成新 AAR/SDK/实际 Flutter 联合验收，逐操作 verified 仍默认空。环境 CRUD、每环境授权与期限、管理者重新锚定和全局设备撤销仍须后续专用接线；本片不完成 P1 或 M2。
+
 ## 2026-10-04 首次安装失败与 iOS 入口失败
 
 macOS 正式 P6 首次执行使用公开 core-go `b6c8f9d` 对应的已冻结安装器和原生 CLI。合成用户正常登录、公包传输、SHA 校验、stage、root 工具摘要和安装前清单均实际通过。严格目标解析接受且目标不在 disabled 映射中；正式安装驱动返回 1。原驱动将底层退出和 stderr 隐去，安装后的三个断言也可能导致相同失败，因此不能判定是否发生部分安装。现场保留，后续 HTTPS 夹具、配对、Start、Boot/Pull、重启、终端、卸载与清理均 UNRUN。正在准备固定只读状态投影，不重复安装。
