@@ -16,13 +16,21 @@ core-go 基线 c5866f59299cbb6838c3f753dda7aaefeb7fcf82；仅 localkeys/vault_te
 
 本次在同一 VM、安装、收据、journal 和重启见证下调用同一正式 Uninstall，私有测试层仅加入固定阶段/错误类别观察，不修改已装 CLI、清理门槛或返回错误。实际 PASS 1.659 秒：离线退出子进程 exit0、成功 DTO 41 字节、stderr 空；最终 state、IPC、程序、CA、unit、enable-link、收据、journal 和 guard 全部缺失，unit not-found，目标 UID 进程为零，旧测试范围未变。没有再次 Start、重启、新建账号或更换 CA。
 
-限制：原 post-reboot shell 已由旧运行收尾并退出，本次无法追认其卸载后的同 shell 原值恢复断言；该项仍 UNRUN。此前显式 release 的原值恢复、新增变量移除及无关变量保留通过，Stop 保配置通过，持久原值清理门槛也通过。这些是不同断言。测试账号清理尚待完成；原首次失败原因仍未确认。
+限制：原 post-reboot shell 已由旧运行收尾并退出，本次无法追认其卸载后的同 shell 原值恢复断言；该项仍 UNRUN。此前显式 release 的原值恢复、新增变量移除及无关变量保留通过，Stop 保配置通过，持久原值清理门槛也通过。这些是不同断言。随后独立真实 `/bin/sh` 验证 PASS 0.776 秒：仅删除片段仍保留配置，删除本次 owned 目录后恢复原值、移除新增项且保留无关项。该临时目录已移除；原 shell 的未跑断言仍保留。精确清理 PASS 0.722 秒，只有已核三个诊断对象及本次合成账号/组被清除，四个身份索引均缺失，旧失败证据保留。原首次失败原因仍未确认。完整分段结果见 [Linux 脱敏证据](https://github.com/harmonia-vault/core-go/blob/28a35f286e9ff4bafabf62c0daedca84e0530de3/linuxinstall/evidence/P5-LIFECYCLE.md)。
 
 ## 前台配对请求业务
 
 mobile 基线 b3daffee31c45d1a31257911651e6bc04fa7f9d4 上的七文件片段增加真实 PairID 提示、严格范围检查、到期隐藏、完整快照替换及后台/退出晚到结果退役。LOCAL_PROTECTION_PERSISTENCE 会清可信状态并保持清理闭锁；普通网络故障只清提示。
 
 9 项非视觉业务测试 PASS 5.030 秒，静态分析 PASS 3.176 秒，源码秘密/个人数据检查通过。初次缓存沙箱 setup 失败保留。稳定 Actions/DTO 未改，默认 verifiedPendingPairingOperations 仍为空；组件通过不能开启真实系统认证或产品能力。对应 Android SDK、界面闭环本片未执行。
+
+## Android 非空恢复原生组件
+
+固定旧快照的一项 API 34 ARM64 SDK 组件 PASS 11.029 秒，包含四次实际系统设备密码 CryptoObject、非空恢复 owner、生成新码及完整重输后密封。返回标识/摘要的格式与 pending 元数据通过核验，不冒称额外比对了底层 journal。实际代理 transition POST 为零；系统 PIN、专用包、forward、Node 与端口精确清理通过。Flutter P1 完整恢复、提交/未知续办和入网尚未由这项测试覆盖，最新整树也未据此验收。见 [固定快照与原始证据摘要](https://github.com/harmonia-vault/mobile/blob/d40b3048a7974bb62f232d005bb8eed73a921aed/docs/ANDROID_DAG_B1B2_SDK_20261004.md)。
+
+## 邮件重置入口与原请求
+
+已公开 Go 独立邮件入口及 Dart 协调器/七动作端口。10 个 Go 主测试、15 个测试事件的定向 race 通过，vet 通过；12 项 Dart 业务/端口测试及静态分析通过。真实 HTTPS/SQLite 验收通过：正式申请合成邮件证明，服务器接受但响应丢失后只查询同 RAM 原请求，不重复 POST；冷查询不能准备替代请求，新代际密码成功、旧密码被拒绝。测试中的本机清理为隔离 Go adapter，不能代替 Android/iOS 系统槽物理删除。真实 SMTP 送达和完整手机重置页面仍未验收，默认能力保持关闭。见 [七动作合同](https://github.com/harmonia-vault/mobile/blob/0a8ffce83b7aca64869e0ff32bc27ee5d8fdbf70/docs/ACCOUNT_RESET_CHANNEL.md)及本仓 `acceptance/account_reset_mail_test.go`。
 
 ## 已授权范围
 
