@@ -32,6 +32,16 @@ mobile 基线 b3daffee31c45d1a31257911651e6bc04fa7f9d4 上的七文件片段增�
 
 已公开 Go 独立邮件入口及 Dart 协调器/七动作端口。10 个 Go 主测试、15 个测试事件的定向 race 通过，vet 通过；12 项 Dart 业务/端口测试及静态分析通过。真实 HTTPS/SQLite 验收通过：正式申请合成邮件证明，服务器接受但响应丢失后只查询同 RAM 原请求，不重复 POST；冷查询不能准备替代请求，新代际密码成功、旧密码被拒绝。测试中的本机清理为隔离 Go adapter，不能代替 Android/iOS 系统槽物理删除。真实 SMTP 送达和完整手机重置页面仍未验收，默认能力保持关闭。见 [七动作合同](https://github.com/harmonia-vault/mobile/blob/0a8ffce83b7aca64869e0ff32bc27ee5d8fdbf70/docs/ACCOUNT_RESET_CHANNEL.md)及本仓 `acceptance/account_reset_mail_test.go`。
 
+## 手机产品路由与 Android 联合原生通道
+
+手机路由已公开于 mobile `57388540a329ad39cf0ca4e507ef8346b07f67bf`，接入设备管理、真实配对提示、账号重置页面及主控制器。36 项受影响业务测试（含 3 项新增路由业务用例）PASS 7.178 秒，全应用静态分析 PASS 4.021 秒；没有编写 UI 单元测试。这些结果不代替实际手机操作。默认独立 verified 操作集合仍为空。详见[产品路由整合](https://github.com/harmonia-vault/mobile/blob/57388540a329ad39cf0ca4e507ef8346b07f67bf/docs/PRODUCT_ROUTE_INTEGRATION.md)。
+
+Android 联合原生通道已公开于 mobile `951e09d286bcb744e0c7471cfb4acc7823b13876`：DAG 命令及 getter、前台配对查询、P3 七动作、原生 endpoint 范围与全部 owner 排空。审查修复了首次地址绑定早于 BUSY 拒绝，以及 DAG 取消/后台 registry Close 期间可进入新操作的空档。现在关闭工作完成后仍须主线程确认，关闭结果不明则持续拒绝新操作。
+
+完整 Go AAR 构建 PASS 26.524 秒，真实 Java ABI 核验 PASS；API 36 的全部 native/MainActivity Kotlin 编译 PASS 24.475 秒，7 个非 UI host 程序共 60 项 PASS 0.962 秒。AAR SHA256 为 `4033f8c018b1ceacaa9bccd7ab63fbb196b29a708062629d7064f56357adfcea`，实际 Go 来源是 core-go `c5866f59299cbb6838c3f753dda7aaefeb7fcf82` 加已公开邮件入口，不能冒称最新核心整树。新联合版本的 SDK、JNI 和 Flutter P1/P2/P3 实跑均 UNRUN，未发布二进制。详见[原生整合边界](https://github.com/harmonia-vault/mobile/blob/951e09d286bcb744e0c7471cfb4acc7823b13876/docs/ANDROID_NATIVE_CHANNEL_INTEGRATION.md)。
+
+恢复后的 DAG 读取路径已具备，但旧普通写入和管理路径会明确拒绝 DAG 状态。接下来的实现使用独立 DAG 高层业务与 P4 验证，先完成变量写删及原 ID 续办，再连接环境 CRUD 与每环境授权撤销；不放宽旧路径检查，不以只读 fullView 或变量写删代替“可管理”验收。
+
 ## 已授权范围
 
 八项固定清单只对应 M2。iOS 现在并行，CI/CD 和自动更新在 M2 后继续；Tag、Release、安装包发布和真实部署不在本轮执行范围。完整交付需明确所有未验项，不将粗略进度或工期估算视为承诺。
