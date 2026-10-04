@@ -18,6 +18,12 @@ core-go 基线 c5866f59299cbb6838c3f753dda7aaefeb7fcf82；仅 localkeys/vault_te
 
 限制：原 post-reboot shell 已由旧运行收尾并退出，本次无法追认其卸载后的同 shell 原值恢复断言；该项仍 UNRUN。此前显式 release 的原值恢复、新增变量移除及无关变量保留通过，Stop 保配置通过，持久原值清理门槛也通过。这些是不同断言。随后独立真实 `/bin/sh` 验证 PASS 0.776 秒：仅删除片段仍保留配置，删除本次 owned 目录后恢复原值、移除新增项且保留无关项。该临时目录已移除；原 shell 的未跑断言仍保留。精确清理 PASS 0.722 秒，只有已核三个诊断对象及本次合成账号/组被清除，四个身份索引均缺失，旧失败证据保留。原首次失败原因仍未确认。完整分段结果见 [Linux 脱敏证据](https://github.com/harmonia-vault/core-go/blob/28a35f286e9ff4bafabf62c0daedca84e0530de3/linuxinstall/evidence/P5-LIFECYCLE.md)。
 
+## Linux 清理后只读确认与 macOS 解析修正
+
+Linux 在 2026-10-04 06:09 UTC 进行了唯一一次固定 VM/SSH 身份下的只读复核，PASS 0.584 秒。合成账号名称及 UID、组名称及 GID 四个索引均缺失，目标 UID 进程为零，原八个正式资源路径缺失，unit not-found、MainPID 为零、cgroup 为空。没有再次清理、重启或修改 VM。原 cleanup PASS 0.722 秒单独保留；原完整 P5 FAIL 和已退役原 shell 的恢复 UNRUN 不变。见[脱敏原始结果投影](evidence/linux-final-cleanup-readonly.json)。
+
+macOS 解析修正已公开于 core-go `b6c8f9d2d3ba333f5a66895be08755ad2c7ef697`，仅修改 `macosservice/launch_darwin.go` 及对应测试：精确接受 `true`/`disabled` 和 `false`/`enabled` 两组等价值，继续拒绝重复目标、未知字面值或额外内容。263 个受影响 race 测试事件 PASS 14.892 秒，vet PASS 3.190 秒，安装器和原生 PAKE CLI 构建分别 PASS 4.118 与 3.466 秒。构建产物没有公开发布。已有 VM 字面值观测支持这一修正，但正式安装器的配对、服务、重启、终端及卸载链仍 UNRUN；解析成功也不授权接管已有服务或修改未知覆盖项。
+
 ## 前台配对请求业务
 
 mobile 基线 b3daffee31c45d1a31257911651e6bc04fa7f9d4 上的七文件片段增加真实 PairID 提示、严格范围检查、到期隐藏、完整快照替换及后台/退出晚到结果退役。LOCAL_PROTECTION_PERSISTENCE 会清可信状态并保持清理闭锁；普通网络故障只清提示。
