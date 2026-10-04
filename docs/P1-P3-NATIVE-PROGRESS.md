@@ -11,3 +11,11 @@ P3 新增独立 accountreset 客户端，使用现有邮件证明协议。密码
 P3 原请求目前仅在 RAM；进程丢失后只能持原邮件证明查询，不能构造替代密码伪称原重试。手机接线仍需实际验证证明、匹配当前账号与本机槽，并完成真实本地清理。重置不恢复旧 vault，不赋予设备信任。
 
 SDK、系统强认证、Flutter 界面、邮件和最终产品验收尚缺；没有最新五仓全套通过的声明。固定剩余范围见 [PRODUCT-ACCEPTANCE.md](PRODUCT-ACCEPTANCE.md)，机器可读摘要见 [结果](evidence/p1-p3-native-source-result.json)。项目仍为实验实现，不可宣传生产可用。
+
+## 连续恢复关闭原分支与 Flutter 业务映射
+
+新增四个 Go 原生操作，复用成熟 recovery-operation-closure-v1：查询原目标、本机状态、明确关闭与持有效完整码显式重开。仅支持已密封 transition-v2/old-recovery；登记和准备阶段仍不支持关闭。普通本机取消不等于服务器关闭，未知结果及本机保存失败保留原包。
+
+本片最终定向 race 5 主测试通过（1.294 秒）、vet 通过；真实 HTTPS 闭锁→最后 CAS 失败→同原 ID 查询保存闭锁结果→完整 HPKE 新 owner 主链通过（1 主，包 6.132 秒）。首次组件运行 4 主通过、1 项因沙箱监听拒绝而失败，原日志保留；其后同选集通过。没有新增 SDK、界面或能力开放证据。
+
+Flutter B1–B3b typed 业务接线已公开于 mobile 500ddf89b85bdbaae45dd12345da8c7dacea1c4a：当前字节 44 项非 UI 测试通过，其中 17 项为新恢复业务测试；analyzer 无问题。早期复用的 widget 回归不计入这 44 项。视觉控件尚未实现，本片没有真实 Android 页面验收，DAG 逐操作证据默认空。关闭分支的 Flutter 映射仍待下一增量，P1 保持未完成。
