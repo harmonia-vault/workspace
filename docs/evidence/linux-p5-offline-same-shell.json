@@ -1,0 +1,115 @@
+{
+  "schema": "harmonia/linux-p5-offline-same-shell/v1",
+  "sourceCommit": "94a7d53344c0ae2488a5f55fb945ad0996583434",
+  "historicalSourceCommit": "78d7dd845307abb9566cf8a6d0711c4977841c11",
+  "historicalServerCommit": "36ab16fbaadacd766548e201c05acd5e80ccb89b",
+  "status": "PASS",
+  "seconds": 2.267,
+  "scope": "formal-disabled-install-offline-uninstall-same-live-shell-local-restoration-fixture",
+  "checks": {
+    "formalResourcesAbsent": true,
+    "sameShellManaged": true,
+    "sameShellAutoRestore": true,
+    "syntheticIdentityAbsent": true,
+    "ownStageAbsent": true,
+    "serviceNeverStarted": true
+  },
+  "formalCommands": {
+    "install": {
+      "exactCompletionDTO": true,
+      "exitCode": 0,
+      "fault": "EMPTY",
+      "stderrBytes": 0,
+      "stdoutBytes": 73
+    },
+    "uninstall": {
+      "exactCompletionDTO": true,
+      "exitCode": 0,
+      "fault": "EMPTY",
+      "stderrBytes": 0,
+      "stdoutBytes": 64
+    }
+  },
+  "sourceAlignment": {
+    "unchangedInstallerStateVaultAndLogoutProductionFiles": 37,
+    "additionalUnchangedCLIEntryAndPOSIXFiles": 5,
+    "sharedSecureProviderChange": "Windows constructor only; POSIX path unchanged",
+    "syncClientCallback": "Not called by offline logout; no claim of identical whole HEAD"
+  },
+  "historicalEvidenceRetained": {
+    "originalFullRun": "FAIL at final offline uninstall, 26.089s",
+    "originalSameShellRestore": "UNRUN; process retired",
+    "originalFailureRootCause": "UNCONFIRMED; original helper stderr not retained",
+    "originalSameReceiptFormalUninstallResume": "PASS 1.659s",
+    "originalRealPairingStartReboot": "PASS retained, not repeated"
+  },
+  "earlierAttempt": {
+    "status": "FAIL",
+    "seconds": 1.009,
+    "category": "TEST_FIXTURE_BEFORE_PRODUCT_INSTALL",
+    "stage": "synthetic identity creation",
+    "readOnlyObservation": "group created, user absent, no installed product resources",
+    "adjustment": "confirmed mail spool default no; removed login.defs override argument; reused exact stage and group"
+  },
+  "trustBoundary": {
+    "accountCloudEmpty": true,
+    "noDeviceSessionOrAcceptedEnrollment": true,
+    "accountClosedInitially": false,
+    "firstEngineLogoutAndActualProviderRestore": true,
+    "accountSlotDeletes": "already absent; genuine slot deletion evidence belongs to historical paired run",
+    "notTrustOrNativePAKEProof": true
+  },
+  "nonClaims": {
+    "notSingleUninterruptedHistoricalWholeRun": true,
+    "notWholeCurrentHeadEndToEnd": true,
+    "notOriginalFailureReproducedOrFixed": true,
+    "notNewPairingOrReboot": true,
+    "notProductionReady": true
+  },
+  "runtime": {
+    "arch": "linux/arm64",
+    "cliCGOEnabled": false,
+    "purpose": "offline logout only",
+    "serverStarted": false,
+    "serviceStarted": false,
+    "rebootPerformed": false
+  },
+  "cleanup": {
+    "eightFormalResourcePathsAbsent": true,
+    "unitNotFoundMainPIDZeroCgroupEmpty": true,
+    "targetUIDProcessesZeroBeforeIdentityRemoval": true,
+    "exactNewUserGroupRemoved": true,
+    "exactStageFilesAndDirectoryRemoved": true,
+    "sharedAdministratorDirectoryAndPerUIDLock": "retained by existing installer design"
+  },
+  "evidence": {
+    "MANIFEST.json": {
+      "bytes": 1510,
+      "sha256": "105f5af9b3db3eb816d4be3ceeb830a4cbe2610ea8827d237907f5bf82f5653c"
+    },
+    "CONTINUATION-MANIFEST.json": {
+      "bytes": 2358,
+      "sha256": "1d652989ebe02efbe23a7b100dfdbab7d87b6f309713b8ab7d277f0845a0df28"
+    },
+    "actual/EXECUTION.json": {
+      "bytes": 714,
+      "sha256": "bb2b1a1383d0d8955a50a00ec6583152ca821bf8184ef4616936cf7024392855"
+    },
+    "actual-continuation/EXECUTION.json": {
+      "bytes": 1395,
+      "sha256": "f8850f5ed65837d584a98b3cc2f05f9a26387354c7d2c8354a98f7b26de7f9d7"
+    },
+    "actual-continuation/stdout": {
+      "bytes": 767,
+      "sha256": "694de443fd5d2cccf60f8d874bd61c8b9e725ad706492e2c3031698daa7a873c"
+    },
+    "actual-continuation/stderr": {
+      "bytes": 0,
+      "sha256": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+    },
+    "FINAL-SOURCE-ALIGNMENT.json": {
+      "bytes": 8191,
+      "sha256": "4958b1287328b6127ccb00b88b4f872b8cf2892f02163810645de17c75f3da6c"
+    }
+  }
+}

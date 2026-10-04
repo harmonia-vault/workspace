@@ -18,6 +18,23 @@ core-go 基线 c5866f59299cbb6838c3f753dda7aaefeb7fcf82；仅 localkeys/vault_te
 
 限制：原 post-reboot shell 已由旧运行收尾并退出，本次无法追认其卸载后的同 shell 原值恢复断言；该项仍 UNRUN。此前显式 release 的原值恢复、新增变量移除及无关变量保留通过，Stop 保配置通过，持久原值清理门槛也通过。这些是不同断言。随后独立真实 `/bin/sh` 验证 PASS 0.776 秒：仅删除片段仍保留配置，删除本次 owned 目录后恢复原值、移除新增项且保留无关项。该临时目录已移除；原 shell 的未跑断言仍保留。精确清理 PASS 0.722 秒，只有已核三个诊断对象及本次合成账号/组被清除，四个身份索引均缺失，旧失败证据保留。原首次失败原因仍未确认。完整分段结果见 [Linux 脱敏证据](https://github.com/harmonia-vault/core-go/blob/28a35f286e9ff4bafabf62c0daedca84e0530de3/linuxinstall/evidence/P5-LIFECYCLE.md)。
 
+## Linux P5 闭环核定
+
+2026-10-04 08:20 UTC：**P5 按分段实际证据完成，固定清单已勾选。** 清单要求的产品行为均已实际执行；它没有要求把失败历史改写为一次无故障运行。各段精确来源与结果如下：
+
+| 固定完成条件 | 已有实际证据 |
+| --- | --- |
+| 历史 simple 收据正式离线卸载、同账号新装 Type=exec | 原 core `78d7dd8` 正式安装链已通过 |
+| 真实配对、Start/Boot/Pull、终端接入 | 同安装 CGO1 原生 PAKE、HTTP Boot/Pull、IPC 和合成 shell 已通过 |
+| 必要无人登录重启 | 同安装真实重启后目标 UID 登录会话为零，新 Boot/Pull 已通过 |
+| 最后正式离线卸载和已配对材料清除 | 原整轮失败后，同安装同收据续办 PASS 1.659 秒，正式资源移除、真实账号槽清除；旧 FAIL 保留 |
+| 正式目录删除后存活 shell 恢复 | 新 core `94a7d53` 正式安装/离线卸载组合 PASS 2.267 秒；同一 shell 恢复原值、移除工具新增项、保留无关项 |
+| 精确清理 | 原合成账号与诊断对象清理 PASS 0.722 秒及独立只读 PASS 0.584 秒；新合同的账号、组、八项正式资源和自有 stage 清理通过 |
+
+根从两个 Git 提交独立读取并核对 42 个相关生产文件，逐字相同；共享 secure provider 的差异只在 Windows 构造器，新增同步回调不在离线退出调用栈。因此复用旧链中已通过且未受影响的步骤。本次新合同无账号云状态、设备会话或受信 enrollment；它只补正式卸载与同活 shell 恢复组合，不代替原真实配对、已持钥删除或重启证据。完整说明与证据摘要见 [Linux 新组合合同](evidence/LINUX-P5-OFFLINE-SAME-SHELL.md)，旧来源见 [core-go 分段记录](https://github.com/harmonia-vault/core-go/blob/28a35f286e9ff4bafabf62c0daedca84e0530de3/linuxinstall/evidence/P5-LIFECYCLE.md)。
+
+原整轮 FAIL 26.089 秒、原已退役 post-reboot shell 的 UNRUN 及首次卸载根因未知不变。新夹具在产品安装前的身份创建 FAIL 1.009 秒亦保留；修正测试命令后复用原 stage/组，唯一续办通过。P5 完成不等于原故障已重现或修复，不等于整个当前 HEAD 一次全链通过，也不代表 M2 或生产安全验收完成。
+
 ## 恢复后 DAG 变量业务与授权收紧保存
 
 core-go `94a7d53344c0ae2488a5f55fb945ad0996583434` 已公开来源专用变量写入、删除、持久原 ID 查询与重试；普通入口仍拒绝该来源。完整验签拉取后的授权状态先按原 owner/hash/epoch 和原生整份 CAS 持久保存，首次拉取或 Writer 内部拉取降权后即使拒写，也不会保留旧权限。日志保存过程中明确失去设备信任的原因继续传递；取消时只允许已验的授权安全收紧投影，不推进数据序号、新值或增权。详见[核心合同](../core-go/docs/DAG-VARIABLE-BUSINESS.md)。
