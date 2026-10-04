@@ -1,8 +1,8 @@
 # Windows SCM v9 审阅分支
 
-`core-go` 固定到 `836b7dd6ebe93893ff19e1039a96414687a553ac`，包含标准 SCM 普通账号服务候选、v9 父目录元数据修复和中文证据。其余四仓库引用保持本分支起点不变；主分支没有改动。
+`core-go` 固定到 `45c9b3fd1c61f89191046c1a4c93e0b6ec87ac52`，包含标准 SCM 普通账号服务候选、v9 父目录元数据修复和中文证据。其余四仓库引用保持本分支起点不变；主分支没有改动。
 
-[核心源码与详细验证](https://github.com/harmonia-vault/core-go/blob/836b7dd6ebe93893ff19e1039a96414687a553ac/docs/WINDOWS-SCM-V9.md)
+[核心源码与详细验证](https://github.com/harmonia-vault/core-go/blob/45c9b3fd1c61f89191046c1a4c93e0b6ec87ac52/docs/WINDOWS-SCM-V9.md)
 
 原 v9 的真实 SCM Running/Automatic、指定普通用户、Session 0 与 profile 回读通过；后续一次空账号无人登录重启也通过：服务自行启动，普通账号交互会话与交互登录事件均为 0。整合后的两项定向 provider 测试和 Windows ARM64 候选编译通过。旧 DPAPI、安装与 ACL 证据复用，未重复跑原生矩阵。
 
@@ -11,3 +11,5 @@
 当前 Running 实例不能直接套用只接受历史失败收据的旧升级助手。后续需要精确原生映像升级、合成 HTTPS CA 与同用户 CLI 接线；没有缺少用户真实凭据，不应索取真实凭据做测试。
 
 复用固定库和工具链构建含 SPAKE2 的 Windows 候选，本次 **FAIL**：Go runtime 编译进程 `signal: killed`，259.37 秒、exit 1；具体终止原因未证实。没有重试、扩大资源或安装新映像；完整凭据流程仍 **UNRUN**。
+
+后续已查清并解决构建阻塞：Linux/LXC 构建机的 `/tmp` 为 tmpfs，工具链材料和缓存占用了大部分 2 GiB 容器配额。只迁移本任务材料到现有磁盘、保留全部内容并校验，保持相同源码、工具链和资源限制后，原生 Windows ARM64/CGO1 候选构建 **PASS**（111.744 秒），PE 架构/依赖检查通过，OOM 计数未增加。原失败记录保留。两个 Windows 构建入口已修复为遵循 `TMPDIR`，详见核心仓库 `docs/WINDOWS-NATIVE-BUILD-STORAGE.md`。新原生映像仍只在私有测试目录，服务凭据配对与 Boot/Pull 尚未运行。
