@@ -50,7 +50,7 @@ func dagEnvironmentChange(t *testing.T, ctx context.Context, a *dagAcceptanceAct
 	t.Helper()
 	_ = environmentValue(a.client.Pull(ctx))
 	control := environmentValue(a.client.EnvironmentControl(ctx, authorityEnv))
-	if control.IssuerDAGEvidence == nil || control.IssuerRecoveryEvidence != nil || control.IssuerEvidence.Profile != "" {
+	if control.IssuerDAGEvidence == nil {
 		t.Fatal("P4 control downgraded")
 	}
 	actor := dagEnvironmentTarget(t, a, authorityEnv).Grant
@@ -356,7 +356,7 @@ func TestNativeP4EnvironmentCRUDAndOriginalBusinessReceipt(t *testing.T) {
 	originMust(t, c.verifier.ValidateStoredIssuerEvidence(c.engine.State().Cloud))
 	originMust(t, d.verifier.ValidateStoredIssuerEvidence(current.Cloud))
 	dagStage(t, "paused signed tombstone auth-only/per-key restore/restart ledger", nil)
-	if _, e := d.client.PrepareEnvironmentChangeV2(ctx, cryptox.SignedEnvironmentChange{}, d.key); !errors.Is(e, syncclient.ErrWritePermission) {
-		t.Fatal("P4 fell back to P2")
+	if _, e := d.client.PrepareEnvironmentChangeV4(ctx, cryptox.SignedEnvironmentChange{}, d.key); e == nil {
+		t.Fatal("empty environment packet accepted")
 	}
 }

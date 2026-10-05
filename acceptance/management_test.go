@@ -120,12 +120,12 @@ func TestNativeMobileDeviceGrantManagementSealedRetryAndOtherRevocation(t *testi
 	if callJSON(t, f.proxy.Client(), f.proxy.URL, "/test/emails", "", "", "", nil, &mails) != 200 {
 		t.Fatal("synthetic verification mail unavailable")
 	}
-	var emailProof mobileworkflow.EmailProof
+	var emailProof mobileworkflow.EmailVerification
 	for _, m := range mails {
 		if m.To == f.email {
 			for _, line := range strings.Split(m.Text, "\n") {
-				if strings.HasPrefix(line, "{") {
-					originMust(t, json.Unmarshal([]byte(line), &emailProof))
+				if code, ok := strings.CutPrefix(line, "验证码："); ok && len(code) == 8 {
+					emailProof = mobileworkflow.EmailVerification{AccountID: registration.AccountID, AccountGeneration: registration.AccountGeneration, Code: code}
 				}
 			}
 		}
@@ -140,9 +140,10 @@ func TestNativeMobileDeviceGrantManagementSealedRetryAndOtherRevocation(t *testi
 	}
 	env := view.Environments[0].ID
 	var native struct {
-		DeviceID string                    `json:"deviceId"`
-		Root     *cryptox.TrustRoot        `json:"root"`
-		Initial  []cryptox.SignedGrantWire `json:"initialAuthorities"`
+		Initialization cryptox.OriginalInitialization `json:"initialization"`
+		DeviceID       string                         `json:"deviceId"`
+		Root           *cryptox.TrustRoot             `json:"root"`
+		Initial        []cryptox.SignedGrantWire      `json:"initialAuthorities"`
 	}
 	data := load()
 	originMust(t, json.Unmarshal(data, &native))
@@ -154,7 +155,7 @@ func TestNativeMobileDeviceGrantManagementSealedRetryAndOtherRevocation(t *testi
 	f.initial = native.Initial
 	keys.DeviceID = native.DeviceID
 	a := &originActor{keys: keys, key: key, engine: environmentValue(localstate.New(&originMemoryStore{state: localstate.EmptyState()}))}
-	a.verifier = environmentValue(syncclient.NewRootPinnedVerifierWithOrigins(syncclient.OriginRootPinnedTrust{Trust: syncclient.PinnedTrust{AccountID: f.account, AccountGeneration: 1, DeviceID: keys.DeviceID, DeviceSigningPublicKey: keys.SigningPublic, ReceivingPrivateKey: keys.ReceivingPrivate}, Root: f.root, InitialAuthorities: f.initial}))
+	a.verifier = environmentValue(syncclient.NewRootDAGPinnedVerifier(syncclient.PinnedTrust{AccountID: f.account, AccountGeneration: 1, DeviceID: keys.DeviceID, DeviceSigningPublicKey: keys.SigningPublic, ReceivingPrivateKey: keys.ReceivingPrivate}, native.Initialization))
 	defer a.verifier.Close()
 	f.boot(a)
 	f.pull(a)
@@ -218,7 +219,15 @@ func TestNativeMobileDeviceGrantManagementSealedRetryAndOtherRevocation(t *testi
 	// 原RW已经接受后，被独立的Admin更新覆盖；旧receipt仍应正确完成而不能重写RW。
 	f.pull(a)
 	newer := environmentValue(a.client.PrepareGrantUpdate(ctx, syncclient.GrantUpdateIntent{ID: "management-later-admin", EnvironmentID: env, SubjectDeviceID: b.keys.DeviceID, Role: "admin"}, a.key))
-	accepted := environmentValue(newer.Submit(ctx))
+	saveGrant, _ := recoveryNativeSeal(t, "independent-dag-grant-journal")
+	accepted := environmentValue(newer.SubmitWithBarrier(ctx, func() error {
+		raw, e := newer.ProtectedBytes()
+		if e != nil {
+			return e
+		}
+		defer clear(raw)
+		return saveGrant(raw)
+	}))
 	if !environmentValue(newer.Confirm(ctx, accepted)).Applied {
 		t.Fatal("newer grant failed verified pull")
 	}
@@ -279,7 +288,14 @@ func TestNativeMobileDeviceGrantManagementSealedRetryAndOtherRevocation(t *testi
 	c := f.enroll(a, "management-other-reader", env, "ro", "0", false)
 	f.pull(b)
 	none := environmentValue(b.client.PrepareGrantUpdate(ctx, syncclient.GrantUpdateIntent{ID: "management-temporary-none", EnvironmentID: env, SubjectDeviceID: c.keys.DeviceID, Role: "none"}, b.key))
-	na := environmentValue(none.Submit(ctx))
+	na := environmentValue(none.SubmitWithBarrier(ctx, func() error {
+		raw, e := none.ProtectedBytes()
+		if e != nil {
+			return e
+		}
+		defer clear(raw)
+		return saveGrant(raw)
+	}))
 	if !environmentValue(none.Confirm(ctx, na)).Applied {
 		t.Fatal("temporary admin none ceiling normalization failed")
 	}

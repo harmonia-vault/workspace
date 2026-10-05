@@ -42,7 +42,7 @@ func TestMobileWorkflowRealInitializationCRUDSealedResumeAndUnknownResults(t *te
 				lose = loseInit.Swap(false)
 			} else if strings.HasSuffix(path, "/mutations") {
 				lose = loseMutation.Swap(false)
-			} else if strings.HasSuffix(path, "/environment-changes") || strings.HasSuffix(path, "/environment-changes-v2") {
+			} else if strings.HasSuffix(path, "/environment-changes") || strings.HasSuffix(path, "/environment-changes-v4") {
 				lose = loseEnvironment.Swap(false)
 			}
 		}
@@ -109,19 +109,17 @@ func TestMobileWorkflowRealInitializationCRUDSealedResumeAndUnknownResults(t *te
 	if status := callJSON(t, client, proxy.URL, "/test/emails", "", "", "", nil, &mail); status != 200 {
 		t.Fatal(status)
 	}
-	var proof mobileworkflow.EmailProof
+	var proof mobileworkflow.EmailVerification
 	for _, message := range mail {
 		if message.To == email {
 			for _, line := range strings.Split(message.Text, "\n") {
-				if strings.HasPrefix(line, "{") {
-					if json.Unmarshal([]byte(line), &proof) != nil {
-						t.Fatal("synthetic email proof invalid")
-					}
+				if code, ok := strings.CutPrefix(line, "验证码："); ok && len(code) == 8 {
+					proof = mobileworkflow.EmailVerification{AccountID: registered.AccountID, AccountGeneration: registered.AccountGeneration, Code: code}
 				}
 			}
 		}
 	}
-	if proof.AccountID != registered.AccountID || proof.Token == "" {
+	if proof.AccountID != registered.AccountID || proof.Code == "" {
 		t.Fatal("synthetic verification proof missing")
 	}
 	if err = workflow.VerifyEmail(ctx, proof); err != nil {

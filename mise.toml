@@ -17,7 +17,7 @@ run = "go test -v ./acceptance"
 
 [tasks.acceptance-native]
 description = "开发集成检查：原生 SPAKE2 初始化、配对、boot、同步与恢复，不代表用户验收"
-run = "go test -tags harmonia_boringssl -v ./acceptance"
+run = "go test -gcflags=-e -tags harmonia_boringssl -v ./acceptance -timeout=20m"
 
 [tasks.test-mobile-dag-query-https]
 description = "三个隔离原事务场景的手机 DAG 冷查询 HTTPS/SQLite 开发检查，不运行 SDK 或配对"
@@ -36,5 +36,23 @@ description = "三个隔离 B3a 明确登记原包的 HTTPS/SQLite 场景；无 
 run = "go test -race ./acceptance -run '^TestMobileDAGRecoveredHTTPS$' -count=1 -timeout=150s -json"
 
 [tasks.test-mobile-dag-closure-https]
-description = "原ID关闭/accepted确认/legacygap的有限真实HTTPS联合race"
+description = "原 ID 关闭、接受确认与后续 DAG 换代的有限真实HTTPS联合race"
 run = "go test -race -p 2 -tags harmonia_boringssl ./acceptance -run '^TestMobileDAGOperationResolutionHTTPS$' -count=1 -timeout=180s -json"
+
+[tasks.test-email-code-https]
+description = "八位字母数字邮件码到 Go 原生账号重置的真实 HTTPS/SQLite 开发检查"
+run = "go test ./acceptance -run '^TestNativeAccountResetRequestedEmail' -count=1 -timeout=120s"
+
+[tasks.test-account-access-https]
+description = "真实 HTTPS/SQLite 恢复登记激活、恢复后读写及八位字母数字邮件码重置回归"
+run = "go test -p 2 -tags harmonia_boringssl ./acceptance -run '^TestNativeBridgeDAG(Applied|Business|Environment|Resolution)HTTPS$|^TestNativeAccountResetRequestedEmail' -count=1 -timeout=240s"
+
+[tasks.test-recovered-writes-https]
+description = "单独验证恢复后变量写入和丢包续办"
+run = "go test -v -tags harmonia_boringssl ./acceptance -run '^TestNativeBridgeDAGBusinessHTTPS$' -count=1 -timeout=180s"
+
+[tasks.format-email-code]
+run = "gofmt -w acceptance/account_reset_mail_test.go acceptance/mobile_manager_test.go acceptance/management_test.go acceptance/selfrevocation_test.go acceptance/pause_rotation_test.go acceptance/origin_test.go acceptance/mobileworkflow_test.go acceptance/mobile_recovery_test.go acceptance/management_fault_test.go core-go/mobilebridge/cmd/genericcontroller/main.go"
+
+[tasks.format-dag]
+run = "gofmt -w acceptance"

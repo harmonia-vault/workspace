@@ -45,7 +45,7 @@ func dagManagementNativeApprover(t *testing.T, f *mobileManagerFixture, d *mobil
 	defer clear(aesKey)
 	block := environmentValue(aes.NewCipher(aesKey))
 	aead := environmentValue(cipher.NewGCM(block))
-	if len(packet) < 40 || string(packet[:8]) != "HARMST01" {
+	if len(packet) < 40 || string(packet[:8]) != "HARMST02" {
 		t.Fatal("native test state format")
 	}
 	n := int(binary.BigEndian.Uint32(packet[8:12]))

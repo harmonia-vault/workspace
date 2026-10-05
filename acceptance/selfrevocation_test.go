@@ -139,17 +139,17 @@ func newRealSelfFixture(t *testing.T) *realSelfFixture {
 	if status := callJSON(t, f.proxy.Client(), f.proxy.URL, "/test/emails", "", "", "", nil, &messages); status != 200 {
 		t.Fatal(status)
 	}
-	var proof mobileworkflow.EmailProof
+	var proof mobileworkflow.EmailVerification
 	for _, message := range messages {
 		if message.To == email {
 			for _, line := range strings.Split(message.Text, "\n") {
-				if strings.HasPrefix(line, "{") {
-					_ = json.Unmarshal([]byte(line), &proof)
+				if code, ok := strings.CutPrefix(line, "验证码："); ok && len(code) == 8 {
+					proof = mobileworkflow.EmailVerification{AccountID: registered.AccountID, AccountGeneration: registered.AccountGeneration, Code: code}
 				}
 			}
 		}
 	}
-	if proof.AccountID != registered.AccountID || proof.Token == "" {
+	if proof.AccountID != registered.AccountID || proof.Code == "" {
 		t.Fatal("real registered synthetic email proof missing")
 	}
 	if err = f.workflow.VerifyEmail(ctx, proof); err != nil {

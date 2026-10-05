@@ -41,11 +41,11 @@ func newPauseOriginFixture(t *testing.T) (*originFixture, *originActor, string) 
 			if strings.HasSuffix(path, "/boot-sessions") {
 				f.boots.Add(1)
 			}
-			if strings.Contains(path, "/pairings-v3/") && strings.HasSuffix(path, "/complete") {
+			if strings.Contains(path, "/pairings-v5/") && strings.HasSuffix(path, "/complete") {
 				f.enrollmentPosts.Add(1)
 				lose = f.loseEnrollment.Swap(false)
 			}
-			if strings.HasSuffix(path, "/environment-changes-v2") {
+			if strings.HasSuffix(path, "/environment-changes-v4") {
 				f.environmentPosts.Add(1)
 				lose = f.loseEnvironment.Swap(false)
 			}
@@ -80,17 +80,17 @@ func newPauseOriginFixture(t *testing.T) (*originFixture, *originActor, string) 
 	if got := callJSON(t, f.proxy.Client(), f.proxy.URL, "/test/emails", "", "", "", nil, &mail); got != 200 {
 		t.Fatal(got)
 	}
-	var proof mobileworkflow.EmailProof
+	var proof mobileworkflow.EmailVerification
 	for _, message := range mail {
 		if message.To == f.email {
 			for _, line := range strings.Split(message.Text, "\n") {
-				if strings.HasPrefix(line, "{") {
-					originMust(t, json.Unmarshal([]byte(line), &proof))
+				if code, ok := strings.CutPrefix(line, "验证码："); ok && len(code) == 8 {
+					proof = mobileworkflow.EmailVerification{AccountID: registered.AccountID, AccountGeneration: registered.AccountGeneration, Code: code}
 				}
 			}
 		}
 	}
-	if proof.AccountID != f.account || proof.Token == "" {
+	if proof.AccountID != f.account || proof.Code == "" {
 		t.Fatal("real registration verification proof missing")
 	}
 	originMust(t, workflow.VerifyEmail(ctx, proof))
@@ -105,11 +105,12 @@ func newPauseOriginFixture(t *testing.T) (*originFixture, *originActor, string) 
 	_, e := workflow.SetVariable(ctx, x, "X_PRIVATE_NAME_ORIGIN_TEST", "synthetic-origin-X-value", "origin-X-put")
 	originMust(t, e)
 	var native struct {
-		AccountID          string                    `json:"accountId"`
-		AccountGeneration  string                    `json:"accountGeneration"`
-		DeviceID           string                    `json:"deviceId"`
-		Root               *cryptox.TrustRoot        `json:"root"`
-		InitialAuthorities []cryptox.SignedGrantWire `json:"initialAuthorities"`
+		Initialization     cryptox.OriginalInitialization `json:"initialization"`
+		AccountID          string                         `json:"accountId"`
+		AccountGeneration  string                         `json:"accountGeneration"`
+		DeviceID           string                         `json:"deviceId"`
+		Root               *cryptox.TrustRoot             `json:"root"`
+		InitialAuthorities []cryptox.SignedGrantWire      `json:"initialAuthorities"`
 	}
 	exported := environmentValue(workflow.ExportProtectedState())
 	originMust(t, json.Unmarshal(exported, &native))
@@ -121,7 +122,7 @@ func newPauseOriginFixture(t *testing.T) (*originFixture, *originActor, string) 
 	f.initial = native.InitialAuthorities
 	rootKeys.DeviceID = native.DeviceID
 	a := &originActor{keys: rootKeys, key: rootKey, engine: environmentValue(localstate.New(&originMemoryStore{state: localstate.EmptyState()}))}
-	a.verifier = environmentValue(syncclient.NewRootPinnedVerifierWithOrigins(syncclient.OriginRootPinnedTrust{Trust: syncclient.PinnedTrust{AccountID: f.account, AccountGeneration: 1, DeviceID: a.keys.DeviceID, DeviceSigningPublicKey: a.keys.SigningPublic, ReceivingPrivateKey: a.keys.ReceivingPrivate}, Root: f.root, InitialAuthorities: f.initial}))
+	a.verifier = environmentValue(syncclient.NewRootDAGPinnedVerifier(syncclient.PinnedTrust{AccountID: f.account, AccountGeneration: 1, DeviceID: a.keys.DeviceID, DeviceSigningPublicKey: a.keys.SigningPublic, ReceivingPrivateKey: a.keys.ReceivingPrivate}, native.Initialization))
 	t.Cleanup(a.verifier.Close)
 	f.boot(a)
 
@@ -176,7 +177,7 @@ func TestNativePausedRotationRetainsSourceThenRevokeDeleteExpireAndCaps(t *testi
 			before := d.engine.State().Cloud
 			if kind == "caps" {
 				lowered := environmentValue(a.client.PrepareGrantUpdate(ctx, syncclient.GrantUpdateIntent{ID: "pause-lower", EnvironmentID: env, SubjectDeviceID: d.keys.DeviceID, Role: "rw", ExpiresAt: time.Now().Unix() + 3600}, a.key))
-				accepted := environmentValue(lowered.Submit(ctx))
+				accepted := submitSealedGrant(t, ctx, lowered)
 				if !environmentValue(lowered.Confirm(ctx, accepted)).Applied {
 					t.Fatal("lower grant did not converge")
 				}
@@ -200,7 +201,7 @@ func TestNativePausedRotationRetainsSourceThenRevokeDeleteExpireAndCaps(t *testi
 			switch kind {
 			case "revoke":
 				transaction := environmentValue(a.client.PrepareGrantUpdate(ctx, syncclient.GrantUpdateIntent{ID: "pause-revoke", EnvironmentID: env, SubjectDeviceID: d.keys.DeviceID, Role: "none"}, a.key))
-				accepted := environmentValue(transaction.Submit(ctx))
+				accepted := submitSealedGrant(t, ctx, transaction)
 				if !environmentValue(transaction.Confirm(ctx, accepted)).Applied {
 					t.Fatal("signed none not accepted")
 				}
@@ -241,7 +242,7 @@ func TestNativePausedRotationRetainsSourceThenRevokeDeleteExpireAndCaps(t *testi
 					t.Fatal("pause failed lower role/deadline")
 				}
 				transaction := environmentValue(a.client.PrepareGrantUpdate(ctx, syncclient.GrantUpdateIntent{ID: "pause-upgrade", EnvironmentID: env, SubjectDeviceID: d.keys.DeviceID, Role: "admin"}, a.key))
-				accepted := environmentValue(transaction.Submit(ctx))
+				accepted := submitSealedGrant(t, ctx, transaction)
 				if !environmentValue(transaction.Confirm(ctx, accepted)).Applied {
 					t.Fatal("signed upgrade not accepted")
 				}

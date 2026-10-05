@@ -41,9 +41,9 @@ func TestNativeBridgeDAGEnvironmentHTTPS(t *testing.T) {
 	ro := newMobileManagerActor(t, f)
 	rw := newMobileManagerActor(t, f)
 	_ = environmentValue(f.enroll(t, f.root, ro, "environment-reader-pair", []mobileworkflow.ApprovalSelection{{EnvironmentID: f.initial, Role: "ro", ExpiresAt: "0"}}))
-	_ = environmentValue(f.root.RetryApprovalV3(context.Background(), "environment-reader-pair"))
+	_ = environmentValue(f.root.RetryApprovalV5(context.Background(), "environment-reader-pair"))
 	_ = environmentValue(f.enroll(t, f.root, rw, "environment-writer-pair", []mobileworkflow.ApprovalSelection{{EnvironmentID: f.initial, Role: "rw", ExpiresAt: "0"}}))
-	_ = environmentValue(f.root.RetryApprovalV3(context.Background(), "environment-writer-pair"))
+	_ = environmentValue(f.root.RetryApprovalV5(context.Background(), "environment-writer-pair"))
 	roID := environmentValue(ro.workflow.View()).DeviceID
 	rwID := environmentValue(rw.workflow.View()).DeviceID
 	added := environmentValue(f.root.CreateEnvironment(context.Background(), "合成只读环境Y", "environment-ro-y"))

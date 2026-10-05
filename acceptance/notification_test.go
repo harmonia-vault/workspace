@@ -69,7 +69,7 @@ func TestGoWSSNodeSQLiteNotificationReconnectPauseAndRevocation(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	verifier, err := syncclient.NewPinnedVerifier(syncclient.PinnedTrust{AccountID: f.AccountID, AccountGeneration: 1, DeviceID: "writer", DeviceSigningPublicKey: keyFor(t, f, "writer").Public().(ed25519.PublicKey), ReceivingPrivateKey: bytes.Repeat([]byte{8}, 32), Managers: map[string]ed25519.PublicKey{"admin": keyFor(t, f, "admin").Public().(ed25519.PublicKey)}})
+	verifier, err := syncclient.NewPinnedVerifierV5(syncclient.IssuerDAGPinnedTrust{AccountID: f.AccountID, AccountGeneration: 1, DeviceID: "writer", DeviceSigningPublicKey: keyFor(t, f, "writer").Public().(ed25519.PublicKey), ReceivingPrivateKey: bytes.Repeat([]byte{9}, 32), Receipt: syncclient.EnrollmentReceiptV5{IdempotencyKey: "fixture-writer", Approval: f.DAGEnrollments["writer"]}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -113,12 +113,12 @@ func TestGoWSSNodeSQLiteNotificationReconnectPauseAndRevocation(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer subscription.Close()
-	if hint := read(subscription); hint.Sequence != 1 || engine.State().Cloud.Sequence != 0 {
+	if hint := read(subscription); hint.Sequence != 4 || engine.State().Cloud.Sequence != 0 {
 		t.Fatal("初始通知直接推进检查点")
 	}
 	pull()
 	sequence := mutate(1, "first-wss-synthetic")
-	if hint := read(subscription); hint.Sequence != sequence || engine.State().Cloud.Sequence != 1 {
+	if hint := read(subscription); hint.Sequence != sequence || engine.State().Cloud.Sequence != 4 {
 		t.Fatal("持久提交通知错误或直接应用了数据")
 	}
 	pull()
@@ -132,7 +132,7 @@ func TestGoWSSNodeSQLiteNotificationReconnectPauseAndRevocation(t *testing.T) {
 		t.Fatal(err)
 	}
 	defer subscription.Close()
-	if hint := read(subscription); hint.Sequence != sequence || engine.State().Cloud.Sequence != 2 {
+	if hint := read(subscription); hint.Sequence != sequence || engine.State().Cloud.Sequence != 5 {
 		t.Fatal("重连初始提示未补漏边界")
 	}
 	pull()
@@ -156,7 +156,7 @@ func TestGoWSSNodeSQLiteNotificationReconnectPauseAndRevocation(t *testing.T) {
 		t.Fatal(err)
 	}
 	state := engine.State()
-	if state.Cloud.Sequence != 3 || state.Cloud.AuthorizationSequence != sequence || state.Cloud.Environments["dev"].Values["WS_SYNTHETIC"] != "missed-wss-synthetic" {
+	if state.Cloud.Sequence != 6 || state.Cloud.AuthorizationSequence != sequence || state.Cloud.Environments["dev"].Values["WS_SYNTHETIC"] != "missed-wss-synthetic" {
 		t.Fatal("暂停提示应用了普通值或推进了数据检查点")
 	}
 	if err = engine.SetPaused(false); err != nil {

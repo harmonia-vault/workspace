@@ -239,7 +239,7 @@ func actualDAGCLI5(t *testing.T, parent context.Context, f *mobileManagerFixture
 	uid := environmentValue(localkeys.CurrentUserID())
 	ca := filepath.Join(base, "ca.pem")
 	originMust(t, os.WriteFile(ca, pem.EncodeToMemory(&pem.Block{Type: "CERTIFICATE", Bytes: f.proxy.Certificate().Raw}), 0600))
-	binary := buildRecoveryCLI4(t, base, true)
+	binary := buildDAGCLI(t, base, true)
 	args := []string{"--local-directory", directory, "--local-user", uid, "--ca-file", ca}
 	run := func(command, input string, extra ...string) ([]byte, error) {
 		p := exec.CommandContext(ctx, binary, append(append([]string{command}, args...), extra...)...)
@@ -270,7 +270,7 @@ func actualDAGCLI5(t *testing.T, parent context.Context, f *mobileManagerFixture
 		return nil
 	}})
 	defer f.responseHook.Store(nil)
-	pair := exec.CommandContext(ctx, binary, append(append([]string{"pair"}, args...), "--certificate-version", "5", "--approver", c.id)...)
+	pair := exec.CommandContext(ctx, binary, append(append([]string{"pair"}, args...), "--approver", c.id)...)
 	pair.Env = []string{"PATH=" + os.Getenv("PATH")}
 	stdout := environmentValue(pair.StdoutPipe())
 	pair.Stderr = io.Discard
@@ -349,13 +349,13 @@ func actualDAGCLI5(t *testing.T, parent context.Context, f *mobileManagerFixture
 		t.Fatal("CLI5 completion count mismatch")
 	}
 	if lose {
-		_, err = run("pair", "", "--certificate-version", "5")
+		_, err = run("pair", "")
 		dagStage(t, "CLI5 original accepted receipt resume", err)
 		if completions.Load() != 1 {
 			t.Fatal("CLI5 lost response caused new completion")
 		}
 	}
-	binary = buildRecoveryCLI4(t, base, false)
+	binary = buildDAGCLI(t, base, false)
 	log := environmentValue(os.OpenFile(filepath.Join(base, "daemon.log"), os.O_CREATE|os.O_EXCL|os.O_WRONLY, 0600))
 	defer log.Close()
 	daemon := exec.CommandContext(ctx, binary, append(append([]string{"daemon"}, args...), "--platform-fragment", filepath.Join(directory, "environment.sh"), "--interval", "20ms", "--sync-interval", "1s")...)
@@ -418,4 +418,37 @@ func actualDAGCLI5(t *testing.T, parent context.Context, f *mobileManagerFixture
 		}
 	}
 	dagStage(t, "formal CLI5 PAKE/Boot/P4/"+role, nil)
+}
+
+func buildDAGCLI(t *testing.T, directory string, native bool) string {
+	t.Helper()
+	name := "harmonia-dag-daemon"
+	if native {
+		name = "harmonia-dag-pair"
+	}
+	binary := filepath.Join(directory, name)
+	goEnv := exec.Command("go", "env", "GOCACHE", "GOMODCACHE", "GOPATH")
+	goEnv.Env = []string{"PATH=" + os.Getenv("PATH")}
+	for _, name := range []string{"HOME", "USERPROFILE", "GOCACHE", "GOMODCACHE", "GOPATH"} {
+		if value := os.Getenv(name); value != "" {
+			goEnv.Env = append(goEnv.Env, name+"="+value)
+		}
+	}
+	caches := strings.Split(strings.TrimSpace(string(environmentValue(goEnv.Output()))), "\n")
+	if len(caches) != 3 {
+		t.Fatal("Go cache tool result invalid")
+	}
+	args := []string{"build", "-o", binary, "./cmd/harmonia"}
+	cgo := "0"
+	if native {
+		args = []string{"build", "-tags", "harmonia_boringssl", "-o", binary, "./cmd/harmonia"}
+		cgo = "1"
+	}
+	build := exec.Command("go", args...)
+	build.Dir = "../core-go"
+	build.Env = []string{"PATH=" + os.Getenv("PATH"), "CGO_ENABLED=" + cgo, "GOCACHE=" + caches[0], "GOMODCACHE=" + caches[1], "GOPATH=" + caches[2]}
+	if output, err := build.CombinedOutput(); err != nil {
+		t.Fatalf("compiled native cert4 CLI failed: %v\n%s", err, output)
+	}
+	return binary
 }

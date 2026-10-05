@@ -18,6 +18,7 @@ import (
 	"strings"
 	"sync/atomic"
 	"testing"
+	"time"
 
 	"github.com/harmonia-vault/core-go/accountreset"
 	"github.com/harmonia-vault/core-go/cryptox"
@@ -101,8 +102,8 @@ func TestNativeAccountResetRequestedEmailHTTPSOriginalProofAndUnknownCommit(t *t
 		for _, m := range mails {
 			if m.To == email && m.Subject == subject {
 				for _, line := range strings.Split(m.Text, "\n") {
-					if strings.HasPrefix(line, "{") {
-						return []byte(line)
+					if code, ok := strings.CutPrefix(line, "验证码："); ok && len(code) == 8 {
+						return []byte(code)
 					}
 				}
 			}
@@ -110,12 +111,11 @@ func TestNativeAccountResetRequestedEmailHTTPSOriginalProofAndUnknownCommit(t *t
 		t.Fatal("本次合成证明缺失")
 		return nil
 	}
-	verify := readMail("Harmonia 邮箱验证")
-	var verification mobileworkflow.EmailProof
-	originMust(t, json.Unmarshal(verify, &verification))
+	verify := readMail("Harmonia 邮箱验证码")
+	verification := mobileworkflow.EmailVerification{AccountID: registered.AccountID, AccountGeneration: registered.AccountGeneration, Code: string(verify)}
 	clear(verify)
 	originMust(t, w.VerifyEmail(ctx, verification))
-	verification = mobileworkflow.EmailProof{}
+	verification = mobileworkflow.EmailVerification{}
 	originMust(t, w.Login(ctx, email, oldPassword))
 	code := environmentValue(w.BeginInitialization(ctx, "合成待重置环境", "native-mail-init"))
 	view := environmentValue(w.CompleteInitialization(ctx, code))
@@ -127,11 +127,25 @@ func TestNativeAccountResetRequestedEmailHTTPSOriginalProofAndUnknownCommit(t *t
 	defer mailOwner.Close()
 	input := []byte(email)
 	accepted := environmentValue(mailOwner.RequestEmail(input))
+	var limited struct {
+		Accepted          bool `json:"accepted"`
+		RetryAfterSeconds int  `json:"retryAfterSeconds"`
+	}
+	originMust(t, json.Unmarshal([]byte(accepted), &limited))
+	if !limited.Accepted && limited.RetryAfterSeconds > 0 && limited.RetryAfterSeconds <= 30 {
+		time.Sleep(time.Duration(limited.RetryAfterSeconds+1) * time.Second)
+		input = []byte(email)
+		accepted = environmentValue(mailOwner.RequestEmail(input))
+	}
+
 	if accepted != `{"version":1,"accepted":true,"trustedDevice":false}` || !bytes.Equal(input, make([]byte, len(input))) || requestPosts.Load() != 1 {
 		t.Fatal("原生邮件入口未严格消费/接受")
 	}
-	proof := readMail("Harmonia 账号重置证明")
-	p := environmentValue(accountreset.ParseProof(proof))
+	shortCode := readMail("Harmonia 账号重置验证码")
+	proof := environmentValue(json.Marshal(map[string]string{"email": email, "code": string(shortCode)}))
+	clear(shortCode)
+	resetClient := environmentValue(accountreset.New(accountreset.Config{Endpoint: proxy.URL, HTTPClient: proxy.Client()}))
+	p := environmentValue(resetClient.ResolveCode(ctx, proof))
 	if p.AccountID != registered.AccountID || p.AccountGeneration != registered.AccountGeneration {
 		t.Fatal("证明账号范围错误")
 	}

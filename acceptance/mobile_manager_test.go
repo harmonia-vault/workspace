@@ -66,7 +66,7 @@ func newMobileManagerActor(t *testing.T, f *mobileManagerFixture) *mobileManager
 			Enrollment *struct {
 				Sequence uint64 `json:"sequence"`
 				Applied  bool   `json:"applied"`
-			} `json:"enrollmentV3"`
+			} `json:"enrollmentV5"`
 			Cloud localstate.State `json:"cloud"`
 		}
 		if err := json.Unmarshal(data, &s); err != nil {
@@ -100,7 +100,7 @@ func newMobileManagerFixture(t *testing.T) *mobileManagerFixture {
 				return err
 			}
 		}
-		if r.StatusCode == 200 && r.Request.Method == "POST" && strings.HasSuffix(r.Request.URL.Path, "/pairings-v3") {
+		if r.StatusCode == 200 && r.Request.Method == "POST" && strings.HasSuffix(r.Request.URL.Path, "/pairings-v5") {
 			data, err := io.ReadAll(r.Body)
 			if err != nil {
 				return err
@@ -115,7 +115,7 @@ func newMobileManagerFixture(t *testing.T) *mobileManagerFixture {
 			}
 			f.ready <- s.ID
 		}
-		if r.StatusCode == 200 && r.Request.Method == "POST" && strings.HasSuffix(r.Request.URL.Path, "/environment-changes-v2") && f.loseEnvironment.Swap(false) {
+		if r.StatusCode == 200 && r.Request.Method == "POST" && strings.HasSuffix(r.Request.URL.Path, "/environment-changes-v4") && f.loseEnvironment.Swap(false) {
 			_ = r.Body.Close()
 			data := []byte(`{"error":"synthetic_lost_environment_origin"}`)
 			r.StatusCode = 502
@@ -123,7 +123,7 @@ func newMobileManagerFixture(t *testing.T) *mobileManagerFixture {
 			r.ContentLength = int64(len(data))
 			r.Header.Set("Content-Length", strconv.Itoa(len(data)))
 		}
-		if r.StatusCode == 200 && r.Request.Method == "POST" && strings.Contains(r.Request.URL.Path, "/pairings-v3/") && strings.HasSuffix(r.Request.URL.Path, "/complete") && f.loseComplete.Swap(false) {
+		if r.StatusCode == 200 && r.Request.Method == "POST" && strings.Contains(r.Request.URL.Path, "/pairings-v5/") && strings.HasSuffix(r.Request.URL.Path, "/complete") && f.loseComplete.Swap(false) {
 			_ = r.Body.Close()
 			data := []byte(`{"error":"synthetic_lost_mobile_receipt"}`)
 			r.StatusCode = 502
@@ -134,10 +134,10 @@ func newMobileManagerFixture(t *testing.T) *mobileManagerFixture {
 		return nil
 	}
 	f.proxy = httptest.NewTLSServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		if r.Method == "POST" && strings.Contains(r.URL.Path, "/pairings-v3/") && strings.HasSuffix(r.URL.Path, "/complete") {
+		if r.Method == "POST" && strings.Contains(r.URL.Path, "/pairings-v5/") && strings.HasSuffix(r.URL.Path, "/complete") {
 			f.completes.Add(1)
 		}
-		if r.Method == "POST" && strings.HasSuffix(r.URL.Path, "/environment-changes-v2") {
+		if r.Method == "POST" && strings.HasSuffix(r.URL.Path, "/environment-changes-v4") {
 			f.environmentPosts.Add(1)
 		}
 		reverse.ServeHTTP(w, r)
@@ -152,17 +152,17 @@ func newMobileManagerFixture(t *testing.T) *mobileManagerFixture {
 	if status := callJSON(t, f.proxy.Client(), f.proxy.URL, "/test/emails", "", "", "", nil, &mails); status != 200 {
 		t.Fatal(status)
 	}
-	var proof mobileworkflow.EmailProof
+	var proof mobileworkflow.EmailVerification
 	for _, m := range mails {
 		if m.To == f.email {
 			for _, line := range strings.Split(m.Text, "\n") {
-				if strings.HasPrefix(line, "{") {
-					_ = json.Unmarshal([]byte(line), &proof)
+				if code, ok := strings.CutPrefix(line, "验证码："); ok && len(code) == 8 {
+					proof = mobileworkflow.EmailVerification{AccountID: registered.AccountID, AccountGeneration: registered.AccountGeneration, Code: code}
 				}
 			}
 		}
 	}
-	if proof.AccountID != registered.AccountID || proof.Token == "" {
+	if proof.AccountID != registered.AccountID || proof.Code == "" {
 		t.Fatal("synthetic email proof missing")
 	}
 	if err := f.root.VerifyEmail(ctx, proof); err != nil {
@@ -177,16 +177,22 @@ func newMobileManagerFixture(t *testing.T) *mobileManagerFixture {
 	if _, err := f.root.SetVariable(ctx, f.initial, "SYNTHETIC_X", "synthetic-x-value", "manager-x-put"); err != nil {
 		t.Fatal(err)
 	}
+	f.environmentPosts.Store(0)
 	return f
 }
 func (f *mobileManagerFixture) enroll(t *testing.T, manager *mobileworkflow.Workflow, a *mobileManagerActor, id string, selections []mobileworkflow.ApprovalSelection) (mobileworkflow.View, error) {
+	t.Helper()
+	managerID := environmentValue(manager.View()).DeviceID
+	return f.enrollWithManagerID(t, manager, a, id, selections, managerID)
+}
+func (f *mobileManagerFixture) enrollWithManagerID(t *testing.T, manager *mobileworkflow.Workflow, a *mobileManagerActor, id string, selections []mobileworkflow.ApprovalSelection, managerID string) (mobileworkflow.View, error) {
 	t.Helper()
 	ctx, cancel := context.WithTimeout(context.Background(), 20*time.Second)
 	defer cancel()
 	if err := a.workflow.Login(ctx, f.email, f.password); err != nil {
 		t.Fatal(err)
 	}
-	managerID := environmentValue(manager.View()).DeviceID
+
 	code := []byte("68429173")
 	defer clear(code)
 	type result struct {
@@ -208,7 +214,7 @@ func (f *mobileManagerFixture) enroll(t *testing.T, manager *mobileworkflow.Work
 	case <-ctx.Done():
 		t.Fatal("pairing begin timeout")
 	}
-	approval, err := manager.ApprovePairingV3(ctx, mobileworkflow.ApprovalInput{PairingID: id, ShortCode: code, Selections: selections})
+	approval, err := manager.ApprovePairingV5(ctx, mobileworkflow.ApprovalInput{PairingID: id, ShortCode: code, Selections: selections})
 	if err != nil {
 		t.Fatal("actual manager approval", err)
 	}
@@ -289,7 +295,7 @@ func TestMobileManagerEnrollmentNativeSaveBoundariesAndRestart(t *testing.T) {
 			if _, err = a.workflow.View(); err != nil {
 				t.Fatal("applied receipt failed sealed resume", err)
 			}
-			if _, err = f.root.RetryApprovalV3(context.Background(), "manager-b-enroll"); err != nil {
+			if _, err = f.root.RetryApprovalV5(context.Background(), "manager-b-enroll"); err != nil {
 				t.Fatal(err)
 			}
 		})
@@ -306,7 +312,7 @@ func TestMobileGenericManagerRealOriginCreateApproveReadOnlyAndRotate(t *testing
 	if _, err := f.enroll(t, f.root, b, "manager-b-enroll", []mobileworkflow.ApprovalSelection{{EnvironmentID: f.initial, Role: "admin", ExpiresAt: expires}}); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := f.root.RetryApprovalV3(ctx, "manager-b-enroll"); err != nil {
+	if _, err := f.root.RetryApprovalV5(ctx, "manager-b-enroll"); err != nil {
 		t.Fatal(err)
 	}
 	b.reopen(t)
@@ -346,7 +352,7 @@ func TestMobileGenericManagerRealOriginCreateApproveReadOnlyAndRotate(t *testing
 	if _, err = c.workflow.SetVariable(ctx, y, "SYNTHETIC_Y", "forbidden", "manager-c-write"); !errors.Is(err, syncclient.ErrWritePermission) {
 		t.Fatal("read-only writer opened", err)
 	}
-	if _, err = b.workflow.RetryApprovalV3(ctx, "manager-c-enroll"); err != nil {
+	if _, err = b.workflow.RetryApprovalV5(ctx, "manager-c-enroll"); err != nil {
 		t.Fatal(err)
 	}
 	d := newMobileManagerActor(t, f)
@@ -354,7 +360,7 @@ func TestMobileGenericManagerRealOriginCreateApproveReadOnlyAndRotate(t *testing
 	if _, err := f.enroll(t, f.root, d, "manager-d-enroll", []mobileworkflow.ApprovalSelection{{EnvironmentID: f.initial, Role: "ro", ExpiresAt: laterExpiry}}); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := f.root.RetryApprovalV3(ctx, "manager-d-enroll"); err != nil {
+	if _, err := f.root.RetryApprovalV5(ctx, "manager-d-enroll"); err != nil {
 		t.Fatal(err)
 	}
 	f.loseEnvironment.Store(true)

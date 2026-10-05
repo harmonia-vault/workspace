@@ -19,6 +19,7 @@ import (
 	"reflect"
 	"runtime"
 	"strconv"
+	"strings"
 	"syscall"
 	"testing"
 	"time"
@@ -43,9 +44,10 @@ type fixture struct {
 		SigningPublicKey   string `json:"signingPublicKey"`
 		ReceivingPublicKey string `json:"receivingPublicKey"`
 	} `json:"devices"`
-	Grants             []syncclient.SignedGrant `json:"grants"`
-	TrustRoot          cryptox.TrustRoot        `json:"trustRoot"`
-	RecoveryGeneration string                   `json:"recoveryGeneration"`
+	Grants             []syncclient.SignedGrant                `json:"grants"`
+	DAGEnrollments     map[string]cryptox.EnrollmentApprovalV5 `json:"dagEnrollments"`
+	TrustRoot          cryptox.TrustRoot                       `json:"trustRoot"`
+	RecoveryGeneration string                                  `json:"recoveryGeneration"`
 }
 
 func startFixture(t *testing.T, arguments ...string) fixture {
@@ -115,6 +117,12 @@ func callJSON(t *testing.T, client *http.Client, endpoint, path, token, device, 
 	request, err := http.NewRequest(method, endpoint+path, reader)
 	if err != nil {
 		t.Fatal(err)
+	}
+	request.Header.Set("Harmonia-Protocol-Major", "2")
+	if strings.HasSuffix(request.URL.Path, "/pull") {
+		q := request.URL.Query()
+		q.Set("capability", cryptox.RecoveryDAGCapability)
+		request.URL.RawQuery = q.Encode()
 	}
 	if body != nil {
 		request.Header.Set("Content-Type", "application/json")
@@ -264,8 +272,8 @@ func TestGoHTTPSNodeSQLiteVerifiedFlow(t *testing.T) {
 		t.Fatalf("Go 管理签 + HPKE 授权 HTTP %d", got)
 	}
 
-	receivingPrivate := bytes.Repeat([]byte{8}, 32)
-	verifier, err := syncclient.NewPinnedVerifier(syncclient.PinnedTrust{AccountID: f.AccountID, AccountGeneration: 1, DeviceID: "writer", DeviceSigningPublicKey: keyFor(t, f, "writer").Public().(ed25519.PublicKey), ReceivingPrivateKey: receivingPrivate, Managers: map[string]ed25519.PublicKey{"admin": keyFor(t, f, "admin").Public().(ed25519.PublicKey)}})
+	receivingPrivate := bytes.Repeat([]byte{9}, 32)
+	verifier, err := syncclient.NewPinnedVerifierV5(syncclient.IssuerDAGPinnedTrust{AccountID: f.AccountID, AccountGeneration: 1, DeviceID: "writer", DeviceSigningPublicKey: keyFor(t, f, "writer").Public().(ed25519.PublicKey), ReceivingPrivateKey: receivingPrivate, Receipt: syncclient.EnrollmentReceiptV5{IdempotencyKey: "fixture-writer", Approval: f.DAGEnrollments["writer"]}})
 	if err != nil {
 		t.Fatal(err)
 	}
@@ -293,8 +301,7 @@ func TestGoHTTPSNodeSQLiteVerifiedFlow(t *testing.T) {
 		duplicate.Close()
 		t.Fatal("第二个进程状态拥有者未被拒绝")
 	}
-	// 此旧流程明确使用测试夹具的固定设备和已知管理签名；它只测试下发，
-	// 不计为入网成功。enrollment_test.go 另验真实首次初始化与 SPAKE2 入网。
+	// 已完成 DAG 证书作为合成夹具；真实 SPAKE2 另由手机授权集成测试验证。
 	receivingPublic, err := cryptox.DecodeBase64(f.Devices["writer"].ReceivingPublicKey, 32, 32)
 	if err != nil {
 		t.Fatal(err)
@@ -303,8 +310,8 @@ func TestGoHTTPSNodeSQLiteVerifiedFlow(t *testing.T) {
 	if err = store.Vault().SaveDeviceKeys(fixtureKeys); err != nil {
 		t.Fatal(err)
 	}
-	fixtureProof, _ := json.Marshal(map[string]any{"syntheticFixture": true, "grant": wireGrant(t, writerGrant, keyFor(t, f, "admin"))})
-	if err = store.Vault().SaveTrustContext(localkeys.TrustContext{Endpoint: proxy.URL, AccountID: f.AccountID, AccountGeneration: 1, DeviceID: "writer", SigningPublic: fixtureKeys.SigningPublic, ReceivingPublic: receivingPublic, Managers: map[string][]byte{"admin": keyFor(t, f, "admin").Public().(ed25519.PublicKey)}, PairingProfile: localkeys.EnrollmentPairingProfile, EnrollmentCertificate: fixtureProof, EnrollmentKey: "synthetic-fixture-pins", Accepted: true}); err != nil {
+	fixtureProof, _ := json.Marshal(syncclient.EnrollmentReceiptV5{IdempotencyKey: "fixture-writer", Approval: f.DAGEnrollments["writer"]})
+	if err = store.Vault().SaveTrustContext(localkeys.TrustContext{Endpoint: proxy.URL, AccountID: f.AccountID, AccountGeneration: 1, DeviceID: "writer", SigningPublic: fixtureKeys.SigningPublic, ReceivingPublic: receivingPublic, CertificateVersion: "5", PairingProfile: localkeys.EnrollmentPairingProfile, EnrollmentCertificate: fixtureProof, EnrollmentKey: "fixture-writer", Accepted: true}); err != nil {
 		t.Fatal(err)
 	}
 	engine, err := localstate.New(store)

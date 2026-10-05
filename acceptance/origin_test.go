@@ -63,7 +63,7 @@ type originActor struct {
 	session   syncclient.DeviceSession
 	store     *localkeys.StateStore
 	directory string
-	receipt   syncclient.EnrollmentReceiptV3
+	receipt   syncclient.EnrollmentReceiptV5
 }
 type originFixture struct {
 	boots                                atomic.Int64
@@ -86,6 +86,7 @@ func (f *originFixture) raw(actor *originActor, path string, body, out any) int 
 		reader = bytes.NewReader(environmentValue(json.Marshal(body)))
 	}
 	req := environmentValue(http.NewRequestWithContext(context.Background(), method, f.proxy.URL+f.base()+path, reader))
+	req.Header.Set("Harmonia-Protocol-Major", "2")
 	req.Header.Set("Authorization", "Bearer "+actor.session.Token)
 	req.Header.Set("X-Harmonia-Device-Id", actor.keys.DeviceID)
 	req.Header.Set("X-Harmonia-Account-Generation", f.generation)
@@ -96,7 +97,7 @@ func (f *originFixture) raw(actor *originActor, path string, body, out any) int 
 	originMust(f.t, e)
 	defer response.Body.Close()
 	if out != nil {
-		originMust(f.t, json.NewDecoder(io.LimitReader(response.Body, cryptox.MaxIssuerProofV2Bytes+4096)).Decode(out))
+		originMust(f.t, json.NewDecoder(io.LimitReader(response.Body, cryptox.MaxRecoveryAuthorityBytes+4096)).Decode(out))
 	}
 	return response.StatusCode
 }
@@ -128,10 +129,10 @@ func (f *originFixture) pull(a *originActor) syncclient.Pull {
 	return p
 }
 func (f *originFixture) grant(a *originActor, env string) cryptox.SignedGrantWire {
-	p := environmentValue(a.client.CurrentIssuerEvidence())
-	for _, target := range p.Targets {
+	p := environmentValue(a.client.CurrentIssuerDAGEvidence())
+	for _, target := range p.Source.View.Targets {
 		if target.EnvironmentID == env {
-			for _, node := range p.Authorities {
+			for _, node := range p.Source.View.Authorities {
 				h := environmentValue(cryptox.IssuerAuthorityHash(node.Grant))
 				if h == target.AuthorityHash {
 					return node.Grant
@@ -199,7 +200,7 @@ func (f *originFixture) enroll(manager *originActor, id, env, role, expiry strin
 	originMust(t, store.Vault().SaveSession(localkeys.LoginSession{Endpoint: f.proxy.URL, AccountID: f.account, AccountGeneration: 1, Token: login.Token, ExpiresAt: time.Unix(login.ExpiresAt, 0).Format(time.RFC3339Nano)}))
 	a.engine = environmentValue(localstate.New(store))
 	config := syncclient.EnrollmentConfig{Endpoint: f.proxy.URL, HTTPClient: f.proxy.Client(), AccountID: f.account, AccountGeneration: 1, DeviceID: id, LoginToken: login.Token, SigningKey: key, ReceivingPrivateKey: keys.ReceivingPrivate, Engine: a.engine}
-	enrollment := environmentValue(syncclient.NewEnrollmentV3(config))
+	enrollment := environmentValue(syncclient.NewEnrollmentV5(config))
 	defer enrollment.Close()
 	short := environmentValue(pairing.GenerateShortCode())
 	defer clear(short)
@@ -210,12 +211,12 @@ func (f *originFixture) enroll(manager *originActor, id, env, role, expiry strin
 	pake, message, e := pairing.NewApprover(status.Context, short)
 	originMust(t, e)
 	defer pake.Close()
-	relay := func(kind string, payload []byte) syncclient.PairingStatusV3 {
+	relay := func(kind string, payload []byte) syncclient.PairingStatusV5 {
 		t.Helper()
 		c := status.Context
 		p := cryptox.PairingRelay{AccountID: f.account, AccountGeneration: f.generation, SessionID: c.SessionID, ChallengeNonce: c.ChallengeNonce, Side: "approver", Kind: kind, Payload: cryptox.EncodeBase64(payload)}
-		var out syncclient.PairingStatusV3
-		if got := f.raw(manager, "/pairings-v3/origin-enroll-"+id+"/relay", cryptox.PairingRelayRequest{Side: p.Side, Kind: kind, Payload: p.Payload, Signature: environmentValue(cryptox.SignPairingRelay(p, manager.key))}, &out); got != 200 {
+		var out syncclient.PairingStatusV5
+		if got := f.raw(manager, "/pairings-v5/origin-enroll-"+id+"/relay", cryptox.PairingRelayRequest{Side: p.Side, Kind: kind, Payload: p.Payload, Signature: environmentValue(cryptox.SignPairingRelay(p, manager.key))}, &out); got != 200 {
 			t.Fatal("PAKE relay status", got)
 		}
 		return out
@@ -240,14 +241,18 @@ func (f *originFixture) enroll(manager *originActor, id, env, role, expiry strin
 	g.ExpiresAt = expiry
 	g.IdempotencyKey = "origin-grant-" + id
 	g.Envelope = cryptox.EncodeBase64(environmentValue(cryptox.WrapEnvironmentKey(k, cryptox.EnvelopeContext{AccountID: f.account, AccountGeneration: f.generation, EnvironmentID: env, KeyVersion: g.KeyVersion, RecipientType: "device", RecipientID: id, RecipientGeneration: "1", RecipientPublicKey: g.SubjectReceivingPublicKey})))
-	proof, pin, initial, e := manager.client.PrepareEnrollmentProofV3([]string{env})
+	proof, pin, e := manager.client.PrepareEnrollmentProofV5([]string{env})
 	originMust(t, e)
-	approval := environmentValue(cryptox.SignEnrollmentApprovalV3(cryptox.EnrollmentApprovalV3{CertificateVersion: "3", Context: status.Context.EnrollmentContext(), PairingProfile: pairing.Profile, TranscriptHash: transcript, Grants: []cryptox.SignedGrantWire{cryptox.GrantToWire(environmentValue(cryptox.SignGrant(g, manager.key)))}, IssuerProof: proof}, pin, cryptox.ConfirmedEnrollmentAnchor{Context: status.Context.EnrollmentContext(), TranscriptHash: transcript}, manager.key, time.Now(), initial...))
+	_, e = cryptox.VerifyIssuerRecoveryDAG(pin, proof)
+	originMust(t, e)
+	approval := cryptox.EnrollmentApprovalV5{CertificateVersion: "5", Capabilities: []string{cryptox.RecoveryDAGCapability}, Context: status.Context.EnrollmentContext(), PairingProfile: pairing.Profile, TranscriptHash: transcript, Grants: []cryptox.SignedGrantWire{cryptox.GrantToWire(environmentValue(cryptox.SignGrant(g, manager.key)))}, IssuerProof: proof}
+	approval.ApproverSignature = environmentValue(cryptox.SignEnrollmentCertificateV5(environmentValue(approval.Certificate()), manager.key))
+
 	var approvalResponse struct {
-		syncclient.PairingStatusV3
+		syncclient.PairingStatusV5
 		Error string `json:"error"`
 	}
-	if got := f.raw(manager, "/pairings-v3/origin-enroll-"+id+"/approve", map[string]any{"certificateVersion": "3", "capabilities": []string{cryptox.EnvironmentOriginCapability}, "grants": approval.Grants, "transcriptHash": transcript, "issuerProof": approval.IssuerProof, "signature": approval.ApproverSignature}, &approvalResponse); got != 200 {
+	if got := f.raw(manager, "/pairings-v5/origin-enroll-"+id+"/approve", map[string]any{"certificateVersion": "5", "capabilities": []string{cryptox.RecoveryDAGCapability}, "grants": approval.Grants, "transcriptHash": transcript, "issuerProof": approval.IssuerProof, "signature": approval.ApproverSignature}, &approvalResponse); got != 200 {
 		safe := map[string]bool{"fields_invalid": true, "issuer_origin_capability_required": true, "issuer_evidence_invalid": true, "issuer_origin_invalid": true, "issuer_proof_invalid": true, "signature_invalid": true, "json_invalid": true, "array_invalid": true}
 		classification := "unclassified"
 		if safe[approvalResponse.Error] {
@@ -255,12 +260,12 @@ func (f *originFixture) enroll(manager *originActor, id, env, role, expiry strin
 		}
 		t.Fatal("cert3 approval status", got, classification)
 	}
-	status = approvalResponse.PairingStatusV3
+	status = approvalResponse.PairingStatusV5
 	_, e = enrollment.Advance(ctx)
 	originMust(t, e)
 	a.receipt = environmentValue(enrollment.Receipt())
 	receiptBytes := environmentValue(json.Marshal(a.receipt))
-	trust := localkeys.TrustContext{Endpoint: f.proxy.URL, AccountID: f.account, AccountGeneration: 1, DeviceID: id, SigningPublic: keys.SigningPublic, ReceivingPublic: keys.ReceivingPublic, CertificateVersion: "3", PairingProfile: pairing.Profile, EnrollmentCertificate: receiptBytes, EnrollmentKey: a.receipt.IdempotencyKey, Accepted: false}
+	trust := localkeys.TrustContext{Endpoint: f.proxy.URL, AccountID: f.account, AccountGeneration: 1, DeviceID: id, SigningPublic: keys.SigningPublic, ReceivingPublic: keys.ReceivingPublic, CertificateVersion: "5", PairingProfile: pairing.Profile, EnrollmentCertificate: receiptBytes, EnrollmentKey: a.receipt.IdempotencyKey, Accepted: false}
 	originMust(t, store.Vault().SaveTrustContext(trust))
 	sealed := environmentValue(os.ReadFile(filepath.Join(directory, "trust.v1.enc")))
 	if bytes.Contains(sealed, receiptBytes) || bytes.Contains(sealed, short) || bytes.Contains(sealed, []byte(login.Token)) {
@@ -269,7 +274,7 @@ func (f *originFixture) enroll(manager *originActor, id, env, role, expiry strin
 	if a.engine.State().Cloud.AccountID != "" {
 		t.Fatal("approval updated authoritative cache before pull")
 	}
-	var result syncclient.EnrollmentResultV3
+	var result syncclient.EnrollmentResultV5
 	if lose {
 		before := f.enrollmentPosts.Load()
 		f.loseEnrollment.Store(true)
@@ -285,12 +290,12 @@ func (f *originFixture) enroll(manager *originActor, id, env, role, expiry strin
 		if saved.Accepted {
 			t.Fatal("uncertain acknowledgment prematurely accepted")
 		}
-		r := environmentValue(syncclient.DecodeEnrollmentReceiptV3(saved.EnrollmentCertificate))
+		r := environmentValue(syncclient.DecodeEnrollmentReceiptV5(saved.EnrollmentCertificate))
 		if !reflect.DeepEqual(r, a.receipt) {
 			t.Fatal("sealed original enrollment receipt changed")
 		}
 		config.Engine = a.engine
-		resumed := environmentValue(syncclient.ResumeEnrollmentV3(config, r))
+		resumed := environmentValue(syncclient.ResumeEnrollmentV5(config, r))
 		result = environmentValue(resumed.Complete(ctx))
 		resumed.Close()
 		if f.enrollmentPosts.Load() != before+1 {
@@ -330,28 +335,28 @@ func (f *originFixture) create(manager *originActor, authorityEnv, newEnv, label
 	recovery := environmentValue(cryptox.WrapEnvironmentKey(key, cryptox.EnvelopeContext{AccountID: f.account, AccountGeneration: f.generation, EnvironmentID: newEnv, KeyVersion: "1", RecipientType: "recovery", RecipientID: f.account, RecipientGeneration: f.root.RecoveryGeneration, RecipientPublicKey: f.root.RecoveryReceivingPublicKey}))
 	encryptedLabel := environmentValue(cryptox.EncryptEnvironmentLabel(key, cryptox.EnvironmentLabelContext{AccountID: f.account, AccountGeneration: f.generation, EnvironmentID: newEnv, KeyVersion: "1"}, []byte(label)))
 	change := cryptox.EnvironmentChange{AccountID: f.account, AccountGeneration: f.generation, DeviceID: manager.keys.DeviceID, EnvironmentID: newEnv, Operation: "create", AuthorityEnvironmentID: authorityEnv, AuthorityKeyVersion: parent.KeyVersion, AuthorityGrantGeneration: parent.GrantGeneration, PreviousKeyVersion: "0", KeyVersion: "1", ExpectedSequence: strconv.FormatUint(control.Sequence, 10), IdempotencyKey: id, LabelPayload: cryptox.EncodeBase64(encryptedLabel), RecoveryGeneration: f.root.RecoveryGeneration, RecoveryEnvelope: cryptox.EncodeBase64(recovery), Grants: []cryptox.SignedGrantWire{cryptox.GrantToWire(environmentValue(cryptox.SignGrant(g, manager.key)))}}
-	packet := environmentValue(manager.client.PrepareEnvironmentChangeV2(ctx, environmentValue(cryptox.SignEnvironmentChange(change, manager.key)), manager.key))
+	packet := environmentValue(manager.client.PrepareEnvironmentChangeV4(ctx, environmentValue(cryptox.SignEnvironmentChange(change, manager.key)), manager.key))
 	if lose {
 		before := f.environmentPosts.Load()
 		old := manager.engine.State().Cloud.Sequence
 		f.loseEnvironment.Store(true)
-		if _, e := manager.client.SubmitEnvironmentChangeV2(ctx, packet); e == nil {
+		if _, e := manager.client.SubmitEnvironmentChangeV4(ctx, packet); e == nil {
 			t.Fatal("lost accepted environment response reported success")
 		}
 		if manager.engine.State().Cloud.Sequence != old {
 			t.Fatal("unknown environment submit optimistically changed local cache")
 		}
-		status := environmentValue(manager.client.EnvironmentStatusV2(ctx, id))
+		status := environmentValue(manager.client.EnvironmentStatusV4(ctx, id))
 		hash := environmentValue(cryptox.EnvironmentSubmissionHash(packet))
 		if status.State != "complete" || status.ContentHash != hash {
 			t.Fatal("accepted operation status not bound to original packet")
 		}
-		result := environmentValue(manager.client.ConfirmEnvironmentChangeV2(ctx, packet, syncclient.Acceptance{Sequence: status.Sequence, Replayed: true}))
+		result := environmentValue(manager.client.ConfirmEnvironmentChangeV4(ctx, packet, syncclient.Acceptance{Sequence: status.Sequence, Replayed: true}))
 		if !result.Applied || f.environmentPosts.Load() != before+1 {
 			t.Fatal("status retry made a new environment write")
 		}
 	} else {
-		if !environmentValue(manager.client.SubmitEnvironmentChangeV2(ctx, packet)).Applied {
+		if !environmentValue(manager.client.SubmitEnvironmentChangeV4(ctx, packet)).Applied {
 			t.Fatal("new environment did not follow verified pull")
 		}
 	}
@@ -391,17 +396,17 @@ func (f *originFixture) rotate(manager *originActor, env, label, id string) cryp
 		m := environmentValue(cryptox.SignMutation(cryptox.Mutation{AccountID: f.account, AccountGeneration: f.generation, DeviceID: manager.keys.DeviceID, EnvironmentID: env, KeyVersion: nextKV, GrantGeneration: nextGG, Operation: "put", IdempotencyKey: id + "-" + name, Name: name, Payload: cryptox.EncodeBase64(cipher)}, manager.key))
 		change.Mutations = append(change.Mutations, cryptox.MutationToWire(m))
 	}
-	packet := environmentValue(manager.client.PrepareEnvironmentChangeV2(ctx, environmentValue(cryptox.SignEnvironmentChange(change, manager.key)), manager.key))
-	result, submitErr := manager.client.SubmitEnvironmentChangeV2(ctx, packet)
+	packet := environmentValue(manager.client.PrepareEnvironmentChangeV4(ctx, environmentValue(cryptox.SignEnvironmentChange(change, manager.key)), manager.key))
+	result, submitErr := manager.client.SubmitEnvironmentChangeV4(ctx, packet)
 	if submitErr != nil {
 		var raw syncclient.Pull
-		got := f.raw(manager, "/pull?after=0&capability="+cryptox.EnvironmentOriginCapability, nil, &raw)
+		got := f.raw(manager, "/pull?after=0&capability="+cryptox.RecoveryDAGCapability, nil, &raw)
 		candidateOK := false
 		canonicalOK := false
-		if raw.IssuerEvidence != nil {
-			_, canonicalErr := raw.IssuerEvidence.CanonicalBytes()
+		if raw.IssuerDAGEvidence != nil {
+			_, canonicalErr := raw.IssuerDAGEvidence.CanonicalBytes()
 			canonicalOK = canonicalErr == nil
-			_, proofErr := cryptox.VerifyIssuerEvidenceV2(cryptox.PinnedIssuerRoot{AccountID: f.account, AccountGeneration: f.generation, DeviceID: f.root.RootDeviceID, SigningPublicKey: f.root.RootSigningPublicKey, ReceivingPublicKey: f.root.RootReceivingPublicKey}, *raw.IssuerEvidence, f.initial...)
+			_, proofErr := cryptox.VerifyIssuerRecoveryDAG(cryptox.PinnedIssuerRoot{AccountID: f.account, AccountGeneration: f.generation, DeviceID: f.root.RootDeviceID, SigningPublicKey: f.root.RootSigningPublicKey, ReceivingPublicKey: f.root.RootReceivingPublicKey}, *raw.IssuerDAGEvidence)
 			candidateOK = proofErr == nil
 		}
 		t.Fatalf("rotation accepted/pull failed; HTTP=%d candidateCanonical=%t candidateProof=%t failure=%v", got, canonicalOK, candidateOK, submitErr)
@@ -427,8 +432,8 @@ func (f *originFixture) restart(a *originActor) {
 	if !trust.Accepted || !bytes.Equal(trust.EnrollmentCertificate, original) {
 		t.Fatal("dynamic ledger replaced original certificate receipt")
 	}
-	receipt := environmentValue(syncclient.DecodeEnrollmentReceiptV3(trust.EnrollmentCertificate))
-	a.verifier = environmentValue(syncclient.NewPinnedVerifierV3(syncclient.IssuerOriginPinnedTrust{AccountID: f.account, AccountGeneration: 1, DeviceID: a.keys.DeviceID, DeviceSigningPublicKey: a.keys.SigningPublic, ReceivingPrivateKey: a.keys.ReceivingPrivate, Receipt: receipt}))
+	receipt := environmentValue(syncclient.DecodeEnrollmentReceiptV5(trust.EnrollmentCertificate))
+	a.verifier = environmentValue(syncclient.NewPinnedVerifierV5(syncclient.IssuerDAGPinnedTrust{AccountID: f.account, AccountGeneration: 1, DeviceID: a.keys.DeviceID, DeviceSigningPublicKey: a.keys.SigningPublic, ReceivingPrivateKey: a.keys.ReceivingPrivate, Receipt: receipt}))
 	originMust(t, a.verifier.ValidateStoredIssuerEvidence(a.engine.State().Cloud))
 	missingLedger := originClone(a.engine.State().Cloud)
 	missingLedger.IssuerEvidence = nil
@@ -464,11 +469,11 @@ func TestNativeSPAKE2EnvironmentOriginsV3PrivacyRotationAndSealedResume(t *testi
 			if strings.HasSuffix(path, "/boot-sessions") {
 				f.boots.Add(1)
 			}
-			if strings.Contains(path, "/pairings-v3/") && strings.HasSuffix(path, "/complete") {
+			if strings.Contains(path, "/pairings-v5/") && strings.HasSuffix(path, "/complete") {
 				f.enrollmentPosts.Add(1)
 				lose = f.loseEnrollment.Swap(false)
 			}
-			if strings.HasSuffix(path, "/environment-changes-v2") {
+			if strings.HasSuffix(path, "/environment-changes-v4") {
 				f.environmentPosts.Add(1)
 				lose = f.loseEnvironment.Swap(false)
 			}
@@ -503,17 +508,17 @@ func TestNativeSPAKE2EnvironmentOriginsV3PrivacyRotationAndSealedResume(t *testi
 	if got := callJSON(t, f.proxy.Client(), f.proxy.URL, "/test/emails", "", "", "", nil, &mail); got != 200 {
 		t.Fatal(got)
 	}
-	var proof mobileworkflow.EmailProof
+	var proof mobileworkflow.EmailVerification
 	for _, message := range mail {
 		if message.To == f.email {
 			for _, line := range strings.Split(message.Text, "\n") {
-				if strings.HasPrefix(line, "{") {
-					originMust(t, json.Unmarshal([]byte(line), &proof))
+				if code, ok := strings.CutPrefix(line, "验证码："); ok && len(code) == 8 {
+					proof = mobileworkflow.EmailVerification{AccountID: registered.AccountID, AccountGeneration: registered.AccountGeneration, Code: code}
 				}
 			}
 		}
 	}
-	if proof.AccountID != f.account || proof.Token == "" {
+	if proof.AccountID != f.account || proof.Code == "" {
 		t.Fatal("real registration verification proof missing")
 	}
 	originMust(t, workflow.VerifyEmail(ctx, proof))
@@ -528,11 +533,12 @@ func TestNativeSPAKE2EnvironmentOriginsV3PrivacyRotationAndSealedResume(t *testi
 	_, e := workflow.SetVariable(ctx, x, "X_PRIVATE_NAME_ORIGIN_TEST", "synthetic-origin-X-value", "origin-X-put")
 	originMust(t, e)
 	var native struct {
-		AccountID          string                    `json:"accountId"`
-		AccountGeneration  string                    `json:"accountGeneration"`
-		DeviceID           string                    `json:"deviceId"`
-		Root               *cryptox.TrustRoot        `json:"root"`
-		InitialAuthorities []cryptox.SignedGrantWire `json:"initialAuthorities"`
+		Initialization     cryptox.OriginalInitialization `json:"initialization"`
+		AccountID          string                         `json:"accountId"`
+		AccountGeneration  string                         `json:"accountGeneration"`
+		DeviceID           string                         `json:"deviceId"`
+		Root               *cryptox.TrustRoot             `json:"root"`
+		InitialAuthorities []cryptox.SignedGrantWire      `json:"initialAuthorities"`
 	}
 	exported := environmentValue(workflow.ExportProtectedState())
 	originMust(t, json.Unmarshal(exported, &native))
@@ -544,7 +550,7 @@ func TestNativeSPAKE2EnvironmentOriginsV3PrivacyRotationAndSealedResume(t *testi
 	f.initial = native.InitialAuthorities
 	rootKeys.DeviceID = native.DeviceID
 	a := &originActor{keys: rootKeys, key: rootKey, engine: environmentValue(localstate.New(&originMemoryStore{state: localstate.EmptyState()}))}
-	a.verifier = environmentValue(syncclient.NewRootPinnedVerifierWithOrigins(syncclient.OriginRootPinnedTrust{Trust: syncclient.PinnedTrust{AccountID: f.account, AccountGeneration: 1, DeviceID: a.keys.DeviceID, DeviceSigningPublicKey: a.keys.SigningPublic, ReceivingPrivateKey: a.keys.ReceivingPrivate}, Root: f.root, InitialAuthorities: f.initial}))
+	a.verifier = environmentValue(syncclient.NewRootDAGPinnedVerifier(syncclient.PinnedTrust{AccountID: f.account, AccountGeneration: 1, DeviceID: a.keys.DeviceID, DeviceSigningPublicKey: a.keys.SigningPublic, ReceivingPrivateKey: a.keys.ReceivingPrivate}, native.Initialization))
 	defer a.verifier.Close()
 	f.boot(a)
 	rootPull := f.pull(a)
@@ -581,7 +587,7 @@ func TestNativeSPAKE2EnvironmentOriginsV3PrivacyRotationAndSealedResume(t *testi
 		t.Fatal("C did not read only selected Y")
 	}
 	var cPull syncclient.Pull
-	if got := f.raw(c, "/pull?after=0&capability="+cryptox.EnvironmentOriginCapability, nil, &cPull); got != 200 {
+	if got := f.raw(c, "/pull?after=0&capability="+cryptox.RecoveryDAGCapability, nil, &cPull); got != 200 {
 		t.Fatal("C actual pull status", got)
 	}
 	candidate := environmentValue(json.Marshal(cPull))
@@ -591,19 +597,19 @@ func TestNativeSPAKE2EnvironmentOriginsV3PrivacyRotationAndSealedResume(t *testi
 			t.Fatal("C Y-only proof/pull leaked unrelated X data")
 		}
 	}
-	if cPull.IssuerEvidence == nil || len(cPull.IssuerEvidence.Origins) != 1 {
+	if cPull.IssuerDAGEvidence == nil || len(cPull.IssuerDAGEvidence.Source.View.Origins) != 1 {
 		t.Fatal("C lacks real Y creation origin")
 	}
 	beforeC := c.engine.State().Cloud
 	oldProfile := originClone(cPull)
-	oldProfile.IssuerEvidence.Profile = "harmonia/issuer-proof/v1"
+	oldProfile.IssuerDAGEvidence.Profile = "harmonia/issuer-proof/v1"
 	if _, err := c.verifier.VerifyPull(ctx, oldProfile, beforeC); err == nil {
 		t.Fatal("old evidence profile accepted")
 	}
 
 	missing := originClone(cPull)
-	missing.IssuerEvidence.Origins = []cryptox.SignedEnvironmentOrigin{}
-	if _, err := missing.IssuerEvidence.CanonicalBytes(); err != nil {
+	missing.IssuerDAGEvidence.Source.View.Origins = []cryptox.SignedEnvironmentOrigin{}
+	if _, err := missing.IssuerDAGEvidence.CanonicalBytes(); err != nil {
 		t.Fatal("missing-origin negative fixture was not structurally canonical", err)
 	}
 	if _, err := c.verifier.VerifyPull(ctx, missing, beforeC); err == nil {
@@ -665,7 +671,7 @@ func TestNativeSPAKE2EnvironmentOriginsV3PrivacyRotationAndSealedResume(t *testi
 	f.restart(c)
 	f.pull(c)
 	var latestC syncclient.Pull
-	if got := f.raw(c, "/pull?after=0&capability="+cryptox.EnvironmentOriginCapability, nil, &latestC); got != 200 {
+	if got := f.raw(c, "/pull?after=0&capability="+cryptox.RecoveryDAGCapability, nil, &latestC); got != 200 {
 		t.Fatal("C rotated issuer proof pull failed", got)
 	}
 	latestBytes := environmentValue(json.Marshal(latestC))
@@ -681,7 +687,7 @@ func TestNativeSPAKE2EnvironmentOriginsV3PrivacyRotationAndSealedResume(t *testi
 	var missingOriginResponse struct {
 		Error string `json:"error"`
 	}
-	if got := f.raw(b, "/environment-changes-v2", cryptox.SignedEnvironmentChange{Change: created.Change, Signature: created.Signature}, &missingOriginResponse); got != 400 {
+	if got := f.raw(b, "/environment-changes-v4", cryptox.SignedEnvironmentChange{Change: created.Change, Signature: created.Signature}, &missingOriginResponse); got != 400 {
 		t.Fatal("v2 endpoint accepted missing origin", got)
 	}
 	if len(c.engine.State().Cloud.Environments) != 1 || c.engine.State().Cloud.Environments[x].ID != "" {
@@ -693,7 +699,7 @@ func TestNativeSPAKE2EnvironmentOriginsV3PrivacyRotationAndSealedResume(t *testi
 	sum := sha256.Sum256([]byte(f.password))
 	oldLogin := environmentValue(syncclient.Login(ctx, syncclient.LoginConfig{Endpoint: f.proxy.URL, HTTPClient: f.proxy.Client(), Email: f.email, Credential: hex.EncodeToString(sum[:])}))
 	var unsupported any
-	if got := callJSON(t, f.proxy.Client(), f.proxy.URL, f.base()+"/pairings-v3", oldLogin.Token, oldKeys.DeviceID, f.generation, map[string]any{"idempotencyKey": "origin-old-profile", "deviceId": oldKeys.DeviceID, "signingPublicKey": cryptox.EncodeBase64(oldKeys.SigningPublic), "receivingPublicKey": cryptox.EncodeBase64(oldKeys.ReceivingPublic), "approverDeviceId": b.keys.DeviceID, "certificateVersion": "2", "capabilities": []string{"issuer-proof-v1"}}, &unsupported); got != 400 {
+	if got := callJSON(t, f.proxy.Client(), f.proxy.URL, f.base()+"/pairings-v5", oldLogin.Token, oldKeys.DeviceID, f.generation, map[string]any{"idempotencyKey": "origin-old-profile", "deviceId": oldKeys.DeviceID, "signingPublicKey": cryptox.EncodeBase64(oldKeys.SigningPublic), "receivingPublicKey": cryptox.EncodeBase64(oldKeys.ReceivingPublic), "approverDeviceId": b.keys.DeviceID, "certificateVersion": "2", "capabilities": []string{"issuer-proof-v1"}}, &unsupported); got != 400 {
 		t.Fatal("old capability accepted by cert3 route", got)
 	}
 	f.formalDaemon(c)

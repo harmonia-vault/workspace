@@ -297,3 +297,33 @@ func TestMobileDAGRecoveredApplyHTTPS(t *testing.T) {
 	w.Close()
 	t.Log("B3B actual HTTPS: persisted JIT scope -> B1/B2/B3a -> Boot/P4 Pull -> final CAS -> cold source -> expiry -> current none/clear; original packet unchanged; failed Pull/CAS remained restricted")
 }
+
+func TestRecoveredDAGMobileApprovesDeviceAfterColdRestartHTTPS(t *testing.T) {
+	b := b3bRotated(t)
+	_, err := b3Seal(t, b, b3Selection(t, b, "admin"), "approval-device-seal")
+	originMust(t, err)
+	_, err = b3Retry(t, b, "approval-device-confirm")
+	originMust(t, err)
+	manager := b.open(t)
+	_, err = manager.ApplyDAGRecoveredDevice(context.Background(), b.registry, b.scope)
+	originMust(t, err)
+	manager.Close()
+	manager = b.open(t)
+	child := newMobileManagerActor(t, b.f)
+	var binding struct {
+		DeviceID string `json:"deviceId"`
+	}
+	originMust(t, json.Unmarshal(b.slot.read(), &binding))
+	view, err := b.f.enrollWithManagerID(t, manager, child, "recovered-dag-approves-child", []mobileworkflow.ApprovalSelection{{EnvironmentID: b.f.initial, Role: "ro", ExpiresAt: strconv.FormatInt(time.Now().Add(5*time.Minute).Unix(), 10)}}, binding.DeviceID)
+	originMust(t, err)
+	if len(view.Environments) != 1 || view.Environments[0].Role != "RO" {
+		t.Fatal("recovered approval did not grant selected access", view)
+	}
+	manager.Close()
+	manager = b.open(t)
+	defer manager.Close()
+	result, err := manager.RetryApprovalV5(context.Background(), "recovered-dag-approves-child")
+	if err != nil || result.State != "complete" {
+		t.Fatal("cold approval did not confirm original", result, err)
+	}
+}

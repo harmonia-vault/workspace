@@ -53,7 +53,7 @@ func TestNativeBridgePendingPairingsHTTPS(t *testing.T) {
 		t.Fatal(e)
 	}
 	rootView := environmentValue(f.root.View())
-	command := environmentValue(json.Marshal(map[string]any{"version": 1, "endpoint": f.proxy.URL, "operation": "enrollDeviceV3", "email": f.email, "password": f.password, "pairingId": "p2-manager-B", "approverDeviceId": rootView.DeviceID}))
+	command := environmentValue(json.Marshal(map[string]any{"version": 1, "endpoint": f.proxy.URL, "operation": "enrollDeviceV5", "email": f.email, "password": f.password, "pairingId": "p2-manager-B", "approverDeviceId": rootView.DeviceID}))
 	type result struct {
 		raw string
 		err error
@@ -70,7 +70,7 @@ func TestNativeBridgePendingPairingsHTTPS(t *testing.T) {
 	case <-ctx.Done():
 		t.Fatal("enrollment begin timeout")
 	}
-	_, e = f.root.ApprovePairingV3(ctx, mobileworkflow.ApprovalInput{PairingID: "p2-manager-B", ShortCode: []byte("68429173"), Selections: []mobileworkflow.ApprovalSelection{{EnvironmentID: f.initial, Role: "admin", ExpiresAt: strconv.FormatInt(time.Now().Unix()+3600, 10)}}})
+	_, e = f.root.ApprovePairingV5(ctx, mobileworkflow.ApprovalInput{PairingID: "p2-manager-B", ShortCode: []byte("68429173"), Selections: []mobileworkflow.ApprovalSelection{{EnvironmentID: f.initial, Role: "admin", ExpiresAt: strconv.FormatInt(time.Now().Unix()+3600, 10)}}})
 	if e != nil {
 		t.Fatal("actual PAKE approval", e)
 	}
@@ -87,7 +87,7 @@ func TestNativeBridgePendingPairingsHTTPS(t *testing.T) {
 		t.Fatal("native enrollment completion timeout")
 	}
 	v.Close()
-	if _, e = f.root.RetryApprovalV3(ctx, "p2-manager-B"); e != nil {
+	if _, e = f.root.RetryApprovalV5(ctx, "p2-manager-B"); e != nil {
 		t.Fatal("manager original approval completion", e)
 	}
 	clear(command)
@@ -111,7 +111,7 @@ func TestNativeBridgePendingPairingsHTTPS(t *testing.T) {
 	digest := sha256.Sum256(sign.Public().(ed25519.PublicKey))
 	cID := hex.EncodeToString(digest[:])
 	engine := environmentValue(localstate.New(&originMemoryStore{state: localstate.EmptyState()}))
-	pending, e := syncclient.NewEnrollmentV3(syncclient.EnrollmentConfig{Endpoint: f.proxy.URL, HTTPClient: f.proxy.Client(), AccountID: login.AccountID, AccountGeneration: 1, DeviceID: cID, LoginToken: login.Token, SigningKey: sign, ReceivingPrivateKey: receiving, Engine: engine})
+	pending, e := syncclient.NewEnrollmentV5(syncclient.EnrollmentConfig{Endpoint: f.proxy.URL, HTTPClient: f.proxy.Client(), AccountID: login.AccountID, AccountGeneration: 1, DeviceID: cID, LoginToken: login.Token, SigningKey: sign, ReceivingPrivateKey: receiving, Engine: engine})
 	if e != nil {
 		t.Fatal(e)
 	}
@@ -128,7 +128,7 @@ func TestNativeBridgePendingPairingsHTTPS(t *testing.T) {
 				boots.Add(1)
 			case strings.HasSuffix(r.Request.URL.Path, "/pull"):
 				pulls.Add(1)
-			case strings.HasSuffix(r.Request.URL.Path, "/pairing-requests-v3"):
+			case strings.HasSuffix(r.Request.URL.Path, "/pairing-requests-v5"):
 				lists.Add(1)
 			}
 		}
@@ -142,7 +142,7 @@ func TestNativeBridgePendingPairingsHTTPS(t *testing.T) {
 			t.Fatal("cold owner", e)
 		}
 		defer owner.Close()
-		raw := environmentValue(json.Marshal(map[string]any{"version": 1, "endpoint": f.proxy.URL, "operation": "pendingPairingRequestsV3"}))
+		raw := environmentValue(json.Marshal(map[string]any{"version": 1, "endpoint": f.proxy.URL, "operation": "pendingPairingRequestsV5"}))
 		return owner.ExecutePendingPairings(string(raw))
 	}
 	raw, e := run()
@@ -163,7 +163,7 @@ func TestNativeBridgePendingPairingsHTTPS(t *testing.T) {
 			Authoritative      bool                               `json:"authoritativeForApproval"`
 		} `json:"data"`
 	}
-	if json.Unmarshal([]byte(raw), &out) != nil || !out.OK || out.Version != 1 || out.Operation != "pendingPairingRequestsV3" || out.Data.AccountID != login.AccountID || out.Data.AccountGeneration != "1" || out.Data.ApproverDeviceID != bID || out.Data.CertificateVersion != "3" || len(out.Data.Capabilities) != 1 || out.Data.Capabilities[0] != cryptox.EnvironmentOriginCapability || out.Data.Authoritative || len(out.Data.Requests) != 1 || out.Data.Requests[0].IdempotencyKey != "p2-request-C" || out.Data.Requests[0].InitiatorDeviceID != cID || out.Data.Requests[0].State != "pending" {
+	if json.Unmarshal([]byte(raw), &out) != nil || !out.OK || out.Version != 1 || out.Operation != "pendingPairingRequestsV5" || out.Data.AccountID != login.AccountID || out.Data.AccountGeneration != "1" || out.Data.ApproverDeviceID != bID || out.Data.CertificateVersion != "5" || len(out.Data.Capabilities) != 1 || out.Data.Capabilities[0] != cryptox.RecoveryDAGCapability || out.Data.Authoritative || len(out.Data.Requests) != 1 || out.Data.Requests[0].IdempotencyKey != "p2-request-C" || out.Data.Requests[0].InitiatorDeviceID != cID || out.Data.Requests[0].State != "pending" {
 		t.Fatal("exact real metadata missing")
 	}
 	for _, name := range []string{"sequence", "platform", "name", "token", "signature", "password"} {
@@ -182,7 +182,7 @@ func TestNativeBridgePendingPairingsHTTPS(t *testing.T) {
 	// 原 endpoint 已写入密文，额外 proxy 只能替换 HTTP transport，不得改变绑定。
 	// 使用原 fixture 的响应钩子阻塞，以保留原生 endpoint 和 CA 精确绑定。
 	f.responseHook.Store(&mobileManagerResponseHook{invoke: func(r *http.Response) error {
-		if strings.HasSuffix(r.Request.URL.Path, "/pairing-requests-v3") {
+		if strings.HasSuffix(r.Request.URL.Path, "/pairing-requests-v5") {
 			close(entered)
 			<-release
 		}
@@ -192,7 +192,7 @@ func TestNativeBridgePendingPairingsHTTPS(t *testing.T) {
 	if e != nil {
 		t.Fatal(e)
 	}
-	pendingRaw := environmentValue(json.Marshal(map[string]any{"version": 1, "endpoint": f.proxy.URL, "operation": "pendingPairingRequestsV3"}))
+	pendingRaw := environmentValue(json.Marshal(map[string]any{"version": 1, "endpoint": f.proxy.URL, "operation": "pendingPairingRequestsV5"}))
 	late := make(chan result, 1)
 	go func() { raw, e := owner.ExecutePendingPairings(string(pendingRaw)); late <- result{raw, e} }()
 	select {

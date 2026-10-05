@@ -268,7 +268,7 @@ func TestMobileDAGOperationResolutionHTTPS(t *testing.T) {
 			t.Fatal("accepted overwritten", e)
 		}
 	})
-	t.Run("auth-only-closed-query-after-legacy-gap", func(t *testing.T) {
+	t.Run("auth-only-closed-query-after-dag-transition", func(t *testing.T) {
 		b, _, _ := resolutionSealedMobile(t)
 		w := b.open(t)
 		info, e := w.RecoveryDAGResolutionInfo()
@@ -280,21 +280,12 @@ func TestMobileDAGOperationResolutionHTTPS(t *testing.T) {
 		if e != nil || closed.LocalState != "closed" {
 			t.Fatal("close before independent legacy rotation", e)
 		}
-		// 独立成熟旧流程产生真实新码/HPKE封套；不是P4客户端fallback。
-		legacy := newMobileManagerActor(t, b.f)
-		if e = legacy.workflow.Login(context.Background(), b.f.email, b.f.password); e != nil {
-			t.Fatal(e)
+		var scopeAccount struct {
+			AccountID string `json:"accountId"`
 		}
-		if _, e = legacy.workflow.BeginRecoveryWithOrigins(context.Background(), b.f.code); e != nil {
-			t.Fatal("legacy full vault", e)
-		}
-		current, e := legacy.workflow.BeginRecoveryRotation(context.Background(), "independent-legacy-after-close")
-		if e != nil {
-			t.Fatal("legacy proposal", e)
-		}
-		if done, e := legacy.workflow.CompleteRecoveryRotation(context.Background(), current); e != nil || done.RecoveryGeneration != "2" {
-			t.Fatal("legacy accepted rotation", e)
-		}
+		originMust(t, json.Unmarshal(b.f.rootActor.load(), &scopeAccount))
+		_, current := recoverDAGActor(t, context.Background(), b.f, scopeAccount.AccountID, b.f.code, "independent-dag-after-close", false)
+
 		var vaultReads atomic.Int32
 		b.f.responseHook.Store(&mobileManagerResponseHook{invoke: func(r *http.Response) error {
 			if strings.HasSuffix(r.Request.URL.Path, "/recovery-vault-v2") {
@@ -309,8 +300,8 @@ func TestMobileDAGOperationResolutionHTTPS(t *testing.T) {
 		w = b.open(t)
 		reopened, e := w.BeginDAGRecoveryAfterClosure(context.Background(), b.registry, b.scope, []byte(current))
 		w.Close()
-		if e == nil || reopened.TrustedDevice || vaultReads.Load() != 1 {
-			t.Fatal("ordinary full recovery accepted legacy gap", e)
+		if e != nil || reopened.TrustedDevice || vaultReads.Load() != 1 {
+			t.Fatal("fresh DAG recovery after closed history failed", e)
 		}
 		b.f.responseHook.Store(nil)
 	})

@@ -81,17 +81,17 @@ func TestNativeManagementLateDirectoryForbiddenIsNotApplied(t *testing.T) {
 			w := environmentValue(mobileworkflow.New(mobileworkflow.Config{Endpoint: tls.URL, HTTPClient: tls.Client(), SigningKey: key, ReceivingPrivateKey: keys.ReceivingPrivate, SaveProtectedState: save}))
 			defer w.Close()
 			email, password := "fault@example.invalid", "synthetic-directory-fault-password"
-			_ = environmentValue(w.Register(ctx, email, password))
+			registered := environmentValue(w.Register(ctx, email, password))
 			var mails []struct{ To, Text string }
 			if callJSON(t, tls.Client(), tls.URL, "/test/emails", "", "", "", nil, &mails) != 200 {
 				t.Fatal("synthetic verification mail unavailable")
 			}
-			var proof mobileworkflow.EmailProof
+			var proof mobileworkflow.EmailVerification
 			for _, mail := range mails {
 				if mail.To == email {
 					for _, line := range strings.Split(mail.Text, "\n") {
-						if strings.HasPrefix(line, "{") {
-							originMust(t, json.Unmarshal([]byte(line), &proof))
+						if code, ok := strings.CutPrefix(line, "验证码："); ok && len(code) == 8 {
+							proof = mobileworkflow.EmailVerification{AccountID: registered.AccountID, AccountGeneration: registered.AccountGeneration, Code: code}
 						}
 					}
 				}
