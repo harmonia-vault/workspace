@@ -12,15 +12,15 @@ description = "公开前检查源码秘密和个人路径"
 run = "python3 scripts/check_source.py"
 
 [tasks.acceptance]
-description = "合成 Go→HTTPS→TypeScript→SQLite→Go 端到端验收"
+description = "开发集成检查：合成 Go→HTTPS→TypeScript→SQLite→Go，不代表用户验收"
 run = "go test -v ./acceptance"
 
 [tasks.acceptance-native]
-description = "固定原生 SPAKE2 首次初始化、配对、boot、加密同步与恢复验收"
+description = "开发集成检查：原生 SPAKE2 初始化、配对、boot、同步与恢复，不代表用户验收"
 run = "go test -tags harmonia_boringssl -v ./acceptance"
 
 [tasks.test-mobile-dag-query-https]
-description = "三个隔离原事务场景的手机 DAG 冷查询 HTTPS/SQLite 验收，不运行 SDK 或配对"
+description = "三个隔离原事务场景的手机 DAG 冷查询 HTTPS/SQLite 开发检查，不运行 SDK 或配对"
 run = "go test -race ./acceptance -run '^TestMobileDAGOriginalQueryHTTPS$' -count=1 -timeout=150s -json"
 
 [tasks.test-mobile-dag-owner-https]
@@ -28,7 +28,7 @@ description = "一个隔离 B1 owner 跨两个 Workflow 的真实 HTTPS 只读�
 run = "go test -race ./acceptance -run '^TestMobileDAGOwnerTwoWorkflowHTTPS$' -count=1 -timeout=90s -json"
 
 [tasks.test-mobile-dag-transition-https]
-description = "三个隔离 B2 受限连续恢复事务的真实 HTTPS/SQLite 验收，不运行 SDK 或设备登记"
+description = "三个隔离 B2 受限连续恢复事务的真实 HTTPS/SQLite 开发检查，不运行 SDK 或设备登记"
 run = "go test -race ./acceptance -run '^TestMobileDAGTransitionHTTPS$' -count=1 -timeout=150s -json"
 
 [tasks.test-mobile-dag-recovered-https]
