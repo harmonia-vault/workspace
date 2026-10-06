@@ -41,7 +41,7 @@ run = "go test -race -p 2 -tags harmonia_boringssl ./acceptance -run '^TestMobil
 
 [tasks.test-email-code-https]
 description = "八位字母数字邮件码到 Go 原生账号重置的真实 HTTPS/SQLite 开发检查"
-run = "go test ./acceptance -run '^TestNativeAccountResetRequestedEmail' -count=1 -timeout=120s"
+run = "go test -tags harmonia_boringssl ./acceptance -run '^TestNativeAccountResetRequestedEmail' -count=1 -timeout=120s"
 
 [tasks.test-account-access-https]
 description = "真实 HTTPS/SQLite 恢复登记激活、恢复后读写及八位字母数字邮件码重置回归"
